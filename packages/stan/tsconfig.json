@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist",
+    "noEmit": true,
+    "checkJs": true
+  },
+  "include": ["src/**/*", "*.mjs"],
+  "exclude": ["node_modules"]
+}
