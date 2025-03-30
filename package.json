@@ -11,8 +11,5 @@
   },
   "devDependencies": {
     "wsrun": "5.2.4"
-  },
-  "@parcel/resolver-default": {
-    "packageExports": true
   }
 }
