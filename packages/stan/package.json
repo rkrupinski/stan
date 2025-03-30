@@ -2,15 +2,10 @@
   "name": "@rkrupinski/stan",
   "description": "Minimalistic state management",
   "version": "1.0.0-rc4",
+  "main": "./dist/index.js",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./react": {
-      "types": "./dist/react.d.ts",
-      "default": "./dist/react.js"
-    }
+    ".": "./dist/index.js",
+    "./react": "./dist/react.js"
   },
   "scripts": {
     "typecheck": "tsc",
