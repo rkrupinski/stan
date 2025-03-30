@@ -23,5 +23,5 @@ export default {
     commonjs(),
     terser(),
   ],
-  external: ['react'],
+  external: ['react', 'react-dom'],
 };
