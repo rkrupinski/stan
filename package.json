@@ -1,7 +1,8 @@
 {
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/stan",
+    "packages/examples/*"
   ],
   "scripts": {
     "typecheck": "wsrun -p @rkrupinski/stan -c typecheck",
