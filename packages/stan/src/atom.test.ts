@@ -63,7 +63,7 @@ describe('atom', () => {
     expect(mockCallback).toHaveBeenCalledWith(100);
   });
 
-  it('should allow initializing atom value', () => {
+  it('should allow initializing atom value from effects', () => {
     const mockOnSet = jest.fn();
     const testAtom = atom(0, {
       effects: [
@@ -78,7 +78,7 @@ describe('atom', () => {
     expect(mockOnSet).not.toHaveBeenCalled();
   });
 
-  it('should only allow synchronous initialization', done => {
+  it('should only allow synchronous initialization from effects', done => {
     let initFn: (value: number) => void;
 
     const testAtom = atom(0, {
@@ -101,7 +101,7 @@ describe('atom', () => {
     });
   });
 
-  it('should respect initialization order', () => {
+  it('should respect effect order when initializing atom value', () => {
     const testAtom = atom(0, {
       effects: [
         ({ init }) => {
@@ -169,6 +169,29 @@ describe('atom', () => {
         done(err);
       }
     });
+  });
+
+  it('should not have effects that trigger themselves', () => {
+    const innerCallback = jest.fn();
+    const outerCallback = jest.fn();
+
+    let setter: SetterOrUpdater<number> | null = null;
+
+    const testAtom = atom(0, {
+      effects: [
+        ({ onSet, set }) => {
+          onSet(innerCallback);
+          setter = set;
+        },
+      ],
+    });
+
+    testAtom.subscribe(outerCallback);
+
+    (setter ?? jest.fn())(42);
+
+    expect(innerCallback).not.toHaveBeenCalled();
+    expect(outerCallback).toHaveBeenCalledWith(42);
   });
 });
 

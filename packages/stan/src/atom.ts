@@ -20,12 +20,16 @@ export const atom = <T>(
   let value: T = initialValue;
 
   const subscribed = new Set<(newValue: T) => void>();
+  const effectSubs = new Set<(newValue: T) => void>();
 
-  const set: SetterOrUpdater<T> = newValue => {
-    value = newValue instanceof Function ? newValue(value) : newValue;
+  const makeSet =
+    (silent = false): SetterOrUpdater<T> =>
+    newValue => {
+      value = newValue instanceof Function ? newValue(value) : newValue;
 
-    subscribed.forEach(cb => cb(value));
-  };
+      subscribed.forEach(cb => cb(value));
+      if (!silent) effectSubs.forEach(cb => cb(value));
+    };
 
   effects?.forEach(effectFn =>
     effectFn({
@@ -34,9 +38,9 @@ export const atom = <T>(
           value = v;
         }
       },
-      set,
+      set: makeSet(true),
       onSet(cb) {
-        subscribed.add(cb);
+        effectSubs.add(cb);
       },
     }),
   );
@@ -47,7 +51,7 @@ export const atom = <T>(
     get() {
       return value;
     },
-    set,
+    set: makeSet(),
     subscribe(cb) {
       subscribed.add(cb);
 
