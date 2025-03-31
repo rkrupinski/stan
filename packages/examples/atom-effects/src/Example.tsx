@@ -12,14 +12,7 @@ const storageEffect: AtomEffect<string> = ({ init, onSet }) => {
 };
 
 const myAtom = atom("", {
-  effects: [
-    storageEffect,
-    ({ onSet }) => {
-      onSet((newValue) => {
-        console.log("new value:", newValue);
-      });
-    },
-  ],
+  effects: [storageEffect],
 });
 
 export function Example() {
