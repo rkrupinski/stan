@@ -1,5 +1,5 @@
 {
-  "name": "atom-effects",
+  "name": "asynchronous-state",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,8 @@
   "dependencies": {
     "@rkrupinski/stan": "1.0.0-rc9",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "yup": "1.6.1"
   },
   "devDependencies": {
     "@types/react": "^19.0.10",
