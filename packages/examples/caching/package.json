@@ -1,5 +1,5 @@
 {
-  "name": "asynchronous-state",
+  "name": "caching",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -11,14 +11,15 @@
   "dependencies": {
     "@rkrupinski/stan": "1.0.0-rc10",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "yup": "1.6.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "sass-embedded": "1.86.2",
     "typescript": "~5.7.2",
+    "use-debounce": "10.0.4",
     "vite": "^6.2.0"
   }
 }
