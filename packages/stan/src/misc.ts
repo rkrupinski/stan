@@ -13,3 +13,21 @@ export type SerializableParam = Json;
 export const REFRESH_TAG = Symbol('__refresh__');
 
 export const dejaVu = <T>(a: T, b: T) => a === b;
+
+const fnTypes = [
+  '[object AsyncFunction]',
+  '[object AsyncGeneratorFunction]',
+  '[object GeneratorFunction]',
+  '[object Function]',
+];
+
+export const isFunction = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  candidate: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): candidate is (...args: any[]) => any =>
+  fnTypes.includes(Object.prototype.toString.call(candidate));
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isPromiseLike = (candidate: any): candidate is PromiseLike<any> =>
+  !!candidate && isFunction(candidate.then);

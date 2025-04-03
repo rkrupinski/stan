@@ -1,5 +1,5 @@
 import type { SetterOrUpdater, WritableState } from './state';
-import { stableStringify, type SerializableParam } from './misc';
+import { isFunction, stableStringify, type SerializableParam } from './misc';
 import { makeCache } from './cache';
 
 export type AtomEffect<T> = (param: {
@@ -25,7 +25,7 @@ export const atom = <T>(
   const makeSet =
     (silent = false): SetterOrUpdater<T> =>
     newValue => {
-      value = newValue instanceof Function ? newValue(value) : newValue;
+      value = isFunction(newValue) ? newValue(value) : newValue;
 
       subscribed.forEach(cb => cb(value));
       if (!silent) effectSubs.forEach(cb => cb(value));
@@ -77,7 +77,7 @@ export const atomFamily = <T, P extends SerializableParam>(
       cache.set(
         key,
         atom(
-          initialValue instanceof Function ? initialValue(param) : initialValue,
+          isFunction(initialValue) ? initialValue(param) : initialValue,
           options,
         ),
       );

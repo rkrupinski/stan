@@ -4,6 +4,7 @@ import {
   type SerializableParam,
   REFRESH_TAG,
   dejaVu,
+  isPromiseLike,
   stableStringify,
 } from './misc';
 
@@ -125,8 +126,8 @@ export const selectorFamily = <T, P extends SerializableParam>(
       state.get = () => {
         const value = origGet();
 
-        if (value instanceof Promise)
-          value.catch(() => {
+        if (isPromiseLike(value))
+          value.then(undefined, () => {
             cache.delete(key);
           });
 
