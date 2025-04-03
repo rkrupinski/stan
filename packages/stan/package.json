@@ -1,6 +1,6 @@
 {
   "name": "@rkrupinski/stan",
-  "description": "Minimalistic state management",
+  "description": "Minimal, type-safe state management",
   "version": "1.0.0-rc9",
   "exports": {
     ".": "./dist/index.js",
