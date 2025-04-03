@@ -118,7 +118,22 @@ export const selectorFamily = <T, P extends SerializableParam>(
     const key = stableStringify(param);
 
     if (!cache.has(key)) {
-      cache.set(key, selector(selectorFamilyFn(param), { areValuesEqual }));
+      const state = selector(selectorFamilyFn(param), { areValuesEqual });
+
+      const origGet = state.get.bind(state);
+
+      state.get = () => {
+        const value = origGet();
+
+        if (value instanceof Promise)
+          value.catch(() => {
+            cache.delete(key);
+          });
+
+        return value;
+      };
+
+      cache.set(key, state);
     }
 
     return cache.get(key) as ReadonlyState<T>;

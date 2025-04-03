@@ -294,4 +294,28 @@ describe('selectorFamily', () => {
     expect(family({ multiplier: 4 })).toBe(selector3);
     expect(family({ multiplier: 2 })).not.toBe(selector1);
   });
+
+  it('should not cache errors', async () => {
+    const family = selectorFamily<Promise<number>, number>(
+      input => async () => {
+        if (input === 3) throw new Error('Nope');
+        return input;
+      },
+      {
+        cachePolicy: { type: 'lru', maxSize: 2 },
+      },
+    );
+
+    family(1);
+    family(2);
+
+    const selector3 = family(3);
+    expect(family(3)).toBe(selector3);
+
+    selector3.get();
+
+    await Promise.resolve();
+
+    expect(family(3)).not.toBe(selector3);
+  });
 });
