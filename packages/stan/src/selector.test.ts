@@ -294,33 +294,4 @@ describe('selectorFamily', () => {
     expect(family({ multiplier: 4 })).toBe(selector3);
     expect(family({ multiplier: 2 })).not.toBe(selector1);
   });
-
-  /*
-  it('should support different cache policies', () => {
-    const family = selectorFamily<number, { multiplier: number }>(
-      ({ multiplier }) =>
-        () =>
-          multiplier * 42,
-      { cachePolicy: { type: 'lru', maxSize: 2 } },
-    );
-
-    const selector1 = family({ multiplier: 2 });
-    const selector2 = family({ multiplier: 3 });
-    const selector3 = family({ multiplier: 4 });
-
-    // First two selectors should be cached
-    expect(selector1.get()).toBe(84);
-    expect(selector2.get()).toBe(126);
-    expect(selector3.get()).toBe(168);
-
-    // Accessing selector1 again should keep it in cache
-    selector1.get();
-    const selector4 = family({ multiplier: 5 });
-    expect(selector4.get()).toBe(210);
-
-    // selector2 should be evicted from cache
-    const selector2Again = family({ multiplier: 3 });
-    expect(selector2Again).not.toBe(selector2);
-  });
-  */
 });
