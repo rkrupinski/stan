@@ -7,7 +7,7 @@ import { Results } from "./Results";
 export function Example() {
   const [value, setValue] = useState("");
   const phrase = value.trim().toLocaleLowerCase();
-  const [debouncedPhrase] = useDebounce(phrase, 1);
+  const [debouncedPhrase] = useDebounce(phrase, 300);
 
   return (
     <div className={styles.container}>
