@@ -121,6 +121,32 @@ describe('selector', () => {
 
     expect(mockSelectorFn).toHaveBeenCalledTimes(2);
   });
+
+  it('should not cache errors', async () => {
+    const mockSelectorFn = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('Nope'))
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(1);
+
+    const sel = selector(mockSelectorFn);
+
+    sel.get();
+
+    expect(mockSelectorFn).toHaveBeenCalledTimes(1);
+
+    await Promise.resolve();
+
+    sel.get();
+
+    expect(mockSelectorFn).toHaveBeenCalledTimes(2);
+
+    await Promise.resolve();
+
+    sel.get();
+
+    expect(mockSelectorFn).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('selectorFamily', () => {
@@ -296,26 +322,33 @@ describe('selectorFamily', () => {
   });
 
   it('should not cache errors', async () => {
-    const family = selectorFamily<Promise<number>, number>(
-      input => async () => {
-        if (input === 3) throw new Error('Nope');
-        return input;
-      },
-      {
-        cachePolicy: { type: 'lru', maxSize: 2 },
-      },
-    );
+    const mockSelectorFn = jest
+      .fn()
+      .mockResolvedValueOnce(1)
+      .mockRejectedValueOnce(new Error('Nope'))
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(2);
 
-    family(1);
-    family(2);
+    const mockSelectorFamilyFn = jest.fn().mockReturnValue(mockSelectorFn);
 
-    const selector3 = family(3);
-    expect(family(3)).toBe(selector3);
+    const family = selectorFamily(mockSelectorFamilyFn);
 
-    selector3.get();
+    family(1).get();
+
+    expect(mockSelectorFn).toHaveBeenCalledTimes(1);
+
+    family(2).get();
+
+    expect(mockSelectorFn).toHaveBeenCalledTimes(2);
 
     await Promise.resolve();
 
-    expect(family(3)).not.toBe(selector3);
+    family(1).get();
+
+    expect(mockSelectorFn).toHaveBeenCalledTimes(2);
+
+    family(2).get();
+
+    expect(mockSelectorFn).toHaveBeenCalledTimes(3);
   });
 });

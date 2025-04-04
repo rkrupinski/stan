@@ -158,7 +158,9 @@ describe('useStanValueAsync', () => {
   });
 
   it('should handle unknown errors', async () => {
-    const testSelector = selector(() => Promise.reject('🚗'));
+    const testSelector = selector(async () => {
+      throw '🚗';
+    });
 
     const { result } = renderHook(() => useStanValueAsync(testSelector));
 

@@ -52,6 +52,11 @@ export const selector = <T>(
 
   const evaluate = () => {
     value = selectorFn({ get });
+
+    if (isPromiseLike(value))
+      value.then(undefined, () => {
+        initialized = false;
+      });
   };
 
   const notifySubscribers = () => {
@@ -119,22 +124,7 @@ export const selectorFamily = <T, P extends SerializableParam>(
     const key = stableStringify(param);
 
     if (!cache.has(key)) {
-      const state = selector(selectorFamilyFn(param), { areValuesEqual });
-
-      const origGet = state.get.bind(state);
-
-      state.get = () => {
-        const value = origGet();
-
-        if (isPromiseLike(value))
-          value.then(undefined, () => {
-            cache.delete(key);
-          });
-
-        return value;
-      };
-
-      cache.set(key, state);
+      cache.set(key, selector(selectorFamilyFn(param), { areValuesEqual }));
     }
 
     return cache.get(key) as ReadonlyState<T>;

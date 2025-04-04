@@ -1,4 +1,4 @@
-import { useSyncExternalStore, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import type { State, ReadonlyState, WritableState } from './state';
 import { refresh } from './utils';
@@ -8,14 +8,27 @@ export type AsyncValue<T> =
   | { type: 'ready'; value: T }
   | { type: 'error'; reason: string };
 
-export const useStan = <T>(state: WritableState<T>) =>
-  [useSyncExternalStore(state.subscribe, state.get), state.set] as const;
+export const useStanValue = <T>(state: State<T>) => {
+  const prevStateRef = useRef(state);
+  const [value, setValue] = useState(state.get());
 
-export const useStanValue = <T>(state: State<T>) =>
-  useSyncExternalStore(state.subscribe, state.get);
+  useEffect(() => {
+    if (state !== prevStateRef.current) {
+      setValue(state.get());
+      prevStateRef.current = state;
+    }
+
+    return state.subscribe(setValue);
+  }, [state]);
+
+  return value;
+};
+
+export const useStan = <T>(state: WritableState<T>) =>
+  [useStanValue(state), state.set] as const;
 
 export const useStanValueAsync = <T>(state: ReadonlyState<PromiseLike<T>>) => {
-  const rawValue = useSyncExternalStore(state.subscribe, state.get);
+  const value = useStanValue(state);
 
   const [asyncValue, setAsyncValue] = useState<AsyncValue<T>>({
     type: 'loading',
@@ -26,7 +39,7 @@ export const useStanValueAsync = <T>(state: ReadonlyState<PromiseLike<T>>) => {
 
     if (asyncValue.type !== 'loading') setAsyncValue({ type: 'loading' });
 
-    rawValue.then(
+    value.then(
       value => {
         if (active)
           setAsyncValue({
@@ -47,7 +60,7 @@ export const useStanValueAsync = <T>(state: ReadonlyState<PromiseLike<T>>) => {
     return () => {
       active = false;
     };
-  }, [rawValue]);
+  }, [value]);
 
   return asyncValue;
 };
