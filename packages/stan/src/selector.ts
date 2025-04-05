@@ -32,7 +32,7 @@ export const selector = <T>(
   const unsubs = new Set<() => void>();
 
   const get = <V>(state: State<V>) => {
-    let currentValue: V = state.get();
+    let currentValue = state.get();
 
     if (!deps.has(state)) {
       deps.add(state);
