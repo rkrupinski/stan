@@ -10,7 +10,7 @@ Minimal, type-safe state management
 - [Examples](https://github.com/rkrupinski/stan/tree/master/packages/examples)
 
 ```tsx
-import { atom } from '@rkrupinski/stan';
+import { atom, selector } from '@rkrupinski/stan';
 import { useStanValue } from '@rkrupinski/stan/react';
 
 const salary = atom(21);
