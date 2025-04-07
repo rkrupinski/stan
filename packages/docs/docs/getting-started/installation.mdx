@@ -1,0 +1,31 @@
+---
+sidebar_position: 1
+description: Installing Stan via package managers
+---
+
+# Installation
+
+You can install Stan directly from your favorite package manager. Everything is included in the base package - no extras required.
+
+:::tip
+TypeScript types are also included - no need to install them separately.
+:::
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    <CodeBlock language="sh">{`npm install --save @rkrupinski/stan`}</CodeBlock>
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+    <CodeBlock language="sh">{`yarn add @rkrupinski/stan`}</CodeBlock>
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm">
+    <CodeBlock language="sh">{`pnpm add @rkrupinski/stan`}</CodeBlock>
+  </TabItem>
+  <TabItem value="bun" label="Bun">
+    <CodeBlock language="sh">{`bun add @rkrupinski/stan`}</CodeBlock>
+  </TabItem>
+</Tabs>
