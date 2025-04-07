@@ -1,0 +1,9 @@
+{
+  "label": "API",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "slug": "/api",
+    "description": "Learn the core concepts of Stan."
+  }
+}
