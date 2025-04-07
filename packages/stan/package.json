@@ -2,6 +2,7 @@
   "name": "@rkrupinski/stan",
   "description": "Minimal, type-safe state management",
   "version": "1.0.0-rc13",
+  "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
     "./react": "./dist/react.js"
