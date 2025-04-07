@@ -1,7 +1,7 @@
 # Stan
 
 [![CI](https://github.com/rkrupinski/stan/actions/workflows/ci.yml/badge.svg)](https://github.com/rkrupinski/stan/actions/workflows/ci.yml)
-![Bundle size](https://badgen.net/bundlephobia/minzip/@rkrupinski/stan)
+[![Bundle size](https://badgen.net/bundlephobia/minzip/@rkrupinski/stan)](https://bundlephobia.com/package/@rkrupinski/stan)
 
 Minimal, type-safe state management
 
