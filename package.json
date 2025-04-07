@@ -2,6 +2,7 @@
   "private": true,
   "workspaces": [
     "packages/stan",
+    "packages/docs",
     "packages/examples/*"
   ],
   "scripts": {

@@ -1,0 +1,9 @@
+{
+  "label": "Guides",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "slug": "/guides",
+    "description": "Learn how to do things the Stan-idiomatic way."
+  }
+}
