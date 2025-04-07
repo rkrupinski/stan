@@ -16,7 +16,7 @@ const FeatureList: FeatureItem[] = [
     title: 'Type safety, baked in',
     icon: ShieldCheck,
     description:
-      "Write code and refactor with confidence. The compiler's got your back.",
+      'Write code and refactor with confidence. The compiler has got your back.',
   },
   {
     title: 'Tiny footprint, big capabilities',
