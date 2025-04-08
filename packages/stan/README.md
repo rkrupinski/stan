@@ -7,7 +7,7 @@ Minimal, type-safe state management
 
 - [Website](https://rkrupinski.github.io/stan)
 - [API docs](https://rkrupinski.github.io/stan/docs/api)
-- [Examples](https://github.com/rkrupinski/stan/tree/master/packages/examples)
+- [Examples](https://rkrupinski.github.io/stan/docs/getting-started/examples)
 
 ```tsx
 import { atom, selector } from '@rkrupinski/stan';
