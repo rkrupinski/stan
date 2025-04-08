@@ -51,7 +51,15 @@ export const selector = <T>(
     return currentValue;
   };
 
+  const cleanup = () => {
+    unsubs.forEach(unsub => unsub());
+    unsubs.clear();
+    deps.clear();
+  };
+
   const evaluate = () => {
+    cleanup();
+
     value = selectorFn({ get });
 
     if (isPromiseLike(value))
@@ -70,9 +78,6 @@ export const selector = <T>(
 
   const onUnmount = () => {
     mounted = false;
-    unsubs.forEach(unsub => unsub());
-    unsubs.clear();
-    deps.clear();
   };
 
   return {
