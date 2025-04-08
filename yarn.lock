@@ -2559,6 +2559,13 @@
   resolved "https://registry.yarnpkg.com/@rkrupinski/prettierconfig/-/prettierconfig-1.0.1.tgz#6a38a8103445368b727e183c0c6b4ad33d07a34a"
   integrity sha512-qJFjoJijraVFK3sk+6Mls8FqGBOiVMr1x3GQJAZLj7uUW3nPZ6v+i1vValX5NjanQFUdxhORrbzsKpktLM5Xwg==
 
+"@rkrupinski/stan@latest":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@rkrupinski/stan/-/stan-1.0.0.tgz#060aa00df6260ca19e9056886888ed6c4919f0fe"
+  integrity sha512-Zs5BZfurq1fH3Yi9p7PwwdOfToHVTCkdFBP/fdaaGeGKFXFw56Wy7aomhdPABQvpQZl7vjgaJmt0eN0sxIoshw==
+  dependencies:
+    fast-json-stable-stringify "2.1.0"
+
 "@rollup/plugin-commonjs@28.0.3":
   version "28.0.3"
   resolved "https://registry.npmjs.org/@rollup/plugin-commonjs/-/plugin-commonjs-28.0.3.tgz"
