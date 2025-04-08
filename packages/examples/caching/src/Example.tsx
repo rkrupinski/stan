@@ -1,8 +1,9 @@
 import { useState, type ChangeEvent } from "react";
 import { useDebounce } from "use-debounce";
 
-import styles from "./Example.module.scss";
 import { Results } from "./Results";
+
+import styles from "./Example.module.scss";
 
 export function Example() {
   const [value, setValue] = useState("");
