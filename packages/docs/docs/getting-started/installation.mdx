@@ -5,10 +5,10 @@ description: Installing Stan via package managers
 
 # Installation
 
-You can install Stan directly from your favorite package manager. Everything is included in the base package - no extras required.
+You can install Stan directly from your favorite package manager.
 
-:::tip
-TypeScript types are also included - no need to install them separately.
+:::info
+Everything is included in the base package - no extras required (e.g., installing types separately).
 :::
 
 import Tabs from '@theme/Tabs';
@@ -29,3 +29,9 @@ import CodeBlock from '@theme/CodeBlock';
     <CodeBlock language="sh">{`bun add @rkrupinski/stan`}</CodeBlock>
   </TabItem>
 </Tabs>
+
+## Package exports
+
+Some bundlers require additional configuration to handle the [exports field](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#exports) in package.json:
+
+- If you're using [Parcel](https://parceljs.org/), make sure to follow [this guide](https://parceljs.org/features/dependency-resolution/#package-exports).
