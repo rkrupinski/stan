@@ -2559,10 +2559,10 @@
   resolved "https://registry.yarnpkg.com/@rkrupinski/prettierconfig/-/prettierconfig-1.0.1.tgz#6a38a8103445368b727e183c0c6b4ad33d07a34a"
   integrity sha512-qJFjoJijraVFK3sk+6Mls8FqGBOiVMr1x3GQJAZLj7uUW3nPZ6v+i1vValX5NjanQFUdxhORrbzsKpktLM5Xwg==
 
-"@rkrupinski/stan@latest":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@rkrupinski/stan/-/stan-1.0.0.tgz#060aa00df6260ca19e9056886888ed6c4919f0fe"
-  integrity sha512-Zs5BZfurq1fH3Yi9p7PwwdOfToHVTCkdFBP/fdaaGeGKFXFw56Wy7aomhdPABQvpQZl7vjgaJmt0eN0sxIoshw==
+"@rkrupinski/stan@rc":
+  version "1.1.0-rc1"
+  resolved "https://registry.yarnpkg.com/@rkrupinski/stan/-/stan-1.1.0-rc1.tgz#958f992f5247bfc55c5897a0aedd23340ba44049"
+  integrity sha512-QHROCGdXdtsVajU/n5LcnPO8Blzy4cOzZTj6xLVD8dRyymE0Ls/9VzQOy7HCB5jZqq9Xr07MLwnjn0NWdx5fYg==
   dependencies:
     fast-json-stable-stringify "2.1.0"
 

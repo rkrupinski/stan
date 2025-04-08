@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@rkrupinski/stan": "latest",
+    "@rkrupinski/stan": "rc",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "yup": "1.6.1"
