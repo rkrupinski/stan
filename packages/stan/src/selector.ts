@@ -15,12 +15,13 @@ export interface GetFn {
 export type SelectorFn<T> = ({ get }: { get: GetFn }) => T;
 
 export type SelectorOptions = {
+  tag?: string;
   areValuesEqual?: <T>(a: T, b: T) => boolean;
 };
 
 export const selector = <T>(
   selectorFn: SelectorFn<T>,
-  { areValuesEqual = dejaVu }: SelectorOptions = {},
+  { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
 ): ReadonlyState<T> => {
   let initialized = false;
   let mounted = false;
@@ -75,6 +76,7 @@ export const selector = <T>(
   };
 
   return {
+    tag,
     get() {
       if (!initialized) {
         initialized = true;
@@ -114,6 +116,7 @@ export type SelectorFamilyOptions = SelectorOptions & {
 export const selectorFamily = <T, P extends SerializableParam>(
   selectorFamilyFn: SelectorFamilyFn<T, P>,
   {
+    tag,
     areValuesEqual = dejaVu,
     cachePolicy = { type: 'keep-all' },
   }: SelectorFamilyOptions = {},
@@ -124,7 +127,10 @@ export const selectorFamily = <T, P extends SerializableParam>(
     const key = stableStringify(param);
 
     if (!cache.has(key)) {
-      cache.set(key, selector(selectorFamilyFn(param), { areValuesEqual }));
+      cache.set(
+        key,
+        selector(selectorFamilyFn(param), { tag, areValuesEqual }),
+      );
     }
 
     return cache.get(key) as ReadonlyState<T>;

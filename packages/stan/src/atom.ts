@@ -9,12 +9,13 @@ export type AtomEffect<T> = (param: {
 }) => void;
 
 export type AtomOptions<T> = {
+  tag?: string;
   effects?: ReadonlyArray<AtomEffect<T>>;
 };
 
 export const atom = <T>(
   initialValue: T,
-  { effects }: AtomOptions<T> = {},
+  { effects, tag }: AtomOptions<T> = {},
 ): WritableState<T> => {
   let initialized = false;
   let value: T = initialValue;
@@ -48,6 +49,7 @@ export const atom = <T>(
   initialized = true;
 
   return {
+    tag,
     get() {
       return value;
     },

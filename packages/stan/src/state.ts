@@ -5,6 +5,7 @@ export type SetterOrUpdater<T> = (
 ) => void;
 
 export interface State<T> {
+  tag?: string;
   get(): T;
   subscribe(callback: (value: T) => void): () => void;
 }
