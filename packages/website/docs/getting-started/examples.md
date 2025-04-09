@@ -6,7 +6,7 @@ description: Master Stan with code snippets
 # Examples
 
 :::info
-All examples were built using [create-vite](https://github.com/vitejs/vite/tree/main/packages/create-vite). Once you clone the [repository](https://github.com/rkrupinski/stan), simply install the dependencies and run the "dev" script (e.g. `yarn dev`) from the example’s root directory.
+All examples were built using [create-vite](https://github.com/vitejs/vite/tree/main/packages/create-vite). Once you clone the [repository](https://github.com/rkrupinski/stan), simply install the dependencies and run the "dev" script (e.g. `yarn dev`) from the example's root directory.
 :::
 
 The following examples are available:
