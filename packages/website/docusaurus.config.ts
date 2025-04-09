@@ -40,6 +40,13 @@ const config: Config = {
 
   themeConfig: {
     navbar: {
+      hideOnScroll: true,
+      logo: {
+        src: 'img/logo.svg',
+        srcDark: 'img/logoDark.svg',
+        width: 32,
+        height: 32,
+      },
       title: 'Stan',
       items: [
         {
