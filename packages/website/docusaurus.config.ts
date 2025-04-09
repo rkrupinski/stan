@@ -89,7 +89,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Rafał Krupiński`,
+      copyright: `Copyright © ${new Date().getFullYear()} Rafał Krupiński. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
