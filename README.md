@@ -1,3 +1,5 @@
+![](https://github.com/rkrupinski/stan/tree/master/packages/website/static/img/logo.svg)
+
 # Stan
 
 [![CI](https://github.com/rkrupinski/stan/actions/workflows/ci.yml/badge.svg)](https://github.com/rkrupinski/stan/actions/workflows/ci.yml)

@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Stan',
   tagline: 'Minimal, type-safe state management',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo.svg',
 
   url: 'https://rkrupinski.github.io',
   baseUrl: '/stan',
@@ -40,6 +40,13 @@ const config: Config = {
 
   themeConfig: {
     navbar: {
+      hideOnScroll: true,
+      logo: {
+        src: 'img/logo.svg',
+        srcDark: 'img/logoDark.svg',
+        width: 32,
+        height: 32,
+      },
       title: 'Stan',
       items: [
         {
