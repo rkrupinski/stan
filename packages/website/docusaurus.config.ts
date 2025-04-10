@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Stan',
   tagline: 'Minimal, type-safe state management',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo.svg',
 
   url: 'https://rkrupinski.github.io',
   baseUrl: '/stan',
