@@ -1,4 +1,4 @@
-![](../website/static/img/logo.svg)
+![](https://github.com/rkrupinski/stan/tree/master/packages/website/static/img/logo.svg)
 
 # Stan
 
