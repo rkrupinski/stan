@@ -89,6 +89,8 @@ describe('atom', () => {
       ],
     });
 
+    testAtom.get(); // Initialize
+
     setTimeout(() => {
       initFn(42);
 
@@ -129,6 +131,8 @@ describe('atom', () => {
 
     const mockCallback = jest.fn();
 
+    testAtom.get(); // Initialize
+
     testAtom.subscribe(mockCallback);
 
     setTimeout(() => {
@@ -158,6 +162,8 @@ describe('atom', () => {
       ],
     });
 
+    testAtom.get(); // Initialize
+
     setTimeout(() => {
       testAtom.set(42);
 
@@ -171,7 +177,7 @@ describe('atom', () => {
     });
   });
 
-  it('should not have effects that trigger themselves', () => {
+  it('should not have effects trigger themselves', () => {
     const innerCallback = jest.fn();
     const outerCallback = jest.fn();
 
@@ -185,6 +191,8 @@ describe('atom', () => {
         },
       ],
     });
+
+    testAtom.get(); // Initialize
 
     testAtom.subscribe(outerCallback);
 
@@ -254,7 +262,10 @@ describe('atomFamily', () => {
     });
 
     const atom1 = family({ id: 1 });
+    atom1.get(); // Initialize
+
     const atom2 = family({ id: 2 });
+    atom2.get(); // Initialize
 
     atom2.set(prev => prev + 10);
 

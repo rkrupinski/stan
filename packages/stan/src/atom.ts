@@ -32,25 +32,29 @@ export const atom = <T>(
       if (!silent) effectSubs.forEach(cb => cb(value));
     };
 
-  effects?.forEach(effectFn =>
-    effectFn({
-      init(v) {
-        if (!initialized) {
-          value = v;
-        }
-      },
-      set: makeSet(true),
-      onSet(cb) {
-        effectSubs.add(cb);
-      },
-    }),
-  );
-
-  initialized = true;
+  const setupEffects = () => {
+    effects?.forEach(effectFn =>
+      effectFn({
+        init(v) {
+          if (!initialized) {
+            value = v;
+          }
+        },
+        set: makeSet(true),
+        onSet(cb) {
+          effectSubs.add(cb);
+        },
+      }),
+    );
+  };
 
   return {
     tag,
     get() {
+      if (!initialized) {
+        setupEffects();
+        initialized = true;
+      }
       return value;
     },
     set: makeSet(),
