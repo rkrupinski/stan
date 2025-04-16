@@ -1,15 +1,21 @@
-import type { ReadonlyState, State } from './state';
-import { makeCache, type CachePolicy } from './cache';
 import {
-  type SerializableParam,
-  REFRESH_TAG,
   dejaVu,
+  REFRESH_TAG,
+  isFunction,
   isPromiseLike,
   stableStringify,
+  type TypedOmit,
+  type TagFromParam,
+  type SerializableParam,
 } from './misc';
+import type { ReadonlyState, State } from './state';
+import { DEFAULT_STORE, type Scoped } from './store';
+import { memoize, type CachePolicy } from './cache';
+
+let selectorId = 0;
 
 export interface GetFn {
-  <T>(state: State<T>): T;
+  <T>(scopedState: Scoped<State<T>>): T;
 }
 
 export type SelectorFn<T> = ({ get }: { get: GetFn }) => T;
@@ -22,122 +28,122 @@ export type SelectorOptions = {
 export const selector = <T>(
   selectorFn: SelectorFn<T>,
   { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
-): ReadonlyState<T> => {
-  let initialized = false;
-  let mounted = false;
-  let value: T;
+): Scoped<ReadonlyState<T>> => {
+  const key = `selector${tag ? `-${tag}` : ''}-${selectorId++}`;
 
-  const subscribers = new Set<(newValue: T) => void>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deps = new Set<State<any>>();
-  const unsubs = new Set<() => void>();
+  return memoize((store = DEFAULT_STORE) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const deps = new Set<State<any>>();
+    const subs = new Set<() => void>();
 
-  const get = <V>(state: State<V>) => {
-    let currentValue = state.get();
+    const subscribers = new Set<(newValue: T) => void>();
 
-    if (!deps.has(state)) {
-      deps.add(state);
+    const get = <D>(scopedState: Scoped<State<D>>) => {
+      const state = scopedState(store);
+      let curr = state.get();
 
-      const unsubscribe = state.subscribe(newValue => {
-        if (areValuesEqual(currentValue, newValue)) return;
-        currentValue = newValue;
-        evaluate();
-        notifySubscribers();
-      });
+      if (!deps.has(state)) {
+        deps.add(state);
 
-      unsubs.add(unsubscribe);
-    }
-
-    return currentValue;
-  };
-
-  const cleanup = () => {
-    unsubs.forEach(unsub => unsub());
-    unsubs.clear();
-    deps.clear();
-  };
-
-  const evaluate = () => {
-    cleanup();
-
-    value = selectorFn({ get });
-
-    if (isPromiseLike(value))
-      value.then(undefined, () => {
-        initialized = false;
-      });
-  };
-
-  const notifySubscribers = () => {
-    subscribers.forEach(cb => cb(value));
-  };
-
-  const onMount = () => {
-    mounted = true;
-  };
-
-  const onUnmount = () => {
-    mounted = false;
-  };
-
-  return {
-    tag,
-    get() {
-      if (!initialized) {
-        initialized = true;
-        evaluate();
+        subs.add(
+          state.subscribe(val => {
+            if (areValuesEqual(curr, val)) return;
+            curr = val;
+            evaluate();
+            notifySubscribers();
+          }),
+        );
       }
 
-      return value;
-    },
-    subscribe(cb) {
-      if (subscribers.size === 0) onMount();
-      subscribers.add(cb);
+      return curr;
+    };
 
-      return function unsubscribe() {
-        subscribers.delete(cb);
-        if (subscribers.size === 0) onUnmount();
-      };
-    },
-    [REFRESH_TAG]() {
-      if (mounted) {
-        evaluate();
-        notifySubscribers();
-      } else {
-        initialized = false;
-      }
-    },
-  };
+    const cleanup = () => {
+      subs.forEach(unsub => unsub());
+      subs.clear();
+      deps.clear();
+    };
+
+    const evaluate = () => {
+      cleanup();
+
+      const value = selectorFn({ get });
+
+      store.value.set(key, value);
+
+      if (isPromiseLike(value))
+        value.then(undefined, () => {
+          store.initialized.set(key, false);
+        });
+    };
+
+    const notifySubscribers = () => {
+      subscribers.forEach(cb => cb(store.value.get(key)));
+    };
+
+    const onMount = () => {
+      store.mounted.set(key, true);
+    };
+
+    const onUnmount = () => {
+      store.mounted.set(key, false);
+    };
+
+    return {
+      tag,
+      get() {
+        if (!store.initialized.get(key)) {
+          evaluate();
+          store.initialized.set(key, true);
+        }
+
+        return store.value.get(key);
+      },
+      subscribe(cb) {
+        if (subscribers.size === 0) onMount();
+        subscribers.add(cb);
+
+        return function unsubscribe() {
+          subscribers.delete(cb);
+          if (subscribers.size === 0) onUnmount();
+        };
+      },
+      [REFRESH_TAG]() {
+        if (store.mounted.get(key)) {
+          evaluate();
+          notifySubscribers();
+        } else {
+          store.initialized.set(key, false);
+        }
+      },
+    };
+  });
 };
 
 export type SelectorFamilyFn<T, P extends SerializableParam> = (
   param: P,
 ) => SelectorFn<T>;
 
-export type SelectorFamilyOptions = SelectorOptions & {
+export type SelectorFamilyOptions<P extends SerializableParam> = TypedOmit<
+  SelectorOptions,
+  'tag'
+> & {
+  tag?: string | TagFromParam<P>;
   cachePolicy?: CachePolicy;
 };
 
 export const selectorFamily = <T, P extends SerializableParam>(
   selectorFamilyFn: SelectorFamilyFn<T, P>,
-  {
-    tag,
-    areValuesEqual = dejaVu,
-    cachePolicy = { type: 'keep-all' },
-  }: SelectorFamilyOptions = {},
-) => {
-  const cache = makeCache<ReadonlyState<T>>(cachePolicy);
-
-  return (param: P) => {
-    const key = stableStringify(param);
-
-    if (!cache.has(key)) {
-      cache.set(
-        key,
-        selector(selectorFamilyFn(param), { tag, areValuesEqual }),
-      );
-    }
-
-    return cache.get(key) as ReadonlyState<T>;
-  };
-};
+  { cachePolicy, tag, ...other }: SelectorFamilyOptions<P> = {},
+) =>
+  memoize(
+    (param: P) =>
+      selector(selectorFamilyFn(param), {
+        tag: isFunction(tag) ? tag(param) : tag,
+        ...other,
+      }),
+    {
+      cachePolicy,
+      keyMaker: stableStringify,
+    },
+  );
