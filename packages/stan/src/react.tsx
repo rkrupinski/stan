@@ -74,7 +74,7 @@ export type AsyncValue<T> =
   | { type: 'error'; reason: string };
 
 export const useStanValueAsync = <T,>(
-  scopedState: Scoped<ReadonlyState<PromiseLike<T>>>,
+  scopedState: Scoped<State<PromiseLike<T>>>,
 ) => {
   const value = useStanValue(scopedState);
 
