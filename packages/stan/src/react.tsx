@@ -14,7 +14,7 @@ import type { State, ReadonlyState, WritableState } from './state';
 import { DEFAULT_STORE, makeStore, type Scoped, type Store } from './store';
 import { refresh } from './utils';
 
-type StanCtxType = {
+export type StanCtxType = {
   store: Store;
 };
 
@@ -22,12 +22,12 @@ const StanCtx = createContext<StanCtxType>({
   store: DEFAULT_STORE,
 });
 
-export type ProviderProps = {
+export type StanProviderProps = {
   store?: Store;
   children: ReactNode;
 };
 
-export const StanProvider: FC<ProviderProps> = ({ store, children }) => {
+export const StanProvider: FC<StanProviderProps> = ({ store, children }) => {
   const ctxValue = useMemo<StanCtxType>(
     () => ({
       store: store ?? makeStore(),
