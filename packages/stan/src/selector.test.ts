@@ -40,7 +40,7 @@ describe('selector', () => {
     expect(mockCallback).toHaveBeenCalledWith(31);
   });
 
-  it('should support custom equality function', () => {
+  it('should handle custom equality function', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const areValuesEqual = (a: any, b: any) => a.value === b.value;
 
@@ -228,7 +228,7 @@ describe('selectorFamily', () => {
     expect(mockCallback2).toHaveBeenCalledWith(129);
   });
 
-  it('should support custom equality function', () => {
+  it('should handle custom equality function', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const areValuesEqual = (a: any, b: any) => a % 2 === b % 2;
 
@@ -312,7 +312,7 @@ describe('selectorFamily', () => {
     expect(family({ multiplier: 2 })(store)).not.toBe(state1);
   });
 
-  it('should support LRU cache policy', () => {
+  it('should handle LRU cache policy', () => {
     const family = selectorFamily<number, { multiplier: number }>(
       ({ multiplier }) =>
         () =>

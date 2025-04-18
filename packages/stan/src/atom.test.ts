@@ -270,7 +270,7 @@ describe('atomFamily', () => {
     expect(state2.get()).toBe(200);
   });
 
-  it('should support effects for all atoms in the family', () => {
+  it('should handle effects for all atoms in the family', () => {
     const mockOnSet = jest.fn();
     const family = atomFamily(0, {
       effects: [
