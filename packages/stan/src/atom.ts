@@ -36,6 +36,8 @@ export const atom = <T>(
     const makeSetter =
       (silent = false): SetterOrUpdater<T> =>
       newValue => {
+        if (!store.initialized.get(key)) return;
+
         const prevValue = store.value.get(key);
         const value = isFunction(newValue) ? newValue(prevValue) : newValue;
 
