@@ -68,7 +68,7 @@ export const selector = <T>(
     const evaluate = () => {
       cleanup();
 
-      controller?.abort();
+      controller?.abort('stan');
       controller = new AbortController();
 
       const value = selectorFn({
