@@ -18,7 +18,7 @@ export interface GetFn {
   <T>(scopedState: Scoped<State<T>>): T;
 }
 
-export type SelectorFn<T> = ({ get }: { get: GetFn }) => T;
+export type SelectorFn<T> = (arg: { get: GetFn; signal: AbortSignal }) => T;
 
 export type SelectorOptions = {
   tag?: string;
@@ -35,6 +35,7 @@ export const selector = <T>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deps = new Set<State<any>>();
     const subs = new Set<() => void>();
+    let controller: AbortController | null = null;
 
     const subscribers = new Set<(newValue: T) => void>();
 
@@ -67,7 +68,13 @@ export const selector = <T>(
     const evaluate = () => {
       cleanup();
 
-      const value = selectorFn({ get });
+      controller?.abort();
+      controller = new AbortController();
+
+      const value = selectorFn({
+        get,
+        signal: controller.signal,
+      });
 
       store.value.set(key, value);
 
@@ -114,6 +121,7 @@ export const selector = <T>(
           notifySubscribers();
         } else {
           store.initialized.set(key, false);
+          controller = null;
         }
       },
     };
