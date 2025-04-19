@@ -367,3 +367,23 @@ describe('selectorFamily', () => {
     expect(mockSelectorFn).toHaveBeenCalledTimes(3);
   });
 });
+
+it('should abort previous evaluation', () => {
+  const signals: AbortSignal[] = [];
+
+  const dep = atom(42);
+  const store = makeStore();
+
+  const state = selector(async ({ get, signal }) => {
+    signals.push(signal);
+    return get(dep);
+  })(store);
+
+  state.get(); // Initialize
+
+  expect(signals[0].aborted).toBe(false);
+
+  dep(store).set(43);
+
+  expect(signals[0].aborted).toBe(true);
+});
