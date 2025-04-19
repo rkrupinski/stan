@@ -4,8 +4,9 @@ import {
   type TypedOmit,
   type TagFromParam,
   type SerializableParam,
+  type SetterOrUpdater,
 } from './misc';
-import type { SetterOrUpdater, WritableState } from './state';
+import type { WritableState } from './state';
 import { DEFAULT_STORE, type Scoped } from './store';
 import { memoize } from './cache';
 

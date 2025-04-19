@@ -1,8 +1,4 @@
-import type { REFRESH_TAG } from './misc';
-
-export type SetterOrUpdater<T> = (
-  valueOrUpdater: ((currentValue: T) => T) | T,
-) => void;
+import type { REFRESH_TAG, SetterOrUpdater } from './misc';
 
 export interface State<T> {
   tag?: string;

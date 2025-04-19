@@ -14,6 +14,10 @@ export type TagFromParam<P extends SerializableParam> = (param: P) => string;
 
 export type TypedOmit<T, K extends keyof T> = Omit<T, K>;
 
+export type SetterOrUpdater<T> = (
+  valueOrUpdater: ((currentValue: T) => T) | T,
+) => void;
+
 export const REFRESH_TAG = Symbol('__refresh__');
 
 export const dejaVu = <T>(a: T, b: T) => a === b;
