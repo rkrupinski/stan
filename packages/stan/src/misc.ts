@@ -41,3 +41,5 @@ export const isPromiseLike = (candidate: any): candidate is PromiseLike<any> =>
   !!candidate && isFunction(candidate.then);
 
 export const identity = <T>(arg: T) => arg;
+
+export class Aborted extends Error {}

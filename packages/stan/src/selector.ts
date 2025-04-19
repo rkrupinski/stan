@@ -1,5 +1,6 @@
 import {
   dejaVu,
+  Aborted,
   REFRESH_TAG,
   isFunction,
   isPromiseLike,
@@ -68,7 +69,7 @@ export const selector = <T>(
     const evaluate = () => {
       cleanup();
 
-      controller?.abort('stan');
+      controller?.abort(new Aborted());
       controller = new AbortController();
 
       const value = selectorFn({
@@ -79,7 +80,8 @@ export const selector = <T>(
       store.value.set(key, value);
 
       if (isPromiseLike(value))
-        value.then(undefined, () => {
+        value.then(undefined, err => {
+          if (err instanceof Aborted) return;
           store.initialized.set(key, false);
         });
     };
