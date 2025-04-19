@@ -14,7 +14,7 @@ export const search = async (phrase: string) => {
   ac = new AbortController();
 
   const res: SwResponse = await fetch(
-    `https://swapi.dev/api/people/?search=${encodeURIComponent(phrase)}`,
+    `https://www.swapi.tech/api/people/?search=${encodeURIComponent(phrase)}`,
     { signal: ac.signal }
   ).then((res) => res.json());
 
