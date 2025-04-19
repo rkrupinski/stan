@@ -10,7 +10,7 @@ import {
   type SerializableParam,
 } from './misc';
 import type { ReadonlyState, State } from './state';
-import { DEFAULT_STORE, type Scoped } from './store';
+import type { Scoped } from './store';
 import { memoize, type CachePolicy } from './cache';
 
 let selectorId = 0;
@@ -32,7 +32,7 @@ export const selector = <T>(
 ): Scoped<ReadonlyState<T>> => {
   const key = `selector${tag ? `-${tag}` : ''}-${selectorId++}`;
 
-  return memoize((store = DEFAULT_STORE) => {
+  return memoize(store => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const deps = new Set<State<any>>();
     const subs = new Set<() => void>();

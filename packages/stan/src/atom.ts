@@ -7,7 +7,7 @@ import {
   type SetterOrUpdater,
 } from './misc';
 import type { WritableState } from './state';
-import { DEFAULT_STORE, type Scoped } from './store';
+import type { Scoped } from './store';
 import { memoize } from './cache';
 
 let atomId = 0;
@@ -30,7 +30,7 @@ export const atom = <T>(
   const defaultValue = initialValue;
   const key = `atom${tag ? `-${tag}` : ''}-${atomId++}`;
 
-  return memoize((store = DEFAULT_STORE) => {
+  return memoize(store => {
     const subscribed = new Set<(newValue: T) => void>();
     const effectSubs = new Set<(newValue: T) => void>();
 

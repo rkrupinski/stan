@@ -9,4 +9,4 @@ export const makeStore = () => new Store();
 
 export const DEFAULT_STORE = makeStore();
 
-export type Scoped<T> = (store?: Store) => T;
+export type Scoped<T> = (store: Store) => T;
