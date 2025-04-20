@@ -1,4 +1,5 @@
-import type { REFRESH_TAG, SetterOrUpdater } from './misc';
+import type { SetterOrUpdater } from './types';
+import type { REFRESH_TAG } from './internal';
 
 export interface State<T> {
   tag?: string;

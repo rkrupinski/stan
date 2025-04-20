@@ -1,22 +1,6 @@
 export { default as stableStringify } from 'fast-json-stable-stringify';
 
-type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [property: string]: Json }
-  | Json[];
-
-export type SerializableParam = Json;
-
-export type TagFromParam<P extends SerializableParam> = (param: P) => string;
-
 export type TypedOmit<T, K extends keyof T> = Omit<T, K>;
-
-export type SetterOrUpdater<T> = (
-  valueOrUpdater: ((currentValue: T) => T) | T,
-) => void;
 
 export const REFRESH_TAG = Symbol('__refresh__');
 
@@ -41,5 +25,3 @@ export const isPromiseLike = (candidate: any): candidate is PromiseLike<any> =>
   !!candidate && isFunction(candidate.then);
 
 export const identity = <T>(arg: T) => arg;
-
-export class Aborted extends Error {}

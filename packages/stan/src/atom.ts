@@ -1,11 +1,5 @@
-import {
-  isFunction,
-  stableStringify,
-  type TypedOmit,
-  type TagFromParam,
-  type SerializableParam,
-  type SetterOrUpdater,
-} from './misc';
+import type { SerializableParam, SetterOrUpdater, TagFromParam } from './types';
+import { isFunction, stableStringify, type TypedOmit } from './internal';
 import type { WritableState } from './state';
 import type { Scoped } from './store';
 import { memoize } from './cache';

@@ -1,4 +1,4 @@
-import { identity } from './misc';
+import { identity } from './internal';
 
 interface Cache<K, V> {
   has(key: K): boolean;

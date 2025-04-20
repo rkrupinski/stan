@@ -1,4 +1,4 @@
-import type { SetterOrUpdater } from './misc';
+import type { SetterOrUpdater } from './types';
 import { atom, atomFamily } from './atom';
 import { makeStore } from './store';
 
