@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@rkrupinski/stan": "latest",
+    "@rkrupinski/stan": "1.2.0-rc1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
