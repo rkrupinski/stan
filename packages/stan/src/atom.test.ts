@@ -1,6 +1,7 @@
 import type { SetterOrUpdater } from './types';
 import { atom, atomFamily } from './atom';
 import { makeStore } from './store';
+import { reset } from './utils';
 
 describe('atom', () => {
   it('should initialize with the provided value', () => {
@@ -68,6 +69,20 @@ describe('atom', () => {
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
     expect(mockCallback).toHaveBeenCalledWith(100);
+  });
+
+  it('should go back to initial value when reset', () => {
+    const state = atom(42)(makeStore());
+    const mockCallback = jest.fn();
+
+    state.get(); // Initialize
+    state.set(43);
+    state.subscribe(mockCallback);
+
+    reset(state);
+
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+    expect(mockCallback).toHaveBeenCalledWith(42);
   });
 
   it('should allow initializing atom value from effects', () => {

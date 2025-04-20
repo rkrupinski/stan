@@ -4,6 +4,8 @@ export type TypedOmit<T, K extends keyof T> = Omit<T, K>;
 
 export const REFRESH_TAG = Symbol('__refresh__');
 
+export const RESET_TAG = Symbol('__reset__');
+
 export const dejaVu = <T>(a: T, b: T) => a === b;
 
 const fnTypes = [

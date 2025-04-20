@@ -1,5 +1,10 @@
 import type { SerializableParam, SetterOrUpdater, TagFromParam } from './types';
-import { isFunction, stableStringify, type TypedOmit } from './internal';
+import {
+  isFunction,
+  RESET_TAG,
+  stableStringify,
+  type TypedOmit,
+} from './internal';
 import type { WritableState } from './state';
 import type { Scoped } from './store';
 import { memoize } from './cache';
@@ -41,6 +46,9 @@ export const atom = <T>(
         if (!silent) effectSubs.forEach(cb => cb(value));
       };
 
+    const set = makeSetter();
+    const setSilent = makeSetter(true);
+
     const initialize = () => {
       store.value.set(key, defaultValue);
 
@@ -51,7 +59,7 @@ export const atom = <T>(
               store.value.set(key, v);
             }
           },
-          set: makeSetter(true),
+          set: setSilent,
           onSet(cb) {
             effectSubs.add(cb);
           },
@@ -69,13 +77,16 @@ export const atom = <T>(
 
         return store.value.get(key);
       },
-      set: makeSetter(),
+      set,
       subscribe(cb) {
         subscribed.add(cb);
 
         return () => {
           subscribed.delete(cb);
         };
+      },
+      [RESET_TAG]() {
+        set(defaultValue);
       },
     };
   });
