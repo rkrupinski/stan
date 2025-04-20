@@ -12,7 +12,7 @@ import React, {
 
 import type { State, ReadonlyState, WritableState } from './state';
 import { DEFAULT_STORE, makeStore, type Scoped, type Store } from './store';
-import { refresh } from './utils';
+import { refresh, reset } from './utils';
 
 export type StanCtxType = {
   store: Store;
@@ -119,5 +119,14 @@ export const useStanRefresher = <T,>(scopedState: Scoped<ReadonlyState<T>>) => {
 
   return useCallback(() => {
     refresh(state);
+  }, [state]);
+};
+
+export const useStanReset = <T,>(scopedState: Scoped<WritableState<T>>) => {
+  const { store } = useStanCtx();
+  const state = scopedState(store);
+
+  return useCallback(() => {
+    reset(state);
   }, [state]);
 };

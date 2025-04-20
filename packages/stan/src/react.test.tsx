@@ -14,6 +14,7 @@ import {
   useStanValueAsync,
   useSetStanValue,
   useStanRefresher,
+  useStanReset,
   StanProvider,
 } from './react';
 
@@ -327,7 +328,7 @@ describe('useSetStanValue', () => {
 });
 
 describe('useStanRefresher', () => {
-  it('should return a memoized callback that refreshes the state', () => {
+  it('should return a function that refreshes the state', () => {
     const mockSelectorFn = jest
       .fn()
       .mockReturnValueOnce(42)
@@ -363,11 +364,30 @@ describe('useStanRefresher', () => {
 
     testSelector(store).subscribe(jest.fn()); // Mount
 
-    act(() => {
-      result.current();
-    });
+    result.current();
 
     expect(mockSelectorFn).toHaveBeenCalledTimes(3);
     expect(testSelector(store).get()).toBe(44);
+  });
+});
+
+describe('useStanReset', () => {
+  it('should return a function that resets the state', () => {
+    const testAtom = atom(42);
+    const store = makeStore();
+
+    testAtom(store).get(); // Initialize
+
+    const { result } = renderHook(() => useStanReset(testAtom), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <StanProvider store={store}>{children}</StanProvider>
+      ),
+    });
+
+    testAtom(store).set(43);
+
+    result.current();
+
+    expect(testAtom(store).get()).toBe(42);
   });
 });
