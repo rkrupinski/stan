@@ -37,6 +37,7 @@ export const selector = <T>(
     const deps = new Set<State<any>>();
     const subs = new Set<() => void>();
     let controller: AbortController | null = null;
+    let version = 0;
 
     const subscribers = new Set<(newValue: T) => void>();
 
@@ -67,6 +68,8 @@ export const selector = <T>(
     };
 
     const evaluate = () => {
+      const v = ++version;
+
       cleanup();
 
       controller?.abort(new Aborted());
@@ -80,9 +83,8 @@ export const selector = <T>(
       store.value.set(key, value);
 
       if (isPromiseLike(value))
-        value.then(undefined, err => {
-          if (err instanceof Aborted) return;
-          store.initialized.set(key, false);
+        value.then(undefined, () => {
+          if (v === version) store.initialized.set(key, false);
         });
     };
 
