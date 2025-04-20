@@ -1,4 +1,4 @@
-import { atom, selector, makeStore } from "../../../stan/src";
+import { atom, selector, makeStore } from "@rkrupinski/stan";
 
 const store = makeStore();
 

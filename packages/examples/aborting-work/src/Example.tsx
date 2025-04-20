@@ -1,5 +1,5 @@
-import { atom, selector } from "../../../stan/src";
-import { useSetStanValue, useStanValueAsync } from "../../../stan/src/react";
+import { atom, selector } from "@rkrupinski/stan";
+import { useSetStanValue, useStanValueAsync } from "@rkrupinski/stan/react";
 
 const req = atom(0);
 

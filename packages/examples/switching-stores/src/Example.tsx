@@ -1,18 +1,23 @@
 import { useState } from "react";
-import { atom, makeStore } from "../../../stan/src";
-import { StanProvider, useStan } from "../../../stan/src/react";
+import { atom, makeStore } from "@rkrupinski/stan";
+import { StanProvider, useStan } from "@rkrupinski/stan/react";
+import { useStanReset } from "@rkrupinski/stan/react";
 
 const myAtom = atom("");
 
 function StateTest() {
   const [value, setValue] = useStan(myAtom);
+  const r = useStanReset(myAtom);
 
   return (
-    <input
-      placeholder="Enter text"
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
+    <>
+      <input
+        placeholder="Enter text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />{" "}
+      <button onClick={() => r()}>Reset</button>
+    </>
   );
 }
 
