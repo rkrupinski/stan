@@ -16,3 +16,6 @@ The following examples are available:
 3. [error-handling](https://github.com/rkrupinski/stan/tree/master/packages/examples/error-handling) - see how rejected promises are handled.
 4. [complex-state](https://github.com/rkrupinski/stan/tree/master/packages/examples/complex-state) - level up with multiple dependencies.
 5. [caching](https://github.com/rkrupinski/stan/tree/master/packages/examples/caching) - apply cache policies to optimize network traffic.
+6. [aborting-work](https://github.com/rkrupinski/stan/tree/master/packages/examples/aborting-work) - abort work with Stan-provided `AbortSignal`.
+7. [switching-stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/switching-stores) - reset all state by switching stores.
+8. [vanilla](https://github.com/rkrupinski/stan/tree/master/packages/examples/vanilla) - use vanilla Stan if you really have to.

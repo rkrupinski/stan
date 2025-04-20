@@ -8,7 +8,8 @@
     "declaration": true,
     "outDir": "dist",
     "noEmit": true,
-    "checkJs": true
+    "checkJs": true,
+    "jsx": "react-jsx"
   },
   "include": ["src/**/*", "*.mjs"],
   "exclude": ["node_modules"]

@@ -1,6 +1,15 @@
-import type { SetterOrUpdater, WritableState } from './state';
-import { isFunction, stableStringify, type SerializableParam } from './misc';
-import { makeCache } from './cache';
+import type { SerializableParam, SetterOrUpdater, TagFromParam } from './types';
+import {
+  isFunction,
+  RESET_TAG,
+  stableStringify,
+  type TypedOmit,
+} from './internal';
+import type { WritableState } from './state';
+import type { Scoped } from './store';
+import { memoize } from './cache';
+
+let atomId = 0;
 
 export type AtomEffect<T> = (param: {
   init(value: T): void;
@@ -15,76 +24,92 @@ export type AtomOptions<T> = {
 
 export const atom = <T>(
   initialValue: T,
-  { effects, tag }: AtomOptions<T> = {},
-): WritableState<T> => {
-  let initialized = false;
-  let value: T = initialValue;
+  { tag, effects }: AtomOptions<T> = {},
+): Scoped<WritableState<T>> => {
+  const defaultValue = initialValue;
+  const key = `atom${tag ? `-${tag}` : ''}-${atomId++}`;
 
-  const subscribed = new Set<(newValue: T) => void>();
-  const effectSubs = new Set<(newValue: T) => void>();
+  return memoize(store => {
+    const subscribed = new Set<(newValue: T) => void>();
+    const effectSubs = new Set<(newValue: T) => void>();
 
-  const makeSet =
-    (silent = false): SetterOrUpdater<T> =>
-    newValue => {
-      value = isFunction(newValue) ? newValue(value) : newValue;
+    const makeSetter =
+      (silent = false): SetterOrUpdater<T> =>
+      newValue => {
+        if (!store.initialized.get(key)) return;
 
-      subscribed.forEach(cb => cb(value));
-      if (!silent) effectSubs.forEach(cb => cb(value));
+        const prevValue = store.value.get(key);
+        const value = isFunction(newValue) ? newValue(prevValue) : newValue;
+
+        store.value.set(key, value);
+        subscribed.forEach(cb => cb(value));
+        if (!silent) effectSubs.forEach(cb => cb(value));
+      };
+
+    const set = makeSetter();
+    const setSilent = makeSetter(true);
+
+    const initialize = () => {
+      store.value.set(key, defaultValue);
+
+      effects?.forEach(effectFn =>
+        effectFn({
+          init(v) {
+            if (!store.initialized.get(key)) {
+              store.value.set(key, v);
+            }
+          },
+          set: setSilent,
+          onSet(cb) {
+            effectSubs.add(cb);
+          },
+        }),
+      );
     };
 
-  effects?.forEach(effectFn =>
-    effectFn({
-      init(v) {
-        if (!initialized) {
-          value = v;
+    return {
+      tag,
+      get() {
+        if (!store.initialized.get(key)) {
+          initialize();
+          store.initialized.set(key, true);
         }
+
+        return store.value.get(key);
       },
-      set: makeSet(true),
-      onSet(cb) {
-        effectSubs.add(cb);
+      set,
+      subscribe(cb) {
+        subscribed.add(cb);
+
+        return () => {
+          subscribed.delete(cb);
+        };
       },
-    }),
-  );
-
-  initialized = true;
-
-  return {
-    tag,
-    get() {
-      return value;
-    },
-    set: makeSet(),
-    subscribe(cb) {
-      subscribed.add(cb);
-
-      return () => {
-        subscribed.delete(cb);
-      };
-    },
-  };
+      [RESET_TAG]() {
+        set(defaultValue);
+      },
+    };
+  });
 };
 
 export type ValueFromParam<T, P extends SerializableParam> = (param: P) => T;
 
+export type AtomFamilyOptions<T, P extends SerializableParam> = TypedOmit<
+  AtomOptions<T>,
+  'tag'
+> & {
+  tag?: string | TagFromParam<P>;
+};
+
 export const atomFamily = <T, P extends SerializableParam>(
   initialValue: T | ValueFromParam<T, P>,
-  options?: AtomOptions<T>,
-) => {
-  const cache = makeCache<WritableState<T>>({ type: 'keep-all' });
-
-  return (param: P) => {
-    const key = stableStringify(param);
-
-    if (!cache.has(key)) {
-      cache.set(
-        key,
-        atom(
-          isFunction(initialValue) ? initialValue(param) : initialValue,
-          options,
-        ),
-      );
-    }
-
-    return cache.get(key) as WritableState<T>;
-  };
-};
+  { tag, ...other }: AtomFamilyOptions<T, P> = {},
+) =>
+  memoize(
+    (param: P) =>
+      atom(isFunction(initialValue) ? initialValue(param) : initialValue, {
+        tag: isFunction(tag) ? tag(param) : tag,
+        ...other,
+      }),
+    { keyMaker: stableStringify },
+  );

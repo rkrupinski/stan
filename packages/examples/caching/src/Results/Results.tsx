@@ -30,7 +30,7 @@ export const Results: FC<ResultsProps> = ({ phrase }) => {
         <>
           {results.value.length ? (
             <ul className={styles.results}>
-              {results.value.map(({ name, url }) => (
+              {results.value.map(({ properties: { name, url } }) => (
                 <li key={url} className={styles.result}>
                   <a href={url} target="_blank" rel="noopener noreferrer">
                     {name}

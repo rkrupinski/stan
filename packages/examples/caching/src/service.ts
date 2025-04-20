@@ -1,10 +1,12 @@
 export type SWCharacter = {
-  name: string;
-  url: string;
+  properties: {
+    name: string;
+    url: string;
+  };
 };
 
 export type SwResponse = {
-  results: ReadonlyArray<SWCharacter>;
+  result: ReadonlyArray<SWCharacter>;
 };
 
 let ac: AbortController | undefined;
@@ -14,9 +16,9 @@ export const search = async (phrase: string) => {
   ac = new AbortController();
 
   const res: SwResponse = await fetch(
-    `https://swapi.dev/api/people/?search=${encodeURIComponent(phrase)}`,
+    `https://www.swapi.tech/api/people/?name=${encodeURIComponent(phrase)}`,
     { signal: ac.signal }
   ).then((res) => res.json());
 
-  return res.results.slice(0, 5);
+  return res.result.slice(0, 5);
 };

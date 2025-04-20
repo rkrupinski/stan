@@ -7,7 +7,7 @@ import terser from '@rollup/plugin-terser';
 export default {
   input: {
     index: 'src/index.ts',
-    react: 'src/react.ts',
+    react: 'src/react.tsx',
   },
   output: {
     dir: 'dist',
