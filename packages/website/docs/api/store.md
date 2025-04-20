@@ -1,8 +1,8 @@
 ---
-sidebar_position: 8
+sidebar_position: 7
 description: TODO
 ---
 
-# React
+# Store
 
 TODO
