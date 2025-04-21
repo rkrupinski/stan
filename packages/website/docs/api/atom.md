@@ -3,7 +3,7 @@ sidebar_position: 2
 description: atom API docs
 ---
 
-# atom
+# `atom`
 
 In Stan, atoms are value containers. They have no dependencies and can be considered source vertices in the Stan state graph. They're designed for synchronous state but can theoretically work with any type of data (for async, make sure to check out [`selector`](./selector.md)).
 
@@ -14,7 +14,7 @@ const atom: <T>(
 ) => Scoped<WritableState<T>>;
 ```
 
-- `initialValue` – The value used to initialize the atom. While atoms can theoretically store values of any type, if you're thinking of using Promises, you'd likely be better off with a [`selector`](./selector.md).
+- `initialValue` – The value used to initialize the atom.
 - `options?` - Atom configuration:
   - `tag?` - A string identifier (see [`State<T>`](./state.md#statet)).
   - `effects?` - An array of [`AtomEffect<T>`](#atom-effects).
