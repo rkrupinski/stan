@@ -8,17 +8,17 @@ description: State API docs
 At the core of Stan is state. All Stan APIs either create, update, or consume state. To keep things interesting, there are actually different types of state. Stan represents them as follows:
 
 ```ts
-export interface State<T> {
+interface State<T> {
   tag?: string;
   get(): T;
   subscribe(callback: (value: T) => void): () => void;
 }
 
-export interface ReadonlyState<T> extends State<T> {
+interface ReadonlyState<T> extends State<T> {
   [REFRESH_TAG](): void;
 }
 
-export interface WritableState<T> extends State<T> {
+interface WritableState<T> extends State<T> {
   set: SetterOrUpdater<T>;
   [RESET_TAG](): void;
 }
