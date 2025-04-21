@@ -1,8 +1,8 @@
 ---
 sidebar_position: 5
-description: TODO
+description: selectorFamily API docs
 ---
 
-# selectorFamily
+# `selectorFamily`
 
 TODO

@@ -11,9 +11,9 @@ Stan (Polish for "state") builds on ideas from [Recoil](https://recoiljs.org) an
 Highlights:
 
 - Type safety
-- Synchronous and asynchronous state
+- Synchronous and assynchronous state
 - Derived state
-- Caching
+- Configurable cache
 - Composability
-- Provider-less, key-less design
-- Framework-agnostic
+- No framework dependency
+- <abbr>SSR</abbr>-ready

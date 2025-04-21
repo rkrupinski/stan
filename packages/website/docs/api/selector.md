@@ -1,8 +1,8 @@
 ---
 sidebar_position: 4
-description: TODO
+description: selector API docs
 ---
 
-# selector
+# `selector`
 
 TODO
