@@ -17,7 +17,7 @@ export default {
   plugins: [
     typescript({
       tsconfig: './tsconfig.json',
-      exclude: ['node_modules', '**/*.test.ts'],
+      exclude: ['node_modules', '**/*.test.ts?(x)'],
     }),
     resolve(),
     commonjs(),
