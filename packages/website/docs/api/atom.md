@@ -21,7 +21,7 @@ const atom: <T>(
 
 ## Atom effects
 
-Atom effects are an abstraction that allow for:
+Atom effects are an abstraction that allows for:
 
 - Initializing atoms (e.g., from external storage)
 - Executing code when an atom's value changes (e.g., saving the value to external storage)
