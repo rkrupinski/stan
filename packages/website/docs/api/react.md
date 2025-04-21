@@ -1,6 +1,6 @@
 ---
 sidebar_position: 8
-description: TODO
+description: React API docs
 ---
 
 # React

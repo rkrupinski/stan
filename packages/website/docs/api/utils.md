@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-description: TODO
+description: Utils API docs
 ---
 
 # Utils

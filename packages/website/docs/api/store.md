@@ -1,6 +1,6 @@
 ---
 sidebar_position: 7
-description: TODO
+description: Store API docs
 ---
 
 # Store

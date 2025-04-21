@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-description: The bread and butter of Stan
+description: State API docs
 ---
 
 # State

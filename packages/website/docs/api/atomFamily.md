@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-description: TODO
+description: atomFamily API docs
 ---
 
 # atomFamily
