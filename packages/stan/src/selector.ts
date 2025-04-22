@@ -51,8 +51,7 @@ export const selector = <T>(
           state.subscribe(val => {
             if (areValuesEqual(curr, val)) return;
             curr = val;
-            evaluate();
-            notifySubscribers();
+            refresh();
           }),
         );
       }
@@ -91,6 +90,15 @@ export const selector = <T>(
       subscribers.forEach(cb => cb(store.value.get(key)));
     };
 
+    const refresh = () => {
+      if (store.mounted.get(key)) {
+        evaluate();
+        notifySubscribers();
+      } else {
+        store.initialized.set(key, false);
+      }
+    };
+
     const onMount = () => {
       store.mounted.set(key, true);
     };
@@ -119,13 +127,7 @@ export const selector = <T>(
         };
       },
       [REFRESH_TAG]() {
-        if (store.mounted.get(key)) {
-          evaluate();
-          notifySubscribers();
-        } else {
-          store.initialized.set(key, false);
-          controller = null;
-        }
+        refresh();
       },
     };
   });
