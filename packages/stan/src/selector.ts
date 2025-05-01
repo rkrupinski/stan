@@ -36,7 +36,6 @@ export const selector = <T>(
     const subs = new Set<() => () => void>();
     const unsubs = new Set<() => void>();
     let controller: AbortController | null = null;
-    let version = 0;
 
     const subscribers = new Set<(newValue: T) => void>();
 
@@ -74,7 +73,9 @@ export const selector = <T>(
 
     const evaluate = () => {
       console.log(`${key} evaluate`);
-      const v = ++version;
+      const v = (store.version.get(key) ?? 0) + 1;
+
+      store.version.set(key, v);
 
       cleanup();
 
@@ -90,7 +91,7 @@ export const selector = <T>(
 
       if (isPromiseLike(value))
         value.then(undefined, () => {
-          if (v === version) store.initialized.set(key, false);
+          if (v === store.version.get(key)) store.initialized.set(key, false);
         });
     };
 
