@@ -68,7 +68,7 @@ export const atom = <T>(
     };
 
     return {
-      tag,
+      key,
       get() {
         if (!store.initialized.get(key)) {
           initialize();

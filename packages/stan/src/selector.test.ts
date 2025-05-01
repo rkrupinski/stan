@@ -381,6 +381,8 @@ it('should abort previous evaluation', () => {
 
   state.get(); // Initialize
 
+  state.subscribe(jest.fn());
+
   expect(signals[0].aborted).toBe(false);
 
   dep(store).set(43);

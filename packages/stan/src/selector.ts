@@ -32,9 +32,9 @@ export const selector = <T>(
   const key = `selector${tag ? `-${tag}` : ''}-${selectorId++}`;
 
   return memoize(store => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const deps = new Set<State<any>>();
-    const subs = new Set<() => void>();
+    const deps = new Map<string, 'TODO'>();
+    const subs = new Set<() => () => void>();
+    const unsubs = new Set<() => void>();
     let controller: AbortController | null = null;
     let version = 0;
 
@@ -44,28 +44,36 @@ export const selector = <T>(
       const state = scopedState(store);
       let curr = state.get();
 
-      if (!deps.has(state)) {
-        deps.add(state);
+      if (!deps.has(state.key)) {
+        deps.set(state.key, 'TODO');
+        console.log(`adding to deps of ${key}`, deps);
 
-        subs.add(
+        const sub = () =>
           state.subscribe(val => {
             if (areValuesEqual(curr, val)) return;
             curr = val;
             refresh();
-          }),
-        );
+          });
+
+        subs.add(sub);
+
+        if (store.mounted.get(key)) {
+          unsubs.add(sub());
+        }
       }
 
       return curr;
     };
 
     const cleanup = () => {
-      subs.forEach(unsub => unsub());
+      deps.clear(); // TODO
       subs.clear();
-      deps.clear();
+      unsubs.forEach(unsub => unsub());
+      unsubs.clear();
     };
 
     const evaluate = () => {
+      console.log(`${key} evaluate`);
       const v = ++version;
 
       cleanup();
@@ -92,23 +100,32 @@ export const selector = <T>(
 
     const refresh = () => {
       if (store.mounted.get(key)) {
+        console.log(`${key} refresh-eval`);
         evaluate();
         notifySubscribers();
       } else {
+        console.log(`${key} refresh-invalidate`);
         store.initialized.set(key, false);
       }
     };
 
     const onMount = () => {
+      subs.forEach(sub => {
+        unsubs.add(sub());
+      });
       store.mounted.set(key, true);
+      console.log(`${key} onMount`);
     };
 
     const onUnmount = () => {
+      unsubs.forEach(unsub => unsub());
+      unsubs.clear();
       store.mounted.set(key, false);
+      console.log(`${key} onUnmount`);
     };
 
     return {
-      tag,
+      key,
       get() {
         if (!store.initialized.get(key)) {
           evaluate();
