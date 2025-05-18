@@ -6,6 +6,8 @@ export const REFRESH_TAG = Symbol('__refresh__');
 
 export const RESET_TAG = Symbol('__reset__');
 
+export const identity = <T>(arg: T) => arg;
+
 export const dejaVu = <T>(a: T, b: T) => a === b;
 
 const fnTypes = [
@@ -25,5 +27,3 @@ export const isFunction = (
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isPromiseLike = (candidate: any): candidate is PromiseLike<any> =>
   !!candidate && isFunction(candidate.then);
-
-export const identity = <T>(arg: T) => arg;

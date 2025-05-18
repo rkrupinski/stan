@@ -1,9 +1,9 @@
 import {
   dejaVu,
-  REFRESH_TAG,
   isFunction,
   isPromiseLike,
   stableStringify,
+  REFRESH_TAG,
   type TypedOmit,
 } from './internal';
 import { Aborted } from './errors';
@@ -32,79 +32,147 @@ export const selector = <T>(
   const key = `selector${tag ? `-${tag}` : ''}-${selectorId++}`;
 
   return memoize(store => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const deps = new Set<State<any>>();
-    const subs = new Set<() => void>();
+    const deps = new Map<string, number>();
+
+    store.deps.set(key, deps);
+
+    const subs = new Set<() => () => void>();
+    const unsubs = new Set<() => void>();
+
     let controller: AbortController | null = null;
-    let version = 0;
 
     const subscribers = new Set<(newValue: T) => void>();
 
-    const get = <D>(scopedState: Scoped<State<D>>) => {
-      const state = scopedState(store);
-      let curr = state.get();
+    const makeGetter =
+      (id: number) =>
+      <D>(scopedState: Scoped<State<D>>) => {
+        const state = scopedState(store);
+        const value = state.get();
 
-      if (!deps.has(state)) {
-        deps.add(state);
+        if (!deps.has(state.key) && id === evalId) {
+          deps.set(state.key, store.version.get(state.key) ?? 0);
 
-        subs.add(
-          state.subscribe(val => {
-            if (areValuesEqual(curr, val)) return;
-            curr = val;
-            evaluate();
-            notifySubscribers();
-          }),
-        );
-      }
+          const sub = () =>
+            state.subscribe(() => {
+              refresh();
+            });
 
-      return curr;
-    };
+          subs.add(sub);
+
+          if (store.mounted.get(key)) {
+            unsubs.add(sub());
+          }
+        }
+
+        return value;
+      };
 
     const cleanup = () => {
-      subs.forEach(unsub => unsub());
-      subs.clear();
       deps.clear();
+      subs.clear();
+      unsubs.forEach(unsub => unsub());
+      unsubs.clear();
     };
 
-    const evaluate = () => {
-      const v = ++version;
+    const bumpVersion = () => {
+      const currentVersion = store.version.get(key) ?? 0;
 
+      store.version.set(key, currentVersion + 1);
+    };
+
+    const notifySubscribers = () => {
+      [...subscribers].forEach(cb => cb(store.value.get(key)));
+    };
+
+    const depsChanged = (key: string) => {
+      const d = store.deps.get(key);
+
+      if (!d || !d.size) return false;
+
+      for (const [k, v] of d.entries()) {
+        if (store.version.get(k) !== v) return true;
+      }
+
+      for (const k of d.keys()) {
+        if (depsChanged(k)) return true;
+      }
+
+      return false;
+    };
+
+    let evalId = 0;
+
+    const evaluate = (silent = false) => {
       cleanup();
 
       controller?.abort(new Aborted());
       controller = new AbortController();
 
-      const value = selectorFn({
-        get,
+      const candidate = selectorFn({
+        get: makeGetter(++evalId),
         signal: controller.signal,
       });
 
-      store.value.set(key, value);
+      const valueChanged =
+        !store.value.has(key) ||
+        !areValuesEqual(store.value.get(key), candidate);
 
-      if (isPromiseLike(value))
-        value.then(undefined, () => {
-          if (v === version) store.initialized.set(key, false);
-        });
+      if (!valueChanged) return;
+
+      bumpVersion();
+
+      store.value.set(key, candidate);
+
+      if (!silent) notifySubscribers();
+
+      if (!isPromiseLike(candidate)) return;
+
+      const prevVersion = store.version.get(key);
+
+      candidate.then(undefined, () => {
+        if (prevVersion === store.version.get(key))
+          store.initialized.set(key, false);
+      });
     };
 
-    const notifySubscribers = () => {
-      subscribers.forEach(cb => cb(store.value.get(key)));
+    const refresh = () => {
+      if (store.mounted.get(key)) {
+        evaluate();
+      } else {
+        store.initialized.set(key, false);
+      }
     };
 
     const onMount = () => {
+      subs.forEach(sub => {
+        unsubs.add(sub());
+      });
       store.mounted.set(key, true);
     };
 
     const onUnmount = () => {
+      unsubs.forEach(unsub => {
+        unsub();
+      });
+      unsubs.clear();
       store.mounted.set(key, false);
     };
 
     return {
-      tag,
+      key,
       get() {
-        if (!store.initialized.get(key)) {
-          evaluate();
-          store.initialized.set(key, true);
+        switch (true) {
+          case !store.initialized.get(key):
+            evaluate(true);
+            store.initialized.set(key, true);
+            break;
+
+          case depsChanged(key):
+            evaluate(true);
+            break;
+
+          default:
+            break;
         }
 
         return store.value.get(key);
@@ -119,13 +187,7 @@ export const selector = <T>(
         };
       },
       [REFRESH_TAG]() {
-        if (store.mounted.get(key)) {
-          evaluate();
-          notifySubscribers();
-        } else {
-          store.initialized.set(key, false);
-          controller = null;
-        }
+        refresh();
       },
     };
   });

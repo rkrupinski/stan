@@ -44,12 +44,12 @@ export const useStanValue = <T,>(scopedState: Scoped<State<T>>) => {
   const { store } = useStanCtx();
   const state = scopedState(store);
   const prevStateRef = useRef(state);
-  const [value, setValue] = useState(state.get());
+  const [value, setValue] = useState(state.get);
 
   useEffect(() => {
     if (state !== prevStateRef.current) {
-      setValue(state.get());
       prevStateRef.current = state;
+      setValue(state.get());
     }
 
     return state.subscribe(setValue);

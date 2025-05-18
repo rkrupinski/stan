@@ -2,7 +2,7 @@ import type { SetterOrUpdater } from './types';
 import type { REFRESH_TAG, RESET_TAG } from './internal';
 
 export interface State<T> {
-  tag?: string;
+  key: string;
   get(): T;
   subscribe(callback: (value: T) => void): () => void;
 }

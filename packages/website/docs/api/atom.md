@@ -10,12 +10,12 @@ In Stan, atoms are value containers. They have no dependencies and can be consid
 ```ts
 const atom: <T>(
   initialValue: T,
-  options?: AtomOptions<T>,
+  atomOptions?: AtomOptions<T>,
 ) => Scoped<WritableState<T>>;
 ```
 
 - `initialValue` – The value used to initialize the atom.
-- `options?` - Atom configuration:
+- `atomOptions?` - Atom configuration:
   - `tag?` - A string identifier (see [`State<T>`](./state.md#statet)).
   - `effects?` - An array of [`AtomEffect<T>`](#atom-effects).
 
