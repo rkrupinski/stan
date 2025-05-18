@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { atom, makeStore } from "@rkrupinski/stan";
-import { StanProvider, useStan } from "@rkrupinski/stan/react";
-import { useStanReset } from "@rkrupinski/stan/react";
+import { StanProvider, useStan, useStanReset } from "@rkrupinski/stan/react";
 
-const myAtom = atom("");
+const myAtom = atom("default");
 
 function StateTest() {
   const [value, setValue] = useStan(myAtom);
