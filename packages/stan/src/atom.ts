@@ -1,8 +1,9 @@
 import type { SerializableParam, SetterOrUpdater, TagFromParam } from './types';
 import {
+  dejaVu,
   isFunction,
-  RESET_TAG,
   stableStringify,
+  RESET_TAG,
   type TypedOmit,
 } from './internal';
 import type { WritableState } from './state';
@@ -20,11 +21,12 @@ export type AtomEffect<T> = (param: {
 export type AtomOptions<T> = {
   tag?: string;
   effects?: ReadonlyArray<AtomEffect<T>>;
+  areValuesEqual?: <T>(a: T, b: T) => boolean;
 };
 
 export const atom = <T>(
   initialValue: T,
-  { tag, effects }: AtomOptions<T> = {},
+  { tag, effects, areValuesEqual = dejaVu }: AtomOptions<T> = {},
 ): Scoped<WritableState<T>> => {
   const defaultValue = initialValue;
   const key = `atom${tag ? `-${tag}` : ''}-${atomId++}`;
@@ -33,17 +35,32 @@ export const atom = <T>(
     const subscribed = new Set<(newValue: T) => void>();
     const effectSubs = new Set<(newValue: T) => void>();
 
+    store.value.set(key, defaultValue);
+    store.version.set(key, 1);
+
+    const bumpVersion = () => {
+      const currentVersion = store.version.get(key) ?? 0;
+
+      store.version.set(key, currentVersion + 1);
+    };
+
     const makeSetter =
       (silent = false): SetterOrUpdater<T> =>
       newValue => {
         if (!store.initialized.get(key)) return;
 
         const prevValue = store.value.get(key);
-        const value = isFunction(newValue) ? newValue(prevValue) : newValue;
+        const candidate = isFunction(newValue) ? newValue(prevValue) : newValue;
 
-        store.value.set(key, value);
-        subscribed.forEach(cb => cb(value));
-        if (!silent) effectSubs.forEach(cb => cb(value));
+        if (areValuesEqual(prevValue, candidate)) return;
+
+        bumpVersion();
+
+        store.value.set(key, candidate);
+
+        [...subscribed].forEach(cb => cb(candidate));
+
+        if (!silent) effectSubs.forEach(cb => cb(candidate));
       };
 
     const set = makeSetter();

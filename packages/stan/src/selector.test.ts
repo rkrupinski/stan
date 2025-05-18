@@ -44,23 +44,24 @@ describe('selector', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const areValuesEqual = (a: any, b: any) => a.value === b.value;
 
-    const dep = atom({ value: 42 });
     const store = makeStore();
-    const double = selector(({ get }) => get(dep).value * 2, {
+    const dep = atom(42);
+    const double = selector(({ get }) => ({ value: get(dep) * 2 }), {
       areValuesEqual,
-    })(store);
+    });
+
+    double(store).get(); // Initialize
+
     const mockCallback = jest.fn();
+    double(store).subscribe(mockCallback);
 
-    double.get(); // Initialize
-    double.subscribe(mockCallback);
-
-    dep(store).set({ value: 42 });
+    dep(store).set(42);
 
     expect(mockCallback).not.toHaveBeenCalled();
 
-    dep(store).set({ value: 43 });
+    dep(store).set(43);
 
-    expect(mockCallback).toHaveBeenCalledWith(86);
+    expect(mockCallback).toHaveBeenCalledWith({ value: 86 });
   });
 
   it('should allow unsubscribing', () => {
@@ -233,15 +234,15 @@ describe('selectorFamily', () => {
     const areValuesEqual = (a: any, b: any) => a % 2 === b % 2;
 
     const dep = atom(42);
-    const family = selectorFamily<number, { multiplier: number }>(
-      ({ multiplier }) =>
+    const family = selectorFamily<number, number>(
+      multiplier =>
         ({ get }) =>
           get(dep) * multiplier,
       { areValuesEqual },
     );
 
     const store = makeStore();
-    const state = family({ multiplier: 2 })(store);
+    const state = family(2)(store);
     const mockCallback = jest.fn();
 
     state.get(); // Initialize
@@ -251,9 +252,9 @@ describe('selectorFamily', () => {
 
     expect(mockCallback).not.toHaveBeenCalled();
 
-    dep(store).set(43);
+    dep(store).set(43.5);
 
-    expect(mockCallback).toHaveBeenCalledWith(86);
+    expect(mockCallback).toHaveBeenCalledWith(87);
   });
 
   it('should handle primitive parameters', () => {
