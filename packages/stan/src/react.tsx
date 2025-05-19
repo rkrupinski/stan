@@ -10,8 +10,8 @@ import {
   type ReactNode,
 } from 'react';
 
-import type { State, ReadonlyState, WritableState } from './state';
-import { DEFAULT_STORE, makeStore, type Scoped, type Store } from './store';
+import type { Scoped, State, ReadonlyState, WritableState } from './state';
+import { DEFAULT_STORE, makeStore, type Store } from './store';
 import { refresh, reset } from './utils';
 
 export type StanCtxType = {

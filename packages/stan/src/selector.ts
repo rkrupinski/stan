@@ -4,11 +4,11 @@ import {
   isPromiseLike,
   stableStringify,
   REFRESH_TAG,
+  type TypedOmit,
 } from './internal';
 import { Aborted } from './errors';
-import type { SerializableParam, TagFromParam, TypedOmit } from './types';
-import type { ReadonlyState, State } from './state';
-import type { Scoped } from './store';
+import type { SerializableParam, TagFromParam } from './types';
+import type { ReadonlyState, State, Scoped } from './state';
 import { memoize, type CachePolicy } from './cache';
 
 let selectorId = 0;

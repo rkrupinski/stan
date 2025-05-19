@@ -1,12 +1,12 @@
-import type {
-  SerializableParam,
-  SetterOrUpdater,
-  TagFromParam,
-  TypedOmit,
-} from './types';
-import { dejaVu, isFunction, stableStringify, RESET_TAG } from './internal';
-import type { WritableState } from './state';
-import type { Scoped } from './store';
+import type { SerializableParam, SetterOrUpdater, TagFromParam } from './types';
+import {
+  dejaVu,
+  isFunction,
+  stableStringify,
+  RESET_TAG,
+  type TypedOmit,
+} from './internal';
+import type { WritableState, Scoped } from './state';
 import { memoize } from './cache';
 
 let atomId = 0;

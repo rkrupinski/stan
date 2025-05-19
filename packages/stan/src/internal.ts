@@ -8,6 +8,8 @@ export const identity = <T>(arg: T) => arg;
 
 export const dejaVu = <T>(a: T, b: T) => a === b;
 
+export type TypedOmit<T, K extends keyof T> = Omit<T, K>;
+
 const fnTypes = [
   '[object AsyncFunction]',
   '[object AsyncGeneratorFunction]',
