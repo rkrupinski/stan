@@ -13,7 +13,9 @@ describe('selector', () => {
   });
 
   it('should compute derived async state', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const selector1 = selector(async () => 10);
+    // eslint-disable-next-line @typescript-eslint/require-await
     const selector2 = selector(async () => 20);
     const sum = selector(({ get }) =>
       Promise.all([get(selector1), get(selector2)]).then(deps =>
@@ -41,7 +43,7 @@ describe('selector', () => {
   });
 
   it('should handle custom equality function', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     const areValuesEqual = (a: any, b: any) => a.value === b.value;
 
     const store = makeStore();
@@ -375,12 +377,13 @@ it('should abort previous evaluation', () => {
   const dep = atom(42);
   const store = makeStore();
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const state = selector(async ({ get, signal }) => {
     signals.push(signal);
     return get(dep);
   })(store);
 
-  state.get(); // Initialize
+  void state.get(); // Initialize
 
   state.subscribe(jest.fn());
 

@@ -2,6 +2,7 @@ node_modules
 dist
 build
 .DS_Store
+.eslintcache
 .cache-loader
 .docusaurus
 yarn-error.log

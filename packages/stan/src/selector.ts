@@ -4,11 +4,10 @@ import {
   isPromiseLike,
   stableStringify,
   REFRESH_TAG,
-  type TypedOmit,
 } from './internal';
 import { Aborted } from './errors';
+import type { SerializableParam, TagFromParam, TypedOmit } from './types';
 import type { ReadonlyState, State } from './state';
-import type { SerializableParam, TagFromParam } from './types';
 import type { Scoped } from './store';
 import { memoize, type CachePolicy } from './cache';
 
@@ -81,7 +80,7 @@ export const selector = <T>(
     };
 
     const notifySubscribers = () => {
-      [...subscribers].forEach(cb => cb(store.value.get(key)));
+      [...subscribers].forEach(cb => cb(store.value.get(key) as T));
     };
 
     const depsChanged = (key: string) => {
@@ -175,7 +174,7 @@ export const selector = <T>(
             break;
         }
 
-        return store.value.get(key);
+        return store.value.get(key) as T;
       },
       subscribe(cb) {
         if (subscribers.size === 0) onMount();

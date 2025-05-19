@@ -8,6 +8,8 @@ type Json =
 
 export type SerializableParam = Json;
 
+export type TypedOmit<T, K extends keyof T> = Omit<T, K>;
+
 export type TagFromParam<P extends SerializableParam> = (param: P) => string;
 
 export type SetterOrUpdater<T> = (

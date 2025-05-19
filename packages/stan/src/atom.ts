@@ -1,11 +1,10 @@
-import type { SerializableParam, SetterOrUpdater, TagFromParam } from './types';
-import {
-  dejaVu,
-  isFunction,
-  stableStringify,
-  RESET_TAG,
-  type TypedOmit,
-} from './internal';
+import type {
+  SerializableParam,
+  SetterOrUpdater,
+  TagFromParam,
+  TypedOmit,
+} from './types';
+import { dejaVu, isFunction, stableStringify, RESET_TAG } from './internal';
 import type { WritableState } from './state';
 import type { Scoped } from './store';
 import { memoize } from './cache';
@@ -49,7 +48,7 @@ export const atom = <T>(
       newValue => {
         if (!store.initialized.get(key)) return;
 
-        const prevValue = store.value.get(key);
+        const prevValue = store.value.get(key) as T;
         const candidate = isFunction(newValue) ? newValue(prevValue) : newValue;
 
         if (areValuesEqual(prevValue, candidate)) return;
@@ -92,7 +91,7 @@ export const atom = <T>(
           store.initialized.set(key, true);
         }
 
-        return store.value.get(key);
+        return store.value.get(key) as T;
       },
       set,
       subscribe(cb) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import type { SetterOrUpdater } from './types';
 import { atom, atomFamily } from './atom';
 import { makeStore } from './store';

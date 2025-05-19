@@ -1,8 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-
-import React, { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 import { selector } from './selector';
@@ -115,6 +114,7 @@ describe('useStanValue', () => {
   });
 
   it('should initialize with the current async selector value', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async () => 42);
 
     const { result } = renderHook(() => useStanValue(testSelector), {
@@ -167,6 +167,7 @@ describe('useStanValue', () => {
 
 describe('useStanValueAsync', () => {
   it('should handle success', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async () => 42);
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
@@ -181,6 +182,7 @@ describe('useStanValueAsync', () => {
   });
 
   it('should handle error', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async () => {
       throw new Error('Nope');
     });
@@ -197,7 +199,9 @@ describe('useStanValueAsync', () => {
   });
 
   it('should handle unknown errors', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async () => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw '🚗';
     });
 
@@ -212,6 +216,7 @@ describe('useStanValueAsync', () => {
 
   it('should handle changes in dependencies', async () => {
     const dep = atom(42);
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async ({ get }) => get(dep));
     const store = makeStore();
 
@@ -239,6 +244,7 @@ describe('useStanValueAsync', () => {
   });
 
   it('should unsubscribe on unmount', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async () => 42);
     const mockUnsubscribe = jest.fn();
     const store = makeStore();
