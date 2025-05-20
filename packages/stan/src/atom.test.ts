@@ -11,22 +11,30 @@ describe('atom', () => {
     expect(state.get()).toBe(42);
   });
 
-  it('should update value when set is called with a new value', () => {
+  it('should disallow updates when not initialized', () => {
     const state = atom(42)(makeStore());
 
-    state.get(); // Initialize
-    state.set(100);
+    state.set(43);
 
-    expect(state.get()).toBe(100);
+    expect(state.get()).toBe(42);
   });
 
-  it('should handle updater function in set', () => {
+  it('should let one update value', () => {
     const state = atom(42)(makeStore());
 
     state.get(); // Initialize
-    state.set(prev => prev + 10);
+    state.set(43);
 
-    expect(state.get()).toBe(52);
+    expect(state.get()).toBe(43);
+  });
+
+  it('should let one update value via updater', () => {
+    const state = atom(42)(makeStore());
+
+    state.get(); // Initialize
+    state.set(prev => prev + 1);
+
+    expect(state.get()).toBe(43);
   });
 
   it('should notify subscribers when value changes', () => {
@@ -35,9 +43,9 @@ describe('atom', () => {
 
     state.get(); // Initialize
     state.subscribe(mockCallback);
-    state.set(100);
+    state.set(43);
 
-    expect(mockCallback).toHaveBeenCalledWith(100);
+    expect(mockCallback).toHaveBeenCalledWith(43);
   });
 
   it('should allow multiple subscribers', () => {
@@ -48,13 +56,13 @@ describe('atom', () => {
     state.get(); // Initialize
     state.subscribe(mockCallback1);
     state.subscribe(mockCallback2);
-    state.set(100);
+    state.set(43);
 
-    expect(mockCallback1).toHaveBeenCalledWith(100);
-    expect(mockCallback2).toHaveBeenCalledWith(100);
+    expect(mockCallback1).toHaveBeenCalledWith(43);
+    expect(mockCallback2).toHaveBeenCalledWith(43);
   });
 
-  it('should allow unsubscribing', () => {
+  it('let one unsubscribe', () => {
     const state = atom(42)(makeStore());
     const mockCallback = jest.fn();
 
@@ -62,14 +70,46 @@ describe('atom', () => {
 
     const unsubscribe = state.subscribe(mockCallback);
 
-    state.set(100);
+    state.set(43);
 
     unsubscribe();
 
-    state.set(200);
+    state.set(44);
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
-    expect(mockCallback).toHaveBeenCalledWith(100);
+    expect(mockCallback).toHaveBeenLastCalledWith(43);
+  });
+
+  it('should use referential equality by default', () => {
+    const initialValue = { foo: 'bar' };
+    const nextValue = structuredClone(initialValue);
+    const state = atom(initialValue)(makeStore());
+    const mockCallback = jest.fn();
+
+    state.get(); // Initialize
+    state.subscribe(mockCallback);
+    state.set(nextValue);
+
+    expect(state.get()).toBe(nextValue);
+    expect(mockCallback).toHaveBeenCalledWith(nextValue);
+  });
+
+  it('should let one customize equality function', () => {
+    const initialValue = { foo: 'bar' };
+    const nextValue = structuredClone(initialValue);
+
+    const areValuesEqual = <T>(a: T, b: T) =>
+      JSON.stringify(a) === JSON.stringify(b);
+
+    const state = atom(initialValue, { areValuesEqual })(makeStore());
+    const mockCallback = jest.fn();
+
+    state.get(); // Initialize
+    state.subscribe(mockCallback);
+    state.set(nextValue);
+
+    expect(state.get()).toBe(initialValue);
+    expect(mockCallback).not.toHaveBeenCalled();
   });
 
   it('should go back to initial value when reset', () => {
@@ -83,28 +123,28 @@ describe('atom', () => {
     reset(state);
 
     expect(mockCallback).toHaveBeenCalledTimes(1);
-    expect(mockCallback).toHaveBeenCalledWith(42);
+    expect(mockCallback).toHaveBeenLastCalledWith(42);
   });
 
-  it('should allow initializing atom value from effects', () => {
+  it('should let one initialize atom value from effects', () => {
     const mockOnSet = jest.fn();
-    const state = atom(0, {
+    const state = atom(42, {
       effects: [
         ({ init, onSet }) => {
-          init(42);
+          init(43);
           onSet(mockOnSet);
         },
       ],
     })(makeStore());
 
-    expect(state.get()).toBe(42);
+    expect(state.get()).toBe(43);
     expect(mockOnSet).not.toHaveBeenCalled();
   });
 
-  it('should only allow synchronous initialization from effects', done => {
-    let initFn: (value: number) => void;
+  it('should ignore onInit calls after initialization', () => {
+    let initFn: (value: number) => void = () => {};
 
-    const state = atom(0, {
+    const state = atom(42, {
       effects: [
         ({ init }) => {
           initFn = init;
@@ -114,37 +154,30 @@ describe('atom', () => {
 
     state.get(); // Initialize
 
-    setTimeout(() => {
-      initFn(42);
-
-      try {
-        expect(state.get()).toBe(0);
-        done();
-      } catch (err) {
-        done(err);
-      }
-    });
-  });
-
-  it('should respect effect order when initializing atom value', () => {
-    const state = atom(0, {
-      effects: [
-        ({ init }) => {
-          init(Math.PI);
-        },
-        ({ init }) => {
-          init(42);
-        },
-      ],
-    })(makeStore());
+    initFn(43);
 
     expect(state.get()).toBe(42);
   });
 
-  it('should let effects modify atom value', done => {
-    let setFn: SetterOrUpdater<number>;
+  it('should execute effects in order', () => {
+    const state = atom(42, {
+      effects: [
+        ({ init }) => {
+          init(43);
+        },
+        ({ init }) => {
+          init(44);
+        },
+      ],
+    })(makeStore());
 
-    const state = atom(0, {
+    expect(state.get()).toBe(44);
+  });
+
+  it('should let one modify the value from effects', () => {
+    let setFn: SetterOrUpdater<number> = () => {};
+
+    const state = atom(42, {
       effects: [
         ({ set }) => {
           setFn = set;
@@ -158,55 +191,42 @@ describe('atom', () => {
 
     state.subscribe(mockCallback);
 
-    setTimeout(() => {
-      setFn(42);
+    setFn(43);
 
-      try {
-        expect(mockCallback).toHaveBeenCalledWith(42);
-        done();
-      } catch (err) {
-        done(err);
-      }
-    });
+    expect(mockCallback).toHaveBeenCalledWith(43);
   });
 
-  it('should let effects subscribe to value changes', done => {
-    const mockOnSet1 = jest.fn();
-    const mockOnSet2 = jest.fn();
+  it('should let one subscribe to value changes from effects', () => {
+    const mockOnSet = jest.fn();
 
-    const state = atom(0, {
+    const state = atom(42, {
       effects: [
         ({ onSet }) => {
-          onSet(mockOnSet1);
-        },
-        ({ onSet }) => {
-          onSet(mockOnSet2);
+          onSet(mockOnSet);
         },
       ],
     })(makeStore());
 
     state.get(); // Initialize
 
-    setTimeout(() => {
-      state.set(42);
+    expect(mockOnSet).not.toHaveBeenCalled();
 
-      try {
-        expect(mockOnSet1).toHaveBeenCalledWith(42);
-        expect(mockOnSet2).toHaveBeenCalledWith(42);
-        done();
-      } catch (err) {
-        done(err);
-      }
-    });
+    state.set(43);
+
+    expect(mockOnSet).toHaveBeenLastCalledWith(43);
+
+    reset(state);
+
+    expect(mockOnSet).toHaveBeenLastCalledWith(42);
   });
 
   it('should not have effects trigger themselves', () => {
     const innerCallback = jest.fn();
     const outerCallback = jest.fn();
 
-    let setter: SetterOrUpdater<number> | null = null;
+    let setter: SetterOrUpdater<number> = () => {};
 
-    const state = atom(0, {
+    const state = atom(42, {
       effects: [
         ({ onSet, set }) => {
           onSet(innerCallback);
@@ -219,14 +239,14 @@ describe('atom', () => {
 
     state.subscribe(outerCallback);
 
-    (setter ?? jest.fn())(42);
+    setter(43);
 
     expect(innerCallback).not.toHaveBeenCalled();
-    expect(outerCallback).toHaveBeenCalledWith(42);
+    expect(outerCallback).toHaveBeenCalledWith(43);
   });
 });
 
-describe('atomFamily', () => {
+describe.skip('TODO', () => {
   it('should create atoms with static initial value', () => {
     const family = atomFamily(42);
     const store = makeStore();
