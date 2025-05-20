@@ -12,7 +12,7 @@ import {
   useStanValue,
   useStanValueAsync,
   useSetStanValue,
-  useStanRefresher,
+  useStanRefresh,
   useStanReset,
   StanProvider,
 } from './react';
@@ -333,7 +333,7 @@ describe('useSetStanValue', () => {
   });
 });
 
-describe('useStanRefresher', () => {
+describe('useStanRefresh', () => {
   it('should return a function that refreshes the state', () => {
     const mockSelectorFn = jest
       .fn()
@@ -352,7 +352,7 @@ describe('useStanRefresher', () => {
 
     expect(mockSelectorFn).toHaveBeenCalledTimes(1);
 
-    const { result } = renderHook(() => useStanRefresher(testSelector), {
+    const { result } = renderHook(() => useStanRefresh(testSelector), {
       wrapper: ({ children }: { children: ReactNode }) => (
         <StanProvider store={store}>{children}</StanProvider>
       ),

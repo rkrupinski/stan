@@ -114,7 +114,7 @@ export const useStanValueAsync = <T,>(
   return asyncValue;
 };
 
-export const useStanRefresher = <T,>(scopedState: Scoped<ReadonlyState<T>>) => {
+export const useStanRefresh = <T,>(scopedState: Scoped<ReadonlyState<T>>) => {
   const { store } = useStanCtx();
   const state = scopedState(store);
 
