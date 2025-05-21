@@ -244,115 +244,125 @@ describe('atom', () => {
     expect(innerCallback).not.toHaveBeenCalled();
     expect(outerCallback).toHaveBeenCalledWith(43);
   });
+
+  it('should scope state to store', () => {
+    const store1 = makeStore();
+    const store2 = makeStore();
+    const scopedState = atom(42);
+
+    expect(scopedState(store1)).toBe(scopedState(store1));
+    expect(scopedState(store1)).not.toBe(scopedState(store2));
+  });
 });
 
-describe.skip('TODO', () => {
-  it('should create atoms with static initial value', () => {
+describe('atomFamily', () => {
+  it('should let one use static initial value', () => {
     const family = atomFamily(42);
     const store = makeStore();
 
-    const state1 = family({ id: 1 })(store);
-    const state2 = family({ id: 2 })(store);
+    const state1 = family(1)(store);
+    const state2 = family(2)(store);
 
     expect(state1.get()).toBe(42);
     expect(state2.get()).toBe(42);
   });
 
-  it('should create atoms with dynamic initial value based on parameter', () => {
-    const family = atomFamily<number, { id: number }>(({ id }) => id * 2);
+  it('should let one derive initial value from param', () => {
+    const family = atomFamily<number, number>(param => param);
     const store = makeStore();
 
-    const state1 = family({ id: 1 })(store);
-    const state2 = family({ id: 2 })(store);
+    const state1 = family(42)(store);
+    const state2 = family(43)(store);
 
-    expect(state1.get()).toBe(2);
-    expect(state2.get()).toBe(4);
+    expect(state1.get()).toBe(42);
+    expect(state2.get()).toBe(43);
   });
 
-  it('should return the same atom instance for identical parameters', () => {
+  it('should return the same state for the same parameter', () => {
     const family = atomFamily(42);
     const store = makeStore();
 
-    const atom1 = family({ id: 1 })(store);
-    const atom2 = family({ id: 1 })(store);
+    const atom1 = family(1)(store);
+    const atom2 = family(1)(store);
+
+    expect(atom1).toBe(atom2);
+
+    const param = {};
+    const atom3 = family(param)(store);
+    const atom4 = family(param)(store);
+
+    expect(atom3).toBe(atom4);
+  });
+
+  it('should return the same state for identical parameter', () => {
+    const family = atomFamily(42);
+    const store = makeStore();
+
+    const atom1 = family({ foo: 'bar' })(store);
+    const atom2 = family({ foo: 'bar' })(store);
 
     expect(atom1).toBe(atom2);
   });
 
-  it('should return different atom instances for different parameters', () => {
+  it('should return different state for different parameter', () => {
     const family = atomFamily(42);
     const store = makeStore();
 
-    const state1 = family({ id: 1 })(store);
-    const state2 = family({ id: 2 })(store);
+    const state1 = family(1)(store);
+    const state2 = family(2)(store);
 
     expect(state1).not.toBe(state2);
+
+    const state3 = family({ foo: 'bar' })(store);
+    const state4 = family({ bar: 'baz' })(store);
+
+    expect(state3).not.toBe(state4);
   });
 
   it('should maintain independent state for different parameters', () => {
     const family = atomFamily(42);
     const store = makeStore();
 
-    const state1 = family({ id: 1 })(store);
-    const state2 = family({ id: 2 })(store);
+    const state1 = family(1)(store);
+    const state2 = family(2)(store);
 
     state1.get(); // Initialize
     state2.get(); // Initialize
 
-    state1.set(100);
-    state2.set(200);
+    state1.set(43);
+    state2.set(44);
 
-    expect(state1.get()).toBe(100);
-    expect(state2.get()).toBe(200);
+    expect(state1.get()).toBe(43);
+    expect(state2.get()).toBe(44);
   });
 
-  it('should handle effects for all atoms in the family', () => {
+  it('should execute effects for every state', () => {
     const mockOnSet = jest.fn();
-    const family = atomFamily(0, {
+    const family = atomFamily(42, {
       effects: [
         ({ init, onSet }) => {
-          init(42);
+          init(43);
           onSet(mockOnSet);
         },
       ],
     });
     const store = makeStore();
 
-    const state1 = family({ id: 1 })(store);
+    const state1 = family(1)(store);
     state1.get(); // Initialize
 
-    const state2 = family({ id: 2 })(store);
+    const state2 = family(2)(store);
     state2.get(); // Initialize
 
-    state2.set(prev => prev + 10);
+    expect(state1.get()).toBe(43);
+    expect(state2.get()).toBe(43);
 
-    expect(state1.get()).toBe(42);
-    expect(state2.get()).toBe(52);
+    state1.set(44);
 
-    expect(mockOnSet).toHaveBeenCalledWith(52);
-  });
+    expect(mockOnSet).toHaveBeenLastCalledWith(44);
 
-  it('should handle primitive parameters', () => {
-    const family = atomFamily<number, number>(id => id * 2);
-    const store = makeStore();
+    state2.set(45);
 
-    const state1 = family(1)(store);
-    const state2 = family(2)(store);
-
-    expect(state1.get()).toBe(2);
-    expect(state2.get()).toBe(4);
-  });
-
-  it('should handle complex parameters', () => {
-    const family = atomFamily<string, { user: { id: number; name: string } }>(
-      param => param.user.name,
-    );
-    const store = makeStore();
-
-    const state1 = family({ user: { id: 1, name: 'Alice' } })(store);
-    const state2 = family({ user: { id: 2, name: 'Bob' } })(store);
-
-    expect(state1.get()).toBe('Alice');
-    expect(state2.get()).toBe('Bob');
+    expect(mockOnSet).toHaveBeenLastCalledWith(45);
   });
 });
