@@ -48,7 +48,7 @@ describe('atom', () => {
     expect(mockCallback).toHaveBeenCalledWith(43);
   });
 
-  it('should allow multiple subscribers', () => {
+  it('let one subscribe multiple times', () => {
     const state = atom(42)(makeStore());
     const mockCallback1 = jest.fn();
     const mockCallback2 = jest.fn();
