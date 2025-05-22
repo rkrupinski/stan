@@ -101,7 +101,7 @@ export const selector = <T>(
 
     let evalId = 0;
 
-    const evaluate = (silent = false) => {
+    const evaluate = () => {
       cleanup();
 
       controller?.abort(new Aborted());
@@ -122,7 +122,7 @@ export const selector = <T>(
 
       store.value.set(key, candidate);
 
-      if (!silent) notifySubscribers();
+      notifySubscribers();
 
       if (!isPromiseLike(candidate)) return;
 
@@ -162,12 +162,12 @@ export const selector = <T>(
       get() {
         switch (true) {
           case !store.initialized.get(key):
-            evaluate(true);
+            evaluate();
             store.initialized.set(key, true);
             break;
 
           case depsChanged(key):
-            evaluate(true);
+            evaluate();
             break;
 
           default:
