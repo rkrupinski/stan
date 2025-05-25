@@ -277,7 +277,7 @@ describe('selector', () => {
     expect(mockCallback).toHaveBeenCalledTimes(1);
   });
 
-  it('should re-initialize when refreshed unmounted', () => {
+  it('should invalidate cache when refreshed unmounted', () => {
     const evalCounter = jest.fn();
     const producer = jest
       .fn<number, []>()
@@ -341,143 +341,101 @@ describe('selector', () => {
     expect(state.get()).toBe(initialValue);
     expect(mockCallback).not.toHaveBeenCalled();
   });
-});
 
-describe.skip('selectorFamily', () => {
-  it('should create selectors with static computation', () => {
-    const dep = atom(42);
-    const family = selectorFamily<number, { multiplier: number }>(
-      ({ multiplier }) =>
-        ({ get }) =>
-          get(dep) * multiplier,
-    );
-
+  it('should invalidate cache if deps change while unmounted', () => {
+    const dep1 = atom(42);
+    const dep2 = selector(({ get }) => get(dep1) + 1);
     const store = makeStore();
-    const state1 = family({ multiplier: 2 })(store);
-    const state2 = family({ multiplier: 3 })(store);
+    const evalCounter = jest.fn();
+    const mockCallback = jest.fn();
+    const state = selector(({ get }) => {
+      evalCounter();
+      return get(dep2) + 1;
+    })(store);
 
-    expect(state1.get()).toBe(84);
-    expect(state2.get()).toBe(126);
+    state.get(); // Initialize
+    const unsubscribe = state.subscribe(mockCallback);
+
+    expect(evalCounter).toHaveBeenCalledTimes(1);
+
+    dep1(store).set(43);
+
+    expect(state.get()).toBe(45);
+    expect(evalCounter).toHaveBeenCalledTimes(2);
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+
+    dep1(store).set(44);
+    expect(evalCounter).toHaveBeenCalledTimes(2);
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+
+    expect(state.get()).toBe(46);
+    expect(evalCounter).toHaveBeenCalledTimes(3);
   });
 
-  it('should return the same selector instance for identical parameters', () => {
-    const dep = atom(42);
-    const family = selectorFamily<number, { multiplier: number }>(
-      ({ multiplier }) =>
-        ({ get }) =>
-          get(dep) * multiplier,
-    );
+  it('should abort previous work', () => {
+    const signals: AbortSignal[] = [];
 
+    const dep = atom(42);
     const store = makeStore();
-    const state1 = family({ multiplier: 2 })(store);
-    const state2 = family({ multiplier: 2 })(store);
+
+    const state = selector(({ get, signal }) => {
+      signals.push(signal);
+      return get(dep);
+    })(store);
+
+    state.get(); // Initialize
+    state.subscribe(jest.fn());
+
+    expect(signals[0].aborted).toBe(false);
+
+    dep(store).set(43);
+
+    expect(signals[0].aborted).toBe(true);
+  });
+});
+
+describe('selectorFamily', () => {
+  it('should return the same state for the same parameter', () => {
+    const family = selectorFamily(() => () => 1);
+    const store = makeStore();
+
+    const state1 = family(1)(store);
+    const state2 = family(1)(store);
+
+    expect(state1).toBe(state2);
+
+    const param = {};
+    const state3 = family(param)(store);
+    const state4 = family(param)(store);
+
+    expect(state3).toBe(state4);
+  });
+
+  it('should return the same state for identical parameters', () => {
+    const family = selectorFamily(() => () => 1);
+    const store = makeStore();
+
+    const state1 = family({ foo: 'bar' })(store);
+    const state2 = family({ foo: 'bar' })(store);
 
     expect(state1).toBe(state2);
   });
 
-  it('should return different selector instances for different parameters', () => {
-    const dep = atom(42);
-    const family = selectorFamily<number, { multiplier: number }>(
-      ({ multiplier }) =>
-        ({ get }) =>
-          get(dep) * multiplier,
-    );
-
+  it('should return a different state for a different parameter', () => {
+    const family = selectorFamily(() => () => 1);
     const store = makeStore();
-    const state1 = family({ multiplier: 2 })(store);
-    const state2 = family({ multiplier: 3 })(store);
+
+    const state1 = family(1)(store);
+    const state2 = family(2)(store);
 
     expect(state1).not.toBe(state2);
-  });
 
-  it('should update when dependencies change', () => {
-    const dep = atom(42);
-    const family = selectorFamily<number, { multiplier: number }>(
-      ({ multiplier }) =>
-        ({ get }) =>
-          get(dep) * multiplier,
-    );
+    const state3 = family({ foo: 'bar' })(store);
+    const state4 = family({ bar: 'baz' })(store);
 
-    const store = makeStore();
-    const state1 = family({ multiplier: 2 })(store);
-    const state2 = family({ multiplier: 3 })(store);
-    const mockCallback1 = jest.fn();
-    const mockCallback2 = jest.fn();
-
-    state1.get(); // Initialize
-    state2.get(); // Initialize
-    state1.subscribe(mockCallback1);
-    state2.subscribe(mockCallback2);
-
-    dep(store).set(43);
-
-    expect(state1.get()).toBe(86);
-    expect(state2.get()).toBe(129);
-    expect(mockCallback1).toHaveBeenCalledWith(86);
-    expect(mockCallback2).toHaveBeenCalledWith(129);
-  });
-
-  it('should handle custom equality function', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const areValuesEqual = (a: any, b: any) => a % 2 === b % 2;
-
-    const dep = atom(42);
-    const family = selectorFamily<number, number>(
-      multiplier =>
-        ({ get }) =>
-          get(dep) * multiplier,
-      { areValuesEqual },
-    );
-
-    const store = makeStore();
-    const state = family(2)(store);
-    const mockCallback = jest.fn();
-
-    state.get(); // Initialize
-    state.subscribe(mockCallback);
-
-    dep(store).set(44);
-
-    expect(mockCallback).not.toHaveBeenCalled();
-
-    dep(store).set(43.5);
-
-    expect(mockCallback).toHaveBeenCalledWith(87);
-  });
-
-  it('should handle primitive parameters', () => {
-    const dep = atom(42);
-    const family = selectorFamily<number, number>(
-      multiplier =>
-        ({ get }) =>
-          get(dep) * multiplier,
-    );
-
-    const store = makeStore();
-    const state1 = family(2)(store);
-    const state2 = family(3)(store);
-
-    expect(state1.get()).toBe(84);
-    expect(state2.get()).toBe(126);
-  });
-
-  it('should handle complex parameters', () => {
-    const dep = atom(42);
-    const family = selectorFamily<
-      number,
-      { user: { id: number; multiplier: number } }
-    >(
-      ({ user }) =>
-        ({ get }) =>
-          get(dep) * user.multiplier,
-    );
-
-    const store = makeStore();
-    const state1 = family({ user: { id: 1, multiplier: 2 } })(store);
-    const state2 = family({ user: { id: 2, multiplier: 3 } })(store);
-
-    expect(state1.get()).toBe(84);
-    expect(state2.get()).toBe(126);
+    expect(state3).not.toBe(state4);
   });
 
   it('should handle most-recent cache policy', () => {
@@ -523,59 +481,4 @@ describe.skip('selectorFamily', () => {
     expect(family({ multiplier: 4 })(store)).toBe(state3);
     expect(family({ multiplier: 2 })(store)).not.toBe(state1);
   });
-
-  it('should not cache errors', async () => {
-    const mockSelectorFn = jest
-      .fn()
-      .mockResolvedValueOnce(1)
-      .mockRejectedValueOnce(new Error('Nope'))
-      .mockResolvedValueOnce(1)
-      .mockResolvedValueOnce(2);
-
-    const mockSelectorFamilyFn = jest.fn().mockReturnValue(mockSelectorFn);
-
-    const family = selectorFamily(mockSelectorFamilyFn);
-    const store = makeStore();
-
-    family(1)(store).get();
-
-    expect(mockSelectorFn).toHaveBeenCalledTimes(1);
-
-    family(2)(store).get();
-
-    expect(mockSelectorFn).toHaveBeenCalledTimes(2);
-
-    await Promise.resolve();
-
-    family(1)(store).get();
-
-    expect(mockSelectorFn).toHaveBeenCalledTimes(2);
-
-    family(2)(store).get();
-
-    expect(mockSelectorFn).toHaveBeenCalledTimes(3);
-  });
-});
-
-it('should abort previous evaluation', () => {
-  const signals: AbortSignal[] = [];
-
-  const dep = atom(42);
-  const store = makeStore();
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const state = selector(async ({ get, signal }) => {
-    signals.push(signal);
-    return get(dep);
-  })(store);
-
-  void state.get(); // Initialize
-
-  state.subscribe(jest.fn());
-
-  expect(signals[0].aborted).toBe(false);
-
-  dep(store).set(43);
-
-  expect(signals[0].aborted).toBe(true);
 });

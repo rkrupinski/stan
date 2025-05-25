@@ -282,29 +282,29 @@ describe('atomFamily', () => {
     const family = atomFamily(42);
     const store = makeStore();
 
-    const atom1 = family(1)(store);
-    const atom2 = family(1)(store);
+    const state1 = family(1)(store);
+    const state2 = family(1)(store);
 
-    expect(atom1).toBe(atom2);
+    expect(state1).toBe(state2);
 
     const param = {};
-    const atom3 = family(param)(store);
-    const atom4 = family(param)(store);
+    const state3 = family(param)(store);
+    const state4 = family(param)(store);
 
-    expect(atom3).toBe(atom4);
+    expect(state3).toBe(state4);
   });
 
-  it('should return the same state for identical parameter', () => {
+  it('should return the same state for identical parameters', () => {
     const family = atomFamily(42);
     const store = makeStore();
 
-    const atom1 = family({ foo: 'bar' })(store);
-    const atom2 = family({ foo: 'bar' })(store);
+    const state1 = family({ foo: 'bar' })(store);
+    const state2 = family({ foo: 'bar' })(store);
 
-    expect(atom1).toBe(atom2);
+    expect(state1).toBe(state2);
   });
 
-  it('should return different state for different parameter', () => {
+  it('should return a different state for a different parameter', () => {
     const family = atomFamily(42);
     const store = makeStore();
 
