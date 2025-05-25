@@ -1,5 +1,5 @@
 import { selector } from "@rkrupinski/stan";
-import { useStanRefresher, useStanValueAsync } from "@rkrupinski/stan/react";
+import { useStanRefresh, useStanValueAsync } from "@rkrupinski/stan/react";
 
 const foo = ((attempts: number) => {
   let i = 0;
@@ -30,7 +30,7 @@ const baz = selector(async ({ get }) => {
 
 export function Example() {
   const result = useStanValueAsync(baz);
-  const refresh = useStanRefresher(baz);
+  const refresh = useStanRefresh(baz);
 
   return (
     <>

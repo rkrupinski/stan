@@ -1,11 +1,11 @@
 import { useCallback, useState, type FC } from "react";
-import { useStanRefresher } from "@rkrupinski/stan/react";
+import { useStanRefresh } from "@rkrupinski/stan/react";
 
 import { allTodos } from "../List/state";
 import { todoService } from "../service";
 
 export const Toolbar: FC = () => {
-  const refreshTodos = useStanRefresher(allTodos);
+  const refreshTodos = useStanRefresh(allTodos);
   const [busy, setBusy] = useState(false);
 
   const onAddTodo = useCallback(async () => {
