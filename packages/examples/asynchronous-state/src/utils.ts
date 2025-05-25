@@ -1,7 +1,7 @@
 import { object, number, type InferType } from "yup";
 
 const schema = object({
-  value: number().required(),
+  value: number().required().strict(),
 });
 
 type SchemaType = InferType<typeof schema>;
