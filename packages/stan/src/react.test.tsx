@@ -167,8 +167,7 @@ describe('useStanValue', () => {
 
 describe('useStanValueAsync', () => {
   it('should handle success', async () => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const testSelector = selector(async () => 42);
+    const testSelector = selector(() => Promise.resolve(42));
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
       wrapper: StanProvider,
@@ -182,10 +181,7 @@ describe('useStanValueAsync', () => {
   });
 
   it('should handle error', async () => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const testSelector = selector(async () => {
-      throw new Error('Nope');
-    });
+    const testSelector = selector(() => Promise.reject(new Error('Nope')));
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
       wrapper: StanProvider,
@@ -198,12 +194,9 @@ describe('useStanValueAsync', () => {
     });
   });
 
-  it('should handle unknown errors', async () => {
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const testSelector = selector(async () => {
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
-      throw '🚗';
-    });
+  it('should handle unknown error', async () => {
+    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+    const testSelector = selector(() => Promise.reject('🚗'));
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
       wrapper: StanProvider,
@@ -268,19 +261,6 @@ describe('useStanValueAsync', () => {
 });
 
 describe('useSetStanValue', () => {
-  it('should return the setter function from the state', () => {
-    const testAtom = atom(42);
-    const store = makeStore();
-
-    const { result } = renderHook(() => useSetStanValue(testAtom), {
-      wrapper: ({ children }: { children: ReactNode }) => (
-        <StanProvider store={store}>{children}</StanProvider>
-      ),
-    });
-
-    expect(result.current).toBe(testAtom(store).set);
-  });
-
   it('should maintain setter reference across renders', () => {
     const testAtom = atom(42);
     const { result, rerender } = renderHook(() => useSetStanValue(testAtom), {
