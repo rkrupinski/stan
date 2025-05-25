@@ -7,9 +7,8 @@ import {
   type TypedOmit,
 } from './internal';
 import { Aborted } from './errors';
-import type { ReadonlyState, State } from './state';
 import type { SerializableParam, TagFromParam } from './types';
-import type { Scoped } from './store';
+import type { ReadonlyState, State, Scoped } from './state';
 import { memoize, type CachePolicy } from './cache';
 
 let selectorId = 0;
@@ -81,7 +80,7 @@ export const selector = <T>(
     };
 
     const notifySubscribers = () => {
-      [...subscribers].forEach(cb => cb(store.value.get(key)));
+      [...subscribers].forEach(cb => cb(store.value.get(key) as T));
     };
 
     const depsChanged = (key: string) => {
@@ -102,7 +101,7 @@ export const selector = <T>(
 
     let evalId = 0;
 
-    const evaluate = (silent = false) => {
+    const evaluate = () => {
       cleanup();
 
       controller?.abort(new Aborted());
@@ -123,7 +122,7 @@ export const selector = <T>(
 
       store.value.set(key, candidate);
 
-      if (!silent) notifySubscribers();
+      notifySubscribers();
 
       if (!isPromiseLike(candidate)) return;
 
@@ -163,19 +162,19 @@ export const selector = <T>(
       get() {
         switch (true) {
           case !store.initialized.get(key):
-            evaluate(true);
+            evaluate();
             store.initialized.set(key, true);
             break;
 
           case depsChanged(key):
-            evaluate(true);
+            evaluate();
             break;
 
           default:
             break;
         }
 
-        return store.value.get(key);
+        return store.value.get(key) as T;
       },
       subscribe(cb) {
         if (subscribers.size === 0) onMount();

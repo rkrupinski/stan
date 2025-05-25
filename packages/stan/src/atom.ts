@@ -6,8 +6,7 @@ import {
   RESET_TAG,
   type TypedOmit,
 } from './internal';
-import type { WritableState } from './state';
-import type { Scoped } from './store';
+import type { WritableState, Scoped } from './state';
 import { memoize } from './cache';
 
 let atomId = 0;
@@ -49,7 +48,7 @@ export const atom = <T>(
       newValue => {
         if (!store.initialized.get(key)) return;
 
-        const prevValue = store.value.get(key);
+        const prevValue = store.value.get(key) as T;
         const candidate = isFunction(newValue) ? newValue(prevValue) : newValue;
 
         if (areValuesEqual(prevValue, candidate)) return;
@@ -92,7 +91,7 @@ export const atom = <T>(
           store.initialized.set(key, true);
         }
 
-        return store.value.get(key);
+        return store.value.get(key) as T;
       },
       set,
       subscribe(cb) {

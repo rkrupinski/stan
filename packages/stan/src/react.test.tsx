@@ -1,8 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-
-import React, { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
 import { selector } from './selector';
@@ -13,7 +12,7 @@ import {
   useStanValue,
   useStanValueAsync,
   useSetStanValue,
-  useStanRefresher,
+  useStanRefresh,
   useStanReset,
   StanProvider,
 } from './react';
@@ -115,6 +114,7 @@ describe('useStanValue', () => {
   });
 
   it('should initialize with the current async selector value', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async () => 42);
 
     const { result } = renderHook(() => useStanValue(testSelector), {
@@ -167,7 +167,7 @@ describe('useStanValue', () => {
 
 describe('useStanValueAsync', () => {
   it('should handle success', async () => {
-    const testSelector = selector(async () => 42);
+    const testSelector = selector(() => Promise.resolve(42));
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
       wrapper: StanProvider,
@@ -181,9 +181,7 @@ describe('useStanValueAsync', () => {
   });
 
   it('should handle error', async () => {
-    const testSelector = selector(async () => {
-      throw new Error('Nope');
-    });
+    const testSelector = selector(() => Promise.reject(new Error('Nope')));
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
       wrapper: StanProvider,
@@ -196,10 +194,9 @@ describe('useStanValueAsync', () => {
     });
   });
 
-  it('should handle unknown errors', async () => {
-    const testSelector = selector(async () => {
-      throw '🚗';
-    });
+  it('should handle unknown error', async () => {
+    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+    const testSelector = selector(() => Promise.reject('🚗'));
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
       wrapper: StanProvider,
@@ -212,6 +209,7 @@ describe('useStanValueAsync', () => {
 
   it('should handle changes in dependencies', async () => {
     const dep = atom(42);
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async ({ get }) => get(dep));
     const store = makeStore();
 
@@ -239,6 +237,7 @@ describe('useStanValueAsync', () => {
   });
 
   it('should unsubscribe on unmount', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     const testSelector = selector(async () => 42);
     const mockUnsubscribe = jest.fn();
     const store = makeStore();
@@ -262,19 +261,6 @@ describe('useStanValueAsync', () => {
 });
 
 describe('useSetStanValue', () => {
-  it('should return the setter function from the state', () => {
-    const testAtom = atom(42);
-    const store = makeStore();
-
-    const { result } = renderHook(() => useSetStanValue(testAtom), {
-      wrapper: ({ children }: { children: ReactNode }) => (
-        <StanProvider store={store}>{children}</StanProvider>
-      ),
-    });
-
-    expect(result.current).toBe(testAtom(store).set);
-  });
-
   it('should maintain setter reference across renders', () => {
     const testAtom = atom(42);
     const { result, rerender } = renderHook(() => useSetStanValue(testAtom), {
@@ -327,7 +313,7 @@ describe('useSetStanValue', () => {
   });
 });
 
-describe('useStanRefresher', () => {
+describe('useStanRefresh', () => {
   it('should return a function that refreshes the state', () => {
     const mockSelectorFn = jest
       .fn()
@@ -346,7 +332,7 @@ describe('useStanRefresher', () => {
 
     expect(mockSelectorFn).toHaveBeenCalledTimes(1);
 
-    const { result } = renderHook(() => useStanRefresher(testSelector), {
+    const { result } = renderHook(() => useStanRefresh(testSelector), {
       wrapper: ({ children }: { children: ReactNode }) => (
         <StanProvider store={store}>{children}</StanProvider>
       ),

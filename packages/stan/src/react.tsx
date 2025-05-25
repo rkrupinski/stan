@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useMemo,
   useState,
@@ -10,8 +10,8 @@ import React, {
   type ReactNode,
 } from 'react';
 
-import type { State, ReadonlyState, WritableState } from './state';
-import { DEFAULT_STORE, makeStore, type Scoped, type Store } from './store';
+import type { Scoped, State, ReadonlyState, WritableState } from './state';
+import { DEFAULT_STORE, makeStore, type Store } from './store';
 import { refresh, reset } from './utils';
 
 export type StanCtxType = {
@@ -44,7 +44,7 @@ export const useStanValue = <T,>(scopedState: Scoped<State<T>>) => {
   const { store } = useStanCtx();
   const state = scopedState(store);
   const prevStateRef = useRef(state);
-  const [value, setValue] = useState(state.get);
+  const [value, setValue] = useState(() => state.get());
 
   useEffect(() => {
     if (state !== prevStateRef.current) {
@@ -85,7 +85,7 @@ export const useStanValueAsync = <T,>(
   useEffect(() => {
     let active = true;
 
-    if (asyncValue.type !== 'loading') setAsyncValue({ type: 'loading' });
+    setAsyncValue({ type: 'loading' });
 
     value.then(
       value => {
@@ -100,6 +100,7 @@ export const useStanValueAsync = <T,>(
         if (active)
           setAsyncValue({
             type: 'error',
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             reason: err?.message ?? 'unknown',
           });
       },
@@ -113,7 +114,7 @@ export const useStanValueAsync = <T,>(
   return asyncValue;
 };
 
-export const useStanRefresher = <T,>(scopedState: Scoped<ReadonlyState<T>>) => {
+export const useStanRefresh = <T,>(scopedState: Scoped<ReadonlyState<T>>) => {
   const { store } = useStanCtx();
   const state = scopedState(store);
 

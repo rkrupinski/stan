@@ -96,6 +96,7 @@ export const memoize = <A, R>(
   const cache = makeCache<any, R>(cachePolicy);
 
   return (arg: A) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const key = keyMaker(arg);
 
     if (!cache.has(key)) {

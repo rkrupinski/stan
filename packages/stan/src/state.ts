@@ -1,3 +1,4 @@
+import type { Store } from './store';
 import type { SetterOrUpdater } from './types';
 import type { REFRESH_TAG, RESET_TAG } from './internal';
 
@@ -15,3 +16,6 @@ export interface WritableState<T> extends State<T> {
   set: SetterOrUpdater<T>;
   [RESET_TAG](): void;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Scoped<T extends State<any>> = (store: Store) => T;
