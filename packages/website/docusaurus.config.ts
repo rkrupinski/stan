@@ -70,15 +70,15 @@ const config: Config = {
           items: [
             {
               label: 'Getting started',
-              to: '/docs/getting-started',
+              to: '/docs/getting-started/installation',
             },
             {
               label: 'API',
-              to: '/docs/api',
+              to: '/docs/api/state',
             },
             {
               label: 'Guides',
-              to: '/docs/guides',
+              to: '/docs/guides/type-safety',
             },
           ],
         },
