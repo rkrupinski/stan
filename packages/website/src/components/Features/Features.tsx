@@ -22,7 +22,7 @@ const FeatureList: FeatureItem[] = [
     title: 'Tiny footprint, big capabilities',
     icon: Microscope,
     description:
-      'Weighing two kilobytes, it still packs enough features to cover most needs.',
+      'At just two kilobytes, it still packs enough features to meet most needs.',
   },
   {
     title: 'Feels like home',
