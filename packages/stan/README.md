@@ -10,3 +10,16 @@ Minimal, type-safe state management
 - [Website](https://rkrupinski.github.io/stan)
 - [API docs](https://rkrupinski.github.io/stan/docs/api)
 - [Examples](https://rkrupinski.github.io/stan/docs/getting-started/examples)
+
+```tsx
+import { atom } from '@rkrupinski/stan';
+import { useStanValue } from '@rkrupinski/stan/react';
+
+const ultimateQuestion = atom(42);
+
+function MyApp() {
+  const answer = useStanValue(ultimateQuestion);
+
+  return <h1>{answer}</h1>;
+}
+```
