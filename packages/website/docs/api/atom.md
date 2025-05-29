@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-description: atom API docs
+description: atom API reference
 ---
 
 # `atom`
@@ -16,8 +16,14 @@ const atom: <T>(
 
 - `initialValue` – The value used to initialize the atom.
 - `atomOptions?` - Atom configuration:
-  - `tag?` - A string identifier (see [`State<T>`](./state.md#statet)).
+
+  - `tag?` - A string that gets appended to the `key` (see [`State<T>`](./state.md#statet)). Useful for debugging.
   - `effects?` - An array of [`AtomEffect<T>`](#atom-effects).
+  - `areValuesEqual?` - A function used to determine whether two consecutive atom values are equal. It has the following signature: `<T>(a: T, b: T) => boolean`, and defaults to a simple `a === b` check. If this function returns `true` (or any other truthy value) when setting the atom's value, the value is considered unchanged, and no subscribers will be notified.
+
+    :::info
+    `areValuesEqual` is expected to be synchronous.
+    :::
 
 ## Atom effects
 
@@ -41,7 +47,7 @@ type AtomEffect<T> = (param: {
 - `set` – A function used to update the atom's value. Unlike `init`, it is intended to be called asynchronously, after the initialization phase. Calling `set` from within the effect will not trigger `onSet`, but it will notify atom subscribers.
 - `onSet` – A way to subscribe to atom value changes. It accepts a callback function that will be called with the new value, unless the change was triggered from within the effect using `set`.
 
-## Examples
+## Example
 
 Creating an atom that holds a state of type `number`:
 
@@ -81,6 +87,6 @@ function MyComponent() {
 
 ## See also
 
-- [Atom effects](https://github.com/rkrupinski/stan/tree/master/packages/examples/atom-effects) example
-- [Vanilla atoms](https://github.com/rkrupinski/stan/tree/master/packages/examples/vanilla) example
+- [`atomFamily`](./atomFamily.md)
 - [Using Stan with React](./react.md)
+- [Atom effects](https://github.com/rkrupinski/stan/tree/master/packages/examples/atom-effects) (example)
