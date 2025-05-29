@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-description: Utils API docs
+description: Utils API reference
 ---
 
 # Utils

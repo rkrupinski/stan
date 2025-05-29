@@ -1,6 +1,6 @@
 ---
 sidebar_position: 7
-description: Store API docs
+description: Store API reference
 ---
 
 # Store

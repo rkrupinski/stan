@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-description: atomFamily API docs
+description: atomFamily API reference
 ---
 
 # `atomFamily`

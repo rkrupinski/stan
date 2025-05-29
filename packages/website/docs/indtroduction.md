@@ -11,6 +11,7 @@ Stan (Polish for "state") builds on ideas from [Recoil](https://recoiljs.org) an
 Key Features:
 
 - **Type-safe**. Stan harnesses the power of generics and type inference to deliver a great developer experience.
+- **Simple**. A minimal yet sufficient API.
 - **Composable**. Stan lets you build both flat and deeply nested state graphs. These update efficiently thanks to caching and subscription tracking.
 - **Framework-agnostic**. While Stan can theoretically work with any framework, it depends on none.
 - **SSR-ready**. Works out of the box with frameworks like [Next.js](https://nextjs.org).

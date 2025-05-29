@@ -1,6 +1,6 @@
 ---
 sidebar_position: 8
-description: React API docs
+description: React API reference
 ---
 
 # React
