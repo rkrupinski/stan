@@ -10,12 +10,12 @@ In Stan, atoms are value containers. They have no dependencies and can be consid
 ```ts
 const atom: <T>(
   initialValue: T,
-  atomOptions?: AtomOptions<T>,
+  options?: AtomOptions<T>,
 ) => Scoped<WritableState<T>>;
 ```
 
-- `initialValue` – The value used to initialize the atom.
-- `atomOptions?` - Atom configuration:
+- `initialValue` - The value used to initialize the atom.
+- `options?` - Atom configuration:
 
   - `tag?` - A string that gets appended to the `key` (see [`State<T>`](./state.md#statet)). Useful for debugging.
   - `effects?` - An array of [`AtomEffect<T>`](#atom-effects).
@@ -43,9 +43,9 @@ type AtomEffect<T> = (param: {
 }) => void;
 ```
 
-- `init` – A function used to initialize the atom's value. It can be called multiple times, but **only** synchronously, during the execution of the effect function. Any attempt to call it asynchronously will be ignored.
-- `set` – A function used to update the atom's value. Unlike `init`, it is intended to be called asynchronously, after the initialization phase. Calling `set` from within the effect will not trigger `onSet`, but it will notify atom subscribers.
-- `onSet` – A way to subscribe to atom value changes. It accepts a callback function that will be called with the new value, unless the change was triggered from within the effect using `set`.
+- `init` - A function used to initialize the atom's value. It can be called multiple times, but **only** synchronously, during the execution of the effect function. Any attempt to call it asynchronously will be ignored.
+- `set` - A function used to update the atom's value. Unlike `init`, it is intended to be called asynchronously, after the initialization phase. Calling `set` from within the effect will not trigger `onSet`, but it will notify atom subscribers.
+- `onSet` - A way to subscribe to atom value changes. It accepts a callback function that will be called with the new value, unless the change was triggered from within the effect using `set`.
 
 ## Example
 
