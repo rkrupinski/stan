@@ -76,8 +76,8 @@ It inherits all properties from [`State<T>`](#statet), and additionally defines:
 
 - `[REFRESH_TAG]` - A function that refreshes the state.
 
-  - When called on a mounted state, it re-evaluates the state immediately.
-  - When called on an unmounted state, it marks the state as uninitialized - meaning it will be re-evaluated the next time it is accessed.
+  - When called on a _mounted_ state, it re-evaluates the state immediately.
+  - When called on an _unmounted_ state, it marks the state as uninitialized - meaning it will be re-evaluated the next time it is accessed.
 
   Important: This function is not meant to be called directly (see [utils](./utils.md#refresh)).
 
