@@ -82,7 +82,9 @@ It inherits all properties from [`State<T>`](#statet), and additionally defines:
   Important: This function is not meant to be called directly (see [utils](./utils.md#refresh)).
 
 :::info
+`ReadonlyState<T>` must be initialized before use. Initialization occurs when the state is first read.
+:::
 
-- `ReadonlyState<T>` must be initialized before use. Initialization occurs when the state is first read.
-- `ReadonlyState<T>` is considered mounted when it has one or more subscribers, and unmounted when it has none. This affects how the state is refreshed (see [utils](./utils.md#refresh)).
-  :::
+### Mounting
+
+`ReadonlyState<T>` is considered _mounted_ when it has one or more subscribers, and _unmounted_ when it has none. This affects how the state is refreshed (see [utils](./utils.md#refresh)).
