@@ -33,3 +33,7 @@ Works with:
 ```ts
 const refresh: (state: ReadonlyState<any>) => void;
 ```
+
+## See also
+
+- [Using Stan with React](./react.md)
