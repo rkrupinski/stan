@@ -5,7 +5,7 @@ description: atomFamily API reference
 
 # `atomFamily`
 
-When you need to map a values to atoms, `atomFamily` comes in handy. It returns a memoized function that outputs atoms based on the provided parameter (which must be [serializable](../guides//param-serialization.md)).
+When you need to map a values to atoms, `atomFamily` comes in handy. It returns a memoized function that outputs [`atoms`](./atom.md) based on a given parameter (which must be [serializable](../guides/param-serialization.md)).
 
 ```ts
 const atomFamily: <T, P extends SerializableParam>(
@@ -21,7 +21,7 @@ const atomFamily: <T, P extends SerializableParam>(
   - `areValuesEqual?` - A function that determines whether two consecutive values are equal (see [`atom`](./atom.md) for details).
 
 :::info
-Stan does not rely on referential equality for `atomFamily` parameters, so there's no need to maintain stable references. Cache keys are computed by serializing (stable stringification) the parameter values - hence the [serializability](../guides//param-serialization.md) requirement.
+Stan does not rely on referential equality for `atomFamily` parameters, so there's no need to maintain stable references. Cache keys are computed by serializing (stable stringification) the parameter values - hence the [serializability](../guides/param-serialization.md) requirement.
 :::
 
 ## Example
