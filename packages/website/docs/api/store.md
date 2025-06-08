@@ -5,7 +5,7 @@ description: Store API reference
 
 # Store
 
-For several reasons (such as <abbr>SSR</abbr>), it's not a good idea for Stan to keep state locally. Instead, it uses a central store: every change is written to the store, and every value is read from it. However, the store-oriented design introduces some semantic overhead in the form of the [`Scoped<T>`](#scopedt) type.
+For several reasons (such as [SSR](../guides/ssr.md)), it's not a good idea for Stan to keep state locally. Instead, it uses a central store: every change is written to the store, and every value is read from it. However, the store-oriented design introduces some semantic overhead in the form of the [`Scoped<T>`](#scopedt) type.
 
 ## `Scoped<T>`
 
