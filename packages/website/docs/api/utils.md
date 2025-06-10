@@ -9,10 +9,7 @@ description: Utils API reference
 
 Resets the [`WritableState<T>`](./state.md#writablestatet) to its default (initial) value.
 
-Works with:
-
-- [`atom`](./atom.md)
-- [`atomFamily`](./atomFamily.md)
+Works with: [`atom`](./atom.md), [`atomFamily`](./atomFamily.md)
 
 ```ts
 const reset: (state: WritableState<any>) => void;
@@ -25,10 +22,7 @@ Refreshes the [`ReadonlyState<T>`](./state.md/#readonlystatet). This can mean di
 - Re-evaluates _mounted_ state immediately
 - Marks _unmounted_ state for re-evaluation the next time it's read
 
-Works with:
-
-- [`selector`](./selector.md)
-- [`selectorFamily`](./selectorFamily.md)
+Works with: [`selector`](./selector.md), [`selectorFamily`](./selectorFamily.md)
 
 ```ts
 const refresh: (state: ReadonlyState<any>) => void;
@@ -36,4 +30,5 @@ const refresh: (state: ReadonlyState<any>) => void;
 
 ## See also
 
+- [State](./state.md)
 - [Using Stan with React](./react.md)
