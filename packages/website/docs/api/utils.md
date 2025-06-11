@@ -17,7 +17,7 @@ const reset: (state: WritableState<any>) => void;
 
 ## `refresh`
 
-Refreshes the [`ReadonlyState<T>`](./state.md/#readonlystatet). This can mean different things depending on whether the state is [_mounted_](./state.md#mounting):
+Refreshes the [`ReadonlyState<T>`](./state.md#readonlystatet). This can mean different things depending on whether the state is [_mounted_](./state.md#mounting):
 
 - Re-evaluates _mounted_ state immediately
 - Marks _unmounted_ state for re-evaluation the next time it's read
