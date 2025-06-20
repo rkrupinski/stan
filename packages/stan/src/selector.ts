@@ -28,7 +28,7 @@ export const selector = <T>(
   selectorFn: SelectorFn<T>,
   { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
 ): Scoped<ReadonlyState<T>> => {
-  const key = `selector${tag ? `-${tag}` : ''}-${selectorId++}`;
+  const key = `s${tag ? `-${tag}` : ''}-${selectorId++}`;
 
   return memoize(store => {
     const deps = new Map<string, number>();
