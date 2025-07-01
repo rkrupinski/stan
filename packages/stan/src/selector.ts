@@ -30,7 +30,7 @@ export const selector = <T>(
 ): Scoped<ReadonlyState<T>> => {
   const key = `s${tag ? `-${tag}` : ''}-${selectorId++}`;
 
-  return memoize(store => {
+  return memoize(store => () => {
     const deps = new Map<string, number>();
 
     store.deps.set(key, deps);
@@ -209,7 +209,7 @@ export const selectorFamily = <T, P extends SerializableParam>(
   { cachePolicy, tag, ...other }: SelectorFamilyOptions<P> = {},
 ) =>
   memoize(
-    (param: P) =>
+    (param: P) => () =>
       selector(selectorFamilyFn(param), {
         tag: isFunction(tag) ? tag(param) : tag,
         ...other,

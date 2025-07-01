@@ -30,7 +30,7 @@ export const atom = <T>(
   const defaultValue = initialValue;
   const key = `a${tag ? `-${tag}` : ''}-${atomId++}`;
 
-  return memoize(store => {
+  return memoize(store => () => {
     const subscribed = new Set<(newValue: T) => void>();
     const effectSubs = new Set<(newValue: T) => void>();
 
@@ -122,7 +122,7 @@ export const atomFamily = <T, P extends SerializableParam>(
   { tag, ...other }: AtomFamilyOptions<T, P> = {},
 ) =>
   memoize(
-    (param: P) =>
+    (param: P) => () =>
       atom(isFunction(initialValue) ? initialValue(param) : initialValue, {
         tag: isFunction(tag) ? tag(param) : tag,
         ...other,
