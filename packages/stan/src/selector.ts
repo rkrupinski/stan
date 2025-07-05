@@ -3,8 +3,10 @@ import {
   isFunction,
   isPromiseLike,
   stableStringify,
+  ERASE_TAG,
   REFRESH_TAG,
   type TypedOmit,
+  erase,
 } from './internal';
 import { Aborted } from './errors';
 import type { SerializableParam, TagFromParam } from './types';
@@ -22,11 +24,16 @@ export type SelectorFn<T> = (arg: { get: GetFn; signal: AbortSignal }) => T;
 export type SelectorOptions = {
   tag?: string;
   areValuesEqual?: <T>(a: T, b: T) => boolean;
+  [ERASE_TAG]?: AbortSignal;
 };
 
 export const selector = <T>(
   selectorFn: SelectorFn<T>,
-  { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
+  {
+    tag,
+    areValuesEqual = dejaVu,
+    [ERASE_TAG]: eraseSignal,
+  }: SelectorOptions = {},
 ): Scoped<ReadonlyState<T>> => {
   const key = `s${tag ? `-${tag}` : ''}-${selectorId++}`;
 
@@ -37,6 +44,14 @@ export const selector = <T>(
 
     const subs = new Set<() => () => void>();
     const unsubs = new Set<() => void>();
+
+    eraseSignal?.addEventListener(
+      'abort',
+      () => {
+        erase(store, key);
+      },
+      { once: true },
+    );
 
     let controller: AbortController | null = null;
 
@@ -198,7 +213,7 @@ export type SelectorFamilyFn<T, P extends SerializableParam> = (
 
 export type SelectorFamilyOptions<P extends SerializableParam> = TypedOmit<
   SelectorOptions,
-  'tag'
+  'tag' | typeof ERASE_TAG
 > & {
   tag?: string | TagFromParam<P>;
   cachePolicy?: CachePolicy;
@@ -209,9 +224,10 @@ export const selectorFamily = <T, P extends SerializableParam>(
   { cachePolicy, tag, ...other }: SelectorFamilyOptions<P> = {},
 ) =>
   memoize(
-    (param: P) => () =>
+    (param: P) => signal =>
       selector(selectorFamilyFn(param), {
         tag: isFunction(tag) ? tag(param) : tag,
+        [ERASE_TAG]: signal,
         ...other,
       }),
     {
