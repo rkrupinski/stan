@@ -1,15 +1,22 @@
 import { identity } from './internal';
 
+type CacheEntry<V> = {
+  value: V;
+  controller: AbortController;
+};
+
+type Evictable<T> = (signal: AbortSignal) => T;
+
 interface Cache<K, V> {
   has(key: K): boolean;
   get(key: K): V | undefined;
-  set(key: K, value: V): void;
+  set(key: K, value: Evictable<V>): void;
   delete(key: K): boolean;
   clear(): void;
 }
 
 class LRUCache<K, V> implements Cache<K, V> {
-  #cache: Map<K, V>;
+  #cache: Map<K, CacheEntry<V>>;
   #maxSize: number;
 
   constructor(maxSize: number) {
@@ -20,32 +27,40 @@ class LRUCache<K, V> implements Cache<K, V> {
   #evictLeastRecentlyUsed(): void {
     const firstKey = this.#cache.keys().next().value;
 
-    if (typeof firstKey !== 'undefined') this.#cache.delete(firstKey);
+    if (!firstKey) return;
+
+    this.#cache.get(firstKey)?.controller.abort();
+    this.#cache.delete(firstKey);
   }
 
   has(key: K) {
     return this.#cache.has(key);
   }
 
-  get(key: K): V | undefined {
-    if (!this.has(key)) return undefined;
+  get(key: K) {
+    const entry = this.#cache.get(key);
 
-    const value = this.#cache.get(key);
+    if (!entry) return undefined;
 
     this.#cache.delete(key);
-    this.#cache.set(key, value as V);
+    this.#cache.set(key, entry);
 
-    return value;
+    return entry.value;
   }
 
-  set(key: K, value: V) {
+  set(key: K, value: Evictable<V>) {
     if (this.#cache.has(key)) {
       this.#cache.delete(key);
     } else if (this.#cache.size >= this.#maxSize) {
       this.#evictLeastRecentlyUsed();
     }
 
-    this.#cache.set(key, value);
+    const controller = new AbortController();
+
+    this.#cache.set(key, {
+      value: value(controller.signal),
+      controller,
+    });
   }
 
   delete(key: K) {
@@ -57,17 +72,15 @@ class LRUCache<K, V> implements Cache<K, V> {
   }
 }
 
-class SimpleCache<K, V> extends Map<K, V> implements Cache<K, V> {}
-
 export type CachePolicy =
   | { type: 'keep-all' }
   | { type: 'most-recent' }
   | { type: 'lru'; maxSize: number };
 
-const makeCache = <K, V>(policy: CachePolicy): Cache<K, V> => {
+const cacheFromPolicy = <K, V>(policy: CachePolicy): Cache<K, V> => {
   switch (policy.type) {
     case 'keep-all':
-      return new SimpleCache<K, V>();
+      return new LRUCache<K, V>(Number.POSITIVE_INFINITY);
     case 'most-recent':
       return new LRUCache<K, V>(1);
     case 'lru':
@@ -78,22 +91,22 @@ const makeCache = <K, V>(policy: CachePolicy): Cache<K, V> => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type KeyMaker<A> = (arg: A) => any;
+type KeyMaker<A> = (arg: A) => any;
 
-export type MemoizeOptions<A> = {
+type MemoizeOptions<A> = {
   cachePolicy?: CachePolicy;
   keyMaker?: KeyMaker<A>;
 };
 
 export const memoize = <A, R>(
-  fn: (arg: A) => R,
+  fn: (arg: A) => Evictable<R>,
   {
     cachePolicy = { type: 'keep-all' },
     keyMaker = identity,
   }: MemoizeOptions<A> = {},
 ) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cache = makeCache<any, R>(cachePolicy);
+  const cache = cacheFromPolicy<any, R>(cachePolicy);
 
   return (arg: A) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -103,6 +116,6 @@ export const memoize = <A, R>(
       cache.set(key, fn(arg));
     }
 
-    return cache.get(key) as R;
+    return cache.get(key)!;
   };
 };
