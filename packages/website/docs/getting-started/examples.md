@@ -19,4 +19,5 @@ The following examples are available:
 6. [aborting-work](https://github.com/rkrupinski/stan/tree/master/packages/examples/aborting-work) - abort work with Stan-provided `AbortSignal`.
 7. [dynamic-dependencies](https://github.com/rkrupinski/stan/tree/master/packages/examples/dynamic-dependencies) - watch a dynamic state graph in action.
 8. [switching-stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/switching-stores) - reset all state by switching stores.
-9. [vanilla](https://github.com/rkrupinski/stan/tree/master/packages/examples/vanilla) - use vanilla Stan if you really have to.
+9. [react-suspense](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-suspense) - use React Suspense with Stan.
+10. [vanilla](https://github.com/rkrupinski/stan/tree/master/packages/examples/vanilla) - use vanilla Stan if you really have to.

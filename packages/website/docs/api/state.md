@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-description: State API docs
+description: State API reference
 ---
 
 # State
@@ -9,7 +9,7 @@ At the core of Stan is state. All Stan APIs either create, update, or consume st
 
 ```ts
 interface State<T> {
-  tag?: string;
+  key: string;
   get(): T;
   subscribe(callback: (value: T) => void): () => void;
 }
@@ -32,7 +32,7 @@ Nothing in Stan directly produces `State<T>`, but all other state types inherit 
 
 It comes with the following properties:
 
-- `tag?` - An optional string identifier. It doesn't affect the state lifecycle but can be useful for debugging.
+- `key` - A unique string identifier used by Stan internally. To facilitate debugging, it can be partially customized via the `tag` option (see [atom](./atom.md) &amp; [selector](./selector.md)).
 - `get` - A function that returns the current state value.
 - `subscribe` - Allows listening for state changes. It takes a callback function that's called with the new value and returns an unsubscribe function.
 
@@ -72,19 +72,19 @@ As the name implies, this is a state that can only be read from. However, that d
 - When its dependencies change (see [`selector`](./selector.md))
 - When its input changes (see [`selectorFamily`](./selectorFamily.md))
 
-:::info
-`ReadonlyState<T>` is considered initialized once its value has been read. If the value has not yet been read, the state is considered uninitialized. The state is not evaluated before initialization.
-:::
-
-:::info
-`ReadonlyState<T>` is considered mounted when it has one or more subscribers, and unmounted when it has none. Mounting affects how the state is refreshed (see [utils](./utils.md#refresh)).
-:::
-
 It inherits all properties from [`State<T>`](#statet), and additionally defines:
 
 - `[REFRESH_TAG]` - A function that refreshes the state.
 
-  - When called on a mounted state, it re-evaluates the state immediately.
-  - When called on an unmounted state, it marks the state as uninitialized - meaning it will be re-evaluated the next time it's read.
+  - When called on a _mounted_ state, it re-evaluates the state immediately.
+  - When called on an _unmounted_ state, it marks the state as uninitialized - meaning it will be re-evaluated the next time it is accessed.
 
   Important: This function is not meant to be called directly (see [utils](./utils.md#refresh)).
+
+:::info
+`ReadonlyState<T>` must be initialized before use. Initialization occurs when the state is first read.
+:::
+
+### Mounting
+
+`ReadonlyState<T>` is considered _mounted_ when it has one or more subscribers, and _unmounted_ when it has none. This affects how the state is refreshed (see [utils](./utils.md#refresh)).
