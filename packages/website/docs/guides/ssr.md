@@ -27,4 +27,4 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
 ## See also
 
-- [Using Stan with React](./react.md)
+- [Using Stan with React](../api/react.md)
