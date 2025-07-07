@@ -218,7 +218,7 @@ function MyComponent() {
 
 ## `StanProvider`
 
-Stan, by default, operates in provider-less mode, using `DEFAULT_STORE` (see [utils](./utils.md#reset)). However, if you need to supply a different store (e.g., for [SSR](../guides/ssr.md)) or switch stores dynamically, `StanProvider` comes in handy.
+Stan, by default, operates in provider-less mode, using [`DEFAULT_STORE`](./store.md#the-store-class). However, if you need to supply a different store (e.g., for [SSR](../guides/ssr.md)) or switch stores dynamically, `StanProvider` comes in handy. Re-mounting `StanProvider` can also serve as a way to reset all state.
 
 ```ts
 const StanProvider: FC<StanProviderProps>;
