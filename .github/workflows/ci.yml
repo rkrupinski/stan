@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  CI:
+  Verify:
     runs-on: ubuntu-latest
 
     steps:
