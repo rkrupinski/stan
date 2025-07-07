@@ -15,7 +15,7 @@ Rather than directly producing [state](./state.md), all Stan primitives ([`atom`
 type Scoped<T extends State<any>> = (store: Store) => T;
 ```
 
-That way, every piece of [state](./state.md) is "scoped" to a specific [`Store`](#the-store-class) instance. A change in the context of Store A doesn't exist in the context of Store B, and vice versa:
+That way, every piece of [state](./state.md) is "scoped" to a specific [`Store`](#the-store-class) instance. A change in the context of store A doesn't exist in the context of store B, and vice versa:
 
 ```ts
 const myAtom = atom(42);

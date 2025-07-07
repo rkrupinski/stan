@@ -13,6 +13,10 @@ As Albert Einstein once said, there are only two hard problems in computer scien
 
 I'm not entirely sure what he meant, but let's talk about caching. Unlike [Jotai](https://jotai.org), which doesn't really care about caching out of the box, or [Recoil](https://recoiljs.org/), which caches very aggressively until you opt out, Stan takes a more balanced approach - somewhere between the two. Below, you'll find a rundown of all layers of Stan's cache.
 
+## `Store`
+
+Every state change in Stan occurs within the context of a store (see [`Scoped<T>`](../api/store.md#scopedt)). You can think of it as each piece of state being cached using the `Store` instance as the cache key. A state change scoped to a specific store exists only within that store - which can, in fact, be leveraged to your advantage (see [switching stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/switching-stores)).
+
 ## `atom`
 
 Once initialized, the [`atom`](../api/atom.md)'s value is cached. Until it is updated or [reset](../api/utils.md#reset), subscribers won't be notified, and all read attempts will return the cached value.
