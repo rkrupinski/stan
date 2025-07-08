@@ -30,10 +30,7 @@ function HomepageHeader() {
 export default function Home(): ReactNode {
   const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
-    >
+    <Layout title={siteConfig.title} description={siteConfig.tagline}>
       <HomepageHeader />
       <main>
         <Features />
