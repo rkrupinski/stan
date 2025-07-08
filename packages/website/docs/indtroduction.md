@@ -6,7 +6,7 @@ slug: /
 
 # Introduction
 
-Stan (Polish for "state") builds on ideas from [Recoil](https://recoiljs.org) and [Jotai](https://jotai.org), without getting bogged down by questionable extras that often compromise clean software practices. Rather than chasing edge cases, it focuses on proven, battle-tested patterns. Despite its minimal footprint, it's fully capable of handling everything from your TODO lists to the Large Hadron Collider at CERN.
+Stan (Polish for "state") builds on ideas from [Recoil](https://recoiljs.org) and [Jotai](https://jotai.org), without getting bogged down by questionable extras. Rather than chasing edge cases, it focuses on proven, battle-tested patterns. Despite its minimal footprint, it's fully capable of handling everything from your TODO lists to the Large Hadron Collider at CERN.
 
 Key Features:
 
@@ -14,4 +14,3 @@ Key Features:
 - **Simple**. A minimal yet sufficient API.
 - **Composable**. Stan lets you build both flat and deeply nested state graphs. These update efficiently thanks to caching and subscription tracking.
 - **Framework-agnostic**. While Stan can theoretically work with any framework, it depends on none.
-- <strong><abbr>SSR</abbr>-ready</strong>. Works out of the box with frameworks like [Next.js](https://nextjs.org).
