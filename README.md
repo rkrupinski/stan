@@ -8,7 +8,7 @@
 Minimal, type-safe state management
 
 - [Website](https://rkrupinski.github.io/stan)
-- [API docs](https://rkrupinski.github.io/stan/docs/api)
+- [API docs](https://rkrupinski.github.io/stan/docs/api/state)
 - [Examples](https://rkrupinski.github.io/stan/docs/getting-started/examples)
 
 ```tsx
