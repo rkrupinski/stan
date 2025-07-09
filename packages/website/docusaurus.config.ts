@@ -42,6 +42,7 @@ const config: Config = {
   ],
 
   themeConfig: {
+    image: 'img/logo.svg',
     navbar: {
       hideOnScroll: true,
       logo: {
