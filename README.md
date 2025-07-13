@@ -7,9 +7,12 @@
 
 Minimal, type-safe state management
 
-- [Website](https://rkrupinski.github.io/stan)
-- [API docs](https://rkrupinski.github.io/stan/docs/api/state)
-- [Examples](https://rkrupinski.github.io/stan/docs/getting-started/examples)
+[🌐 Website](https://rkrupinski.github.io/stan) &nbsp;&nbsp;|&nbsp;&nbsp;
+[📘 API docs](https://rkrupinski.github.io/stan/docs/api/state) &nbsp;&nbsp;|&nbsp;&nbsp;
+[📝 Examples](https://rkrupinski.github.io/stan/docs/getting-started/examples) &nbsp;&nbsp;|&nbsp;&nbsp;
+[📰 Blog Post](https://rkrupinski.com/post/introducing-stan)
+
+A sneak peek:
 
 ```tsx
 import { selectorFamily } from "@rkrupinski/stan";
