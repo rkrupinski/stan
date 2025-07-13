@@ -12,14 +12,20 @@ Minimal, type-safe state management
 - [Examples](https://rkrupinski.github.io/stan/docs/getting-started/examples)
 
 ```tsx
-import { atom } from '@rkrupinski/stan';
+import { selectorFamily } from '@rkrupinski/stan';
 import { useStanValue } from '@rkrupinski/stan/react';
 
-const ultimateQuestion = atom(42);
+const deepThought = selectorFamily<number, string>(
+  question => () => thinkDeep(question),
+);
 
-function MyApp() {
-  const answer = useStanValue(ultimateQuestion);
+const MyApp: FC<{ question: string }> = ({ question }) => {
+  const answer = useStanValue(deepThought(question));
 
-  return <h1>{answer}</h1>;
-}
+  return (
+    <p>
+      The Answer to {question} is ${answer}!
+    </p>
+  );
+};
 ```
