@@ -18,7 +18,7 @@ A sneak peek:
 import { selectorFamily } from '@rkrupinski/stan';
 import { useStanValue } from '@rkrupinski/stan/react';
 
-const deepThought = selectorFamily<number, string>(
+const deepThought = selectorFamily<string, string>(
   question => () => thinkDeep(question),
 );
 
@@ -27,7 +27,7 @@ const MyApp: FC<{ question: string }> = ({ question }) => {
 
   return (
     <p>
-      The Answer to {question} is ${answer}!
+      The Answer to "{question}" is "{answer}"!
     </p>
   );
 };
