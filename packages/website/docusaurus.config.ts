@@ -7,8 +7,8 @@ const config: Config = {
   tagline: 'Minimal, type-safe state management',
   favicon: 'img/logo.svg',
 
-  url: 'https://rkrupinski.github.io',
-  baseUrl: '/stan',
+  url: 'https://stan.party',
+  baseUrl: '/',
 
   deploymentBranch: 'gh-pages',
   organizationName: 'rkrupinski',

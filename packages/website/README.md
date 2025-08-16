@@ -1,3 +1,3 @@
 # Docs
 
-http://rkrupinski.github.io/stan
+https://stan.party
