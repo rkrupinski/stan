@@ -1,4 +1,4 @@
-[![](packages/website/static/img/logo.svg)](https://rkrupinski.github.io/stan)
+[![](packages/website/static/img/logo.svg)](https://stan.party)
 
 # Stan
 
@@ -7,9 +7,9 @@
 
 Minimal, type-safe state management
 
-[🌐 Website](https://rkrupinski.github.io/stan) &nbsp;&nbsp;|&nbsp;&nbsp;
-[📘 API docs](https://rkrupinski.github.io/stan/docs/api/state) &nbsp;&nbsp;|&nbsp;&nbsp;
-[📝 Examples](https://rkrupinski.github.io/stan/docs/getting-started/examples) &nbsp;&nbsp;|&nbsp;&nbsp;
+[🌐 Website](https://stan.party) &nbsp;&nbsp;|&nbsp;&nbsp;
+[📘 API docs](https://stan.party/docs/api/state) &nbsp;&nbsp;|&nbsp;&nbsp;
+[📝 Examples](https://stan.party/docs/getting-started/examples) &nbsp;&nbsp;|&nbsp;&nbsp;
 [📰 Blog Post](https://rkrupinski.com/post/introducing-stan)
 
 A sneak peek:
