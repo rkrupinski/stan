@@ -37,9 +37,9 @@ const atomA = atom<42 | 43>(42); // Scoped<WritableState<42 | 43>>
 
 const atomB = atom<{ foo: 'bar' | 'baz' }>({ foo: 'bar' }); // Scoped<WritableState<{ foo: "bar" | "baz" }>>
 
-const selectorA = selector<42 | 43>(({ get }) => get(atomA)); // Scoped<ReadonlyState<42 | 43>>
+const selectorA = selector(({ get }) => get(atomA)); // Scoped<ReadonlyState<42 | 43>>
 
-const selectorB = selector<42 | 43 | 'bar' | 'baz'>(({ get }) => {
+const selectorB = selector(({ get }) => {
   if (Math.random() > 0.5) return get(atomA);
 
   return get(atomB).foo;
