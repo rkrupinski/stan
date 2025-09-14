@@ -3,9 +3,19 @@
   "description": "Minimal, type-safe state management",
   "version": "1.3.2",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": "./dist/index.js",
-    "./react": "./dist/react.js"
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.js",
+      "types": "./dist/react.d.ts"
+    }
   },
   "scripts": {
     "typecheck": "tsc",
