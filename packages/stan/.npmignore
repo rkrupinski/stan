@@ -1,7 +1,0 @@
-.github
-eslint.config.mjs
-rollup.config.mjs
-jest.config.mjs
-tsconfig.json
-src
-!dist
