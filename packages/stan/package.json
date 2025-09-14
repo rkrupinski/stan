@@ -19,6 +19,9 @@
   },
   "typesVersions": {
     "*": {
+      "react": [
+        "dist/react.d.ts"
+      ],
       "*": [
         "dist/*"
       ]
