@@ -17,6 +17,13 @@
       "types": "./dist/react.d.ts"
     }
   },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "scripts": {
     "typecheck": "tsc",
     "lint": "eslint --cache --max-warnings=0",
