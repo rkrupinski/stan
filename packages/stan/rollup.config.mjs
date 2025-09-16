@@ -9,11 +9,19 @@ export default {
     index: 'src/index.ts',
     react: 'src/react.tsx',
   },
-  output: {
-    dir: 'dist',
-    entryFileNames: '[name].js',
-    format: 'esm',
-  },
+  output: [
+    {
+      dir: 'dist',
+      entryFileNames: '[name].js',
+      format: 'cjs',
+      exports: 'auto',
+    },
+    {
+      dir: 'dist',
+      entryFileNames: '[name].esm.js',
+      format: 'esm',
+    },
+  ],
   plugins: [
     typescript({
       tsconfig: './tsconfig.json',
