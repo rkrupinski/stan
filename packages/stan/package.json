@@ -20,6 +20,13 @@
       "types": "./dist/react.d.ts"
     }
   },
+  "typesVersions": {
+    "*": {
+      "react": [
+        "dist/react.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "typecheck": "tsc",
     "lint": "eslint --cache --max-warnings=0",
