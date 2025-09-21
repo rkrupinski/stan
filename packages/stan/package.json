@@ -1,12 +1,33 @@
 {
   "name": "@rkrupinski/stan",
   "description": "Minimal, type-safe state management",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": "./dist/index.js",
-    "./react": "./dist/react.js"
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/react.esm.js",
+      "require": "./dist/react.js",
+      "types": "./dist/react.d.ts"
+    }
   },
+  "typesVersions": {
+    "*": {
+      "react": [
+        "dist/react.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
   "scripts": {
     "typecheck": "tsc",
     "lint": "eslint --cache --max-warnings=0",
