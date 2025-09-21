@@ -27,6 +27,7 @@
       ]
     }
   },
+  "sideEffects": false,
   "scripts": {
     "typecheck": "tsc",
     "lint": "eslint --cache --max-warnings=0",
