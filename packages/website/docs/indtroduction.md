@@ -8,7 +8,18 @@ slug: /
 
 Stan (Polish for "state") builds on ideas from [Recoil](https://recoiljs.org) and [Jotai](https://jotai.org), without getting bogged down by questionable extras. Rather than chasing edge cases, it focuses on proven, battle-tested patterns. Despite its minimal footprint, it's fully capable of handling everything from your TODO lists to the Large Hadron Collider at CERN.
 
-![](/img/graph.svg)
+```mermaid
+flowchart LR
+    subgraph User
+      S([Search])
+    end
+    S -. Input .-> S1
+    S1[State] --> D1[Derived state]
+    D1 -. Request .-> DB@{ shape: cyl, label: "Wisdom" }
+    DB -. Response .-> D1
+    S1 --> D2[Derived state]
+    D2 --> D3[Derived state]
+```
 
 Key Features:
 
