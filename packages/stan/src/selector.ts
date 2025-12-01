@@ -24,6 +24,8 @@ export type SelectorFn<T> = (arg: { get: GetFn; signal: AbortSignal }) => T;
 export type SelectorOptions = {
   tag?: string;
   areValuesEqual?: <T>(a: T, b: T) => boolean;
+  onMount?: () => void;
+  onUnmount?: () => void;
 };
 
 export type SelectorCtx = {
@@ -32,7 +34,12 @@ export type SelectorCtx = {
 
 export const selector = <T>(
   selectorFn: SelectorFn<T>,
-  { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
+  {
+    tag,
+    areValuesEqual = dejaVu,
+    onMount: onMountCallback,
+    onUnmount: onUnmountCallback,
+  }: SelectorOptions = {},
   { [ERASE_TAG]: eraseSignal }: SelectorCtx = {},
 ): Scoped<ReadonlyState<T>> => {
   const key = `s${tag ? `-${tag}` : ''}-${selectorId++}`;
@@ -162,6 +169,7 @@ export const selector = <T>(
         unsubs.add(sub());
       });
       store.mounted.set(key, true);
+      onMountCallback?.();
     };
 
     const onUnmount = () => {
@@ -170,6 +178,7 @@ export const selector = <T>(
       });
       unsubs.clear();
       store.mounted.set(key, false);
+      onUnmountCallback?.();
     };
 
     return {
@@ -224,15 +233,18 @@ export const selectorFamily = <T, P extends SerializableParam>(
   { cachePolicy, tag, ...other }: SelectorFamilyOptions<P> = {},
 ) =>
   memoize(
-    (param: P) => signal =>
-      selector(
-        selectorFamilyFn(param),
-        {
-          tag: isFunction(tag) ? tag(param) : tag,
-          ...other,
-        },
-        { [ERASE_TAG]: signal },
-      ),
+    (param: P, { retain, release }) =>
+      signal =>
+        selector(
+          selectorFamilyFn(param),
+          {
+            tag: isFunction(tag) ? tag(param) : tag,
+            ...other,
+            onMount: retain,
+            onUnmount: release,
+          },
+          { [ERASE_TAG]: signal },
+        ),
     {
       cachePolicy,
       keyMaker: stableStringify,

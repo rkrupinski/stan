@@ -13,24 +13,31 @@ interface Cache<K, V> {
   set(key: K, value: Evictable<V>): void;
   delete(key: K): boolean;
   clear(): void;
+  retain(key: K): void;
+  release(key: K): void;
 }
 
 class LRUCache<K, V> implements Cache<K, V> {
   #cache: Map<K, CacheEntry<V>>;
+  #locks: Map<K, number>;
   #maxSize: number;
 
   constructor(maxSize: number) {
     this.#cache = new Map();
+    this.#locks = new Map();
     this.#maxSize = maxSize;
   }
 
   #evictLeastRecentlyUsed(): void {
-    const firstKey = this.#cache.keys().next().value;
+    for (const key of this.#cache.keys()) {
+      if ((this.#locks.get(key) ?? 0) > 0) {
+        continue;
+      }
 
-    if (!firstKey) return;
-
-    this.#cache.get(firstKey)?.controller.abort();
-    this.#cache.delete(firstKey);
+      this.#cache.get(key)?.controller.abort();
+      this.#cache.delete(key);
+      return;
+    }
   }
 
   has(key: K) {
@@ -64,11 +71,31 @@ class LRUCache<K, V> implements Cache<K, V> {
   }
 
   delete(key: K) {
+    this.#locks.delete(key);
     return this.#cache.delete(key);
   }
 
   clear() {
+    this.#locks.clear();
     this.#cache.clear();
+  }
+
+  retain(key: K) {
+    this.#locks.set(key, (this.#locks.get(key) ?? 0) + 1);
+  }
+
+  release(key: K) {
+    const count = this.#locks.get(key) ?? 0;
+    if (count > 0) {
+      this.#locks.set(key, count - 1);
+    }
+
+    if ((this.#locks.get(key) ?? 0) === 0) {
+      this.#locks.delete(key);
+      if (this.#cache.size > this.#maxSize) {
+        this.#evictLeastRecentlyUsed();
+      }
+    }
   }
 }
 
@@ -98,8 +125,13 @@ type MemoizeOptions<A> = {
   keyMaker?: KeyMaker<A>;
 };
 
+type Tools = {
+  retain: VoidFunction;
+  release: VoidFunction;
+};
+
 export const memoize = <A, R>(
-  fn: (arg: A) => Evictable<R>,
+  fn: (arg: A, tools: Tools) => Evictable<R>,
   {
     cachePolicy = { type: 'keep-all' },
     keyMaker = identity,
@@ -113,7 +145,13 @@ export const memoize = <A, R>(
     const key = keyMaker(arg);
 
     if (!cache.has(key)) {
-      cache.set(key, fn(arg));
+      cache.set(
+        key,
+        fn(arg, {
+          retain: () => cache.retain(key),
+          release: () => cache.release(key),
+        }),
+      );
     }
 
     return cache.get(key)!;

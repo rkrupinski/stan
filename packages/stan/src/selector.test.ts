@@ -481,4 +481,33 @@ describe('selectorFamily', () => {
     expect(family({ multiplier: 4 })(store)).toBe(state3);
     expect(family({ multiplier: 2 })(store)).not.toBe(state1);
   });
+
+  it('should defer eviction when mounted', () => {
+    const family = selectorFamily<number, { multiplier: number }>(
+      ({ multiplier }) =>
+        () =>
+          multiplier * 42,
+      {
+        cachePolicy: { type: 'most-recent' },
+      },
+    );
+    const store = makeStore();
+
+    const state1 = family({ multiplier: 2 })(store);
+    const unsub1 = state1.subscribe(jest.fn());
+
+    const state2 = family({ multiplier: 3 })(store);
+    const unsub2 = state2.subscribe(jest.fn());
+
+    expect(family({ multiplier: 2 })(store)).toBe(state1);
+
+    unsub1();
+
+    const state3 = family({ multiplier: 4 })(store);
+    state3.subscribe(jest.fn());
+
+    expect(family({ multiplier: 2 })(store)).not.toBe(state1);
+
+    unsub2();
+  });
 });
