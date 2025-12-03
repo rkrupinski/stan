@@ -6,6 +6,8 @@ import {
   stableStringify,
   ERASE_TAG,
   REFRESH_TAG,
+  MOUNT_TAG,
+  UNMOUNT_TAG,
   type TypedOmit,
 } from './internal';
 import { Aborted } from './errors';
@@ -24,23 +26,22 @@ export type SelectorFn<T> = (arg: { get: GetFn; signal: AbortSignal }) => T;
 export type SelectorOptions = {
   tag?: string;
   areValuesEqual?: <T>(a: T, b: T) => boolean;
-  onMount?: () => void;
-  onUnmount?: () => void;
 };
 
 export type SelectorCtx = {
   [ERASE_TAG]?: AbortSignal;
+  [MOUNT_TAG]?: () => void;
+  [UNMOUNT_TAG]?: () => void;
 };
 
 export const selector = <T>(
   selectorFn: SelectorFn<T>,
+  { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
   {
-    tag,
-    areValuesEqual = dejaVu,
-    onMount: onMountCallback,
-    onUnmount: onUnmountCallback,
-  }: SelectorOptions = {},
-  { [ERASE_TAG]: eraseSignal }: SelectorCtx = {},
+    [ERASE_TAG]: eraseSignal,
+    [MOUNT_TAG]: onMountCb,
+    [UNMOUNT_TAG]: onUnmountCb,
+  }: SelectorCtx = {},
 ): Scoped<ReadonlyState<T>> => {
   const key = `s${tag ? `-${tag}` : ''}-${selectorId++}`;
 
@@ -169,7 +170,7 @@ export const selector = <T>(
         unsubs.add(sub());
       });
       store.mounted.set(key, true);
-      onMountCallback?.();
+      onMountCb?.();
     };
 
     const onUnmount = () => {
@@ -178,7 +179,7 @@ export const selector = <T>(
       });
       unsubs.clear();
       store.mounted.set(key, false);
-      onUnmountCallback?.();
+      onUnmountCb?.();
     };
 
     return {
@@ -240,10 +241,12 @@ export const selectorFamily = <T, P extends SerializableParam>(
           {
             tag: isFunction(tag) ? tag(param) : tag,
             ...other,
-            onMount: retain,
-            onUnmount: release,
           },
-          { [ERASE_TAG]: signal },
+          {
+            [ERASE_TAG]: signal,
+            [MOUNT_TAG]: retain,
+            [UNMOUNT_TAG]: release,
+          },
         ),
     {
       cachePolicy,
