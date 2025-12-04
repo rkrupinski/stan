@@ -7,29 +7,85 @@ on:
     branches: [master]
 
 jobs:
-  Verify:
+  Typecheck:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "yarn"
-
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
       - name: Type check
         run: yarn typecheck
 
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
       - name: Lint
         run: yarn lint
 
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
       - name: Test
         run: yarn test
 
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
       - name: Build
         run: yarn build
+
+  Post-Summary:
+    runs-on: ubuntu-latest
+    needs: [Typecheck, Lint, Test, Build]
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Post Summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: [
+                '### ✅ All Checks Passed',
+                '',
+                '| Step | Status |',
+                '| :--- | :--- |',
+                '| **Typecheck** | 🟢 Passed |',
+                '| **Lint** | 🟢 Passed |',
+                '| **Test** | 🟢 Passed |',
+                '| **Build** | 🟢 Passed |'
+              ].join('\n')
+            })
