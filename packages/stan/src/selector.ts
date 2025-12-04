@@ -6,6 +6,8 @@ import {
   stableStringify,
   ERASE_TAG,
   REFRESH_TAG,
+  MOUNT_TAG,
+  UNMOUNT_TAG,
   type TypedOmit,
 } from './internal';
 import { Aborted } from './errors';
@@ -28,12 +30,18 @@ export type SelectorOptions = {
 
 export type SelectorCtx = {
   [ERASE_TAG]?: AbortSignal;
+  [MOUNT_TAG]?: () => void;
+  [UNMOUNT_TAG]?: () => void;
 };
 
 export const selector = <T>(
   selectorFn: SelectorFn<T>,
   { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
-  { [ERASE_TAG]: eraseSignal }: SelectorCtx = {},
+  {
+    [ERASE_TAG]: eraseSignal,
+    [MOUNT_TAG]: onMountCb,
+    [UNMOUNT_TAG]: onUnmountCb,
+  }: SelectorCtx = {},
 ): Scoped<ReadonlyState<T>> => {
   const key = `s${tag ? `-${tag}` : ''}-${selectorId++}`;
 
@@ -162,6 +170,7 @@ export const selector = <T>(
         unsubs.add(sub());
       });
       store.mounted.set(key, true);
+      onMountCb?.();
     };
 
     const onUnmount = () => {
@@ -170,6 +179,7 @@ export const selector = <T>(
       });
       unsubs.clear();
       store.mounted.set(key, false);
+      onUnmountCb?.();
     };
 
     return {
@@ -224,15 +234,20 @@ export const selectorFamily = <T, P extends SerializableParam>(
   { cachePolicy, tag, ...other }: SelectorFamilyOptions<P> = {},
 ) =>
   memoize(
-    (param: P) => signal =>
-      selector(
-        selectorFamilyFn(param),
-        {
-          tag: isFunction(tag) ? tag(param) : tag,
-          ...other,
-        },
-        { [ERASE_TAG]: signal },
-      ),
+    (param: P, { retain, release }) =>
+      signal =>
+        selector(
+          selectorFamilyFn(param),
+          {
+            tag: isFunction(tag) ? tag(param) : tag,
+            ...other,
+          },
+          {
+            [ERASE_TAG]: signal,
+            [MOUNT_TAG]: retain,
+            [UNMOUNT_TAG]: release,
+          },
+        ),
     {
       cachePolicy,
       keyMaker: stableStringify,

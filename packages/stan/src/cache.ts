@@ -13,24 +13,39 @@ interface Cache<K, V> {
   set(key: K, value: Evictable<V>): void;
   delete(key: K): boolean;
   clear(): void;
+  retain(key: K): void;
+  release(key: K): void;
 }
 
 class LRUCache<K, V> implements Cache<K, V> {
   #cache: Map<K, CacheEntry<V>>;
+  #refCounts: Map<K, number>;
   #maxSize: number;
 
   constructor(maxSize: number) {
     this.#cache = new Map();
+    this.#refCounts = new Map();
     this.#maxSize = maxSize;
   }
 
-  #evictLeastRecentlyUsed(): void {
-    const firstKey = this.#cache.keys().next().value;
+  #dispose(key: K) {
+    const entry = this.#cache.get(key);
+    if (entry) {
+      entry.controller.abort();
+      this.#cache.delete(key);
+      this.#refCounts.delete(key);
+    }
+  }
 
-    if (!firstKey) return;
+  #evict(): void {
+    for (const key of this.#cache.keys()) {
+      if ((this.#refCounts.get(key) ?? 0) > 0) {
+        continue;
+      }
 
-    this.#cache.get(firstKey)?.controller.abort();
-    this.#cache.delete(firstKey);
+      this.#dispose(key);
+      return;
+    }
   }
 
   has(key: K) {
@@ -42,6 +57,7 @@ class LRUCache<K, V> implements Cache<K, V> {
 
     if (!entry) return undefined;
 
+    // Refresh LRU order
     this.#cache.delete(key);
     this.#cache.set(key, entry);
 
@@ -50,9 +66,9 @@ class LRUCache<K, V> implements Cache<K, V> {
 
   set(key: K, value: Evictable<V>) {
     if (this.#cache.has(key)) {
-      this.#cache.delete(key);
+      this.#dispose(key);
     } else if (this.#cache.size >= this.#maxSize) {
-      this.#evictLeastRecentlyUsed();
+      this.#evict();
     }
 
     const controller = new AbortController();
@@ -64,11 +80,35 @@ class LRUCache<K, V> implements Cache<K, V> {
   }
 
   delete(key: K) {
-    return this.#cache.delete(key);
+    if (this.#cache.has(key)) {
+      this.#dispose(key);
+      return true;
+    }
+    return false;
   }
 
   clear() {
-    this.#cache.clear();
+    for (const key of this.#cache.keys()) {
+      this.#dispose(key);
+    }
+  }
+
+  retain(key: K) {
+    this.#refCounts.set(key, (this.#refCounts.get(key) ?? 0) + 1);
+  }
+
+  release(key: K) {
+    const count = this.#refCounts.get(key) ?? 0;
+    if (count > 0) {
+      this.#refCounts.set(key, count - 1);
+    }
+
+    if ((this.#refCounts.get(key) ?? 0) === 0) {
+      this.#refCounts.delete(key);
+      if (this.#cache.size > this.#maxSize) {
+        this.#evict();
+      }
+    }
   }
 }
 
@@ -98,8 +138,13 @@ type MemoizeOptions<A> = {
   keyMaker?: KeyMaker<A>;
 };
 
+type Tools = {
+  retain: VoidFunction;
+  release: VoidFunction;
+};
+
 export const memoize = <A, R>(
-  fn: (arg: A) => Evictable<R>,
+  fn: (arg: A, tools: Tools) => Evictable<R>,
   {
     cachePolicy = { type: 'keep-all' },
     keyMaker = identity,
@@ -113,7 +158,13 @@ export const memoize = <A, R>(
     const key = keyMaker(arg);
 
     if (!cache.has(key)) {
-      cache.set(key, fn(arg));
+      cache.set(
+        key,
+        fn(arg, {
+          retain: () => cache.retain(key),
+          release: () => cache.release(key),
+        }),
+      );
     }
 
     return cache.get(key)!;
