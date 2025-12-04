@@ -19,23 +19,31 @@ interface Cache<K, V> {
 
 class LRUCache<K, V> implements Cache<K, V> {
   #cache: Map<K, CacheEntry<V>>;
-  #locks: Map<K, number>;
+  #refCounts: Map<K, number>;
   #maxSize: number;
 
   constructor(maxSize: number) {
     this.#cache = new Map();
-    this.#locks = new Map();
+    this.#refCounts = new Map();
     this.#maxSize = maxSize;
   }
 
-  #evictLeastRecentlyUsed(): void {
+  #dispose(key: K) {
+    const entry = this.#cache.get(key);
+    if (entry) {
+      entry.controller.abort();
+      this.#cache.delete(key);
+      this.#refCounts.delete(key);
+    }
+  }
+
+  #evict(): void {
     for (const key of this.#cache.keys()) {
-      if ((this.#locks.get(key) ?? 0) > 0) {
+      if ((this.#refCounts.get(key) ?? 0) > 0) {
         continue;
       }
 
-      this.#cache.get(key)?.controller.abort();
-      this.#cache.delete(key);
+      this.#dispose(key);
       return;
     }
   }
@@ -49,6 +57,7 @@ class LRUCache<K, V> implements Cache<K, V> {
 
     if (!entry) return undefined;
 
+    // Refresh LRU order
     this.#cache.delete(key);
     this.#cache.set(key, entry);
 
@@ -57,9 +66,9 @@ class LRUCache<K, V> implements Cache<K, V> {
 
   set(key: K, value: Evictable<V>) {
     if (this.#cache.has(key)) {
-      this.#cache.delete(key);
+      this.#dispose(key);
     } else if (this.#cache.size >= this.#maxSize) {
-      this.#evictLeastRecentlyUsed();
+      this.#evict();
     }
 
     const controller = new AbortController();
@@ -71,29 +80,33 @@ class LRUCache<K, V> implements Cache<K, V> {
   }
 
   delete(key: K) {
-    this.#locks.delete(key);
-    return this.#cache.delete(key);
+    if (this.#cache.has(key)) {
+      this.#dispose(key);
+      return true;
+    }
+    return false;
   }
 
   clear() {
-    this.#locks.clear();
-    this.#cache.clear();
+    for (const key of this.#cache.keys()) {
+      this.#dispose(key);
+    }
   }
 
   retain(key: K) {
-    this.#locks.set(key, (this.#locks.get(key) ?? 0) + 1);
+    this.#refCounts.set(key, (this.#refCounts.get(key) ?? 0) + 1);
   }
 
   release(key: K) {
-    const count = this.#locks.get(key) ?? 0;
+    const count = this.#refCounts.get(key) ?? 0;
     if (count > 0) {
-      this.#locks.set(key, count - 1);
+      this.#refCounts.set(key, count - 1);
     }
 
-    if ((this.#locks.get(key) ?? 0) === 0) {
-      this.#locks.delete(key);
+    if ((this.#refCounts.get(key) ?? 0) === 0) {
+      this.#refCounts.delete(key);
       if (this.#cache.size > this.#maxSize) {
-        this.#evictLeastRecentlyUsed();
+        this.#evict();
       }
     }
   }
