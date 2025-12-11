@@ -28,15 +28,26 @@ export const isFunction = (
 ): candidate is (...args: any[]) => any =>
   fnTypes.includes(Object.prototype.toString.call(candidate));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const isPromiseLike = (candidate: any): candidate is PromiseLike<any> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  !!candidate && isFunction(candidate.then);
-
 export const erase = (store: Store, key: string) => {
   store.deps.delete(key);
   store.value.delete(key);
   store.version.delete(key);
   store.mounted.delete(key);
   store.initialized.delete(key);
+};
+
+export const depsChanged = (store: Store, key: string) => {
+  const d = store.deps.get(key);
+
+  if (!d || !d.size) return false;
+
+  for (const [k, v] of d.entries()) {
+    if (store.version.get(k) !== v) return true;
+  }
+
+  for (const k of d.keys()) {
+    if (depsChanged(store, k)) return true;
+  }
+
+  return false;
 };

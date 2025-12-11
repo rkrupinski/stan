@@ -2,13 +2,13 @@ import {
   erase,
   dejaVu,
   isFunction,
-  isPromiseLike,
   stableStringify,
   ERASE_TAG,
   REFRESH_TAG,
   MOUNT_TAG,
   UNMOUNT_TAG,
   type TypedOmit,
+  depsChanged,
 } from './internal';
 import { Aborted } from './errors';
 import type { SerializableParam, TagFromParam } from './types';
@@ -28,7 +28,7 @@ export type SelectorOptions = {
   areValuesEqual?: <T>(a: T, b: T) => boolean;
 };
 
-export type SelectorCtx = {
+type SelectorCtx = {
   [ERASE_TAG]?: AbortSignal;
   [MOUNT_TAG]?: () => void;
   [UNMOUNT_TAG]?: () => void;
@@ -53,15 +53,16 @@ export const selector = <T>(
     const subs = new Set<() => () => void>();
     const unsubs = new Set<() => void>();
 
+    let controller: AbortController | null = null;
+
     eraseSignal?.addEventListener(
       'abort',
       () => {
+        controller?.abort(new Aborted());
         erase(store, key);
       },
       { once: true },
     );
-
-    let controller: AbortController | null = null;
 
     const subscribers = new Set<(newValue: T) => void>();
 
@@ -106,22 +107,6 @@ export const selector = <T>(
       [...subscribers].forEach(cb => cb(store.value.get(key) as T));
     };
 
-    const depsChanged = (key: string) => {
-      const d = store.deps.get(key);
-
-      if (!d || !d.size) return false;
-
-      for (const [k, v] of d.entries()) {
-        if (store.version.get(k) !== v) return true;
-      }
-
-      for (const k of d.keys()) {
-        if (depsChanged(k)) return true;
-      }
-
-      return false;
-    };
-
     let evalId = 0;
 
     const evaluate = () => {
@@ -146,15 +131,6 @@ export const selector = <T>(
       store.value.set(key, candidate);
 
       notifySubscribers();
-
-      if (!isPromiseLike(candidate)) return;
-
-      const prevVersion = store.version.get(key);
-
-      candidate.then(undefined, () => {
-        if (prevVersion === store.version.get(key))
-          store.initialized.set(key, false);
-      });
     };
 
     const refresh = () => {
@@ -191,7 +167,7 @@ export const selector = <T>(
             store.initialized.set(key, true);
             break;
 
-          case depsChanged(key):
+          case depsChanged(store, key):
             evaluate();
             break;
 

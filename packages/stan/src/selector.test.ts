@@ -187,35 +187,6 @@ describe('selector', () => {
     expect(evalCounter).toHaveBeenCalledTimes(1);
   });
 
-  it('should handle rejected promises', async () => {
-    const dep = atom(42);
-    const canFail = jest
-      .fn()
-      .mockImplementationOnce(() => {
-        throw new Error('Nope');
-      })
-      .mockImplementationOnce(() => {});
-    const evalCounter = jest.fn();
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const state = selector(async ({ get }) => {
-      evalCounter();
-      canFail();
-      return get(dep) + 1;
-    })(makeStore());
-
-    await expect(state.get()).rejects.toThrow('Nope');
-
-    expect(evalCounter).toHaveBeenCalledTimes(1);
-
-    await expect(state.get()).resolves.toBe(43);
-
-    expect(evalCounter).toHaveBeenCalledTimes(2);
-
-    await expect(state.get()).resolves.toBe(43);
-
-    expect(evalCounter).toHaveBeenCalledTimes(2);
-  });
-
   it('let one subscribe multiple times', () => {
     const dep = atom(42);
     const store = makeStore();
@@ -509,5 +480,28 @@ describe('selectorFamily', () => {
     expect(family({ multiplier: 2 })(store)).not.toBe(state1);
 
     unsub2();
+  });
+
+  it('should abort work when evicted from cache', () => {
+    const signals: AbortSignal[] = [];
+    const family = selectorFamily(
+      () =>
+        ({ signal }) => {
+          signals.push(signal);
+          return 1;
+        },
+      {
+        cachePolicy: { type: 'most-recent' },
+      },
+    );
+    const store = makeStore();
+
+    family(1)(store).get();
+    expect(signals[0].aborted).toBe(false);
+
+    family(2)(store).get();
+
+    expect(signals[0].aborted).toBe(true);
+    expect(signals[1].aborted).toBe(false);
   });
 });
