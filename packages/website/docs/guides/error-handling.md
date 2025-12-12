@@ -25,8 +25,6 @@ const mySelector = selector(async ({ get }) => {
 }); // Scoped<ReadonlyState<Promise<number | "nope">>>
 ```
 
-## Async errors
+## See also
 
-Stan does not implement any internal abstraction around [state](../api/state.md) values. Everything is stored as-is and receives no special treatment, with one small exception: rejected `Promise`s.
-
-When a Stan state satisfies the `Scoped<ReadonlyState<PromiseLike<any>>>` constraint - or, in simpler terms, when a [`selector`](../api/selector.md) returns something that looks like a `Promise` - and that `Promise` is rejected, Stan won't cache it. This means the state will be re-evaluated the next time it's accessed. This behavior is best illustrated by the [error-handling](https://github.com/rkrupinski/stan/tree/master/packages/examples/error-handling) example.
+- [React Suspense](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-suspense) (example)

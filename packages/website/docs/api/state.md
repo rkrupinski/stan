@@ -24,7 +24,7 @@ interface WritableState<T> extends State<T> {
 }
 ```
 
-Stan does not care about the type of value being stored, nor does it behave differently depending on the value type (with one small exception - see the [error handling guide](../guides/error-handling.md)).
+Stan does not care about the type of value being stored, nor does it behave differently depending on the value type.
 
 ## `State<T>`
 
