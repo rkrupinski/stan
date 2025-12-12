@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { useStanValueAsync } from "@rkrupinski/stan/react";
+import { type FC } from "react";
+import { useStanRefresh, useStanValueAsync } from "@rkrupinski/stan/react";
 
 import { swSearch } from "./state";
 
@@ -10,33 +10,33 @@ export type ResultsProps = {
 };
 
 export const Results: FC<ResultsProps> = ({ phrase }) => {
-  const results = useStanValueAsync(swSearch(phrase));
+  const data = useStanValueAsync(swSearch(phrase));
+  const refresh = useStanRefresh(swSearch(phrase));
 
   return (
     <div className={styles.resultsContainer}>
-      {results.type === "loading" && (
+      {data.type === "loading" && (
         <p className={styles.text}>Loading&hellip;</p>
       )}
-      {results.type === "error" && (
-        <p className={styles.text}>
-          {results.reason === "Canceled" ? (
-            <>&nbsp;</>
-          ) : (
-            `Error: ${results.reason}`
-          )}
-        </p>
-      )}
-      {results.type === "ready" && (
+      {data.type === "error" && (
         <>
-          {results.value.length ? (
+          <p className={styles.text}>Nope: {data.reason}</p>
+          <button onClick={refresh}>Try again</button>
+        </>
+      )}
+      {data.type === "ready" && (
+        <>
+          {data.value.result.length ? (
             <ul className={styles.results}>
-              {results.value.map(({ properties: { name, url } }) => (
-                <li key={url} className={styles.result}>
-                  <a href={url} target="_blank" rel="noopener noreferrer">
-                    {name}
-                  </a>
-                </li>
-              ))}
+              {data.value.result
+                .slice(0, 5)
+                .map(({ properties: { name, url } }) => (
+                  <li key={url} className={styles.result}>
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      {name}
+                    </a>
+                  </li>
+                ))}
             </ul>
           ) : (
             <p className={styles.text}>No results</p>
