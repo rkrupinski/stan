@@ -1,10 +1,29 @@
 import { selectorFamily } from "@rkrupinski/stan";
 
-import { search, type SWCharacter } from "../service";
+type SWCharacter = {
+  properties: {
+    name: string;
+    url: string;
+  };
+};
 
-export const swSearch = selectorFamily<Promise<SWCharacter[]>, string>(
-  (phrase) => () => search(phrase),
+type SwResponse = {
+  result: ReadonlyArray<SWCharacter>;
+};
+
+export const swSearch = selectorFamily<Promise<SwResponse>, string>(
+  (phrase) =>
+    async ({ signal }) => {
+      const res = await fetch(
+        `https://www.swapi.tech/api/people/?name=${encodeURIComponent(phrase)}`,
+        { signal }
+      );
+
+      if (!res.ok) throw new Error(res.statusText);
+
+      return res.json();
+    },
   {
-    cachePolicy: { type: "lru", maxSize: 5 },
+    cachePolicy: { type: "lru", maxSize: 3 },
   }
 );

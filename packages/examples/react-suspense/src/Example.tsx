@@ -1,42 +1,46 @@
-import { Suspense, use } from "react";
+import { Suspense, use, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { atom, selector } from "@rkrupinski/stan";
-import { useSetStanValue, useStanValue } from "@rkrupinski/stan/react";
+import { selector } from "@rkrupinski/stan";
+import { useStanRefresh, useStanValue } from "@rkrupinski/stan/react";
 
-const req = atom(0);
-
-const resource = selector(async ({ get, signal }) => {
-  get(req);
-
+const resource = selector(async ({ signal }) => {
   const res = await fetch("https://www.swapi.tech/api/people/1", { signal });
+
+  if (!res.ok) throw new Error("Nope");
 
   return res.json();
 });
 
 function DataViewer() {
-  const result = use(useStanValue(resource));
+  const value = use(useStanValue(resource));
 
-  return <pre>{JSON.stringify(result, null, 2)}</pre>;
+  return <pre>{JSON.stringify(value, null, 2)}</pre>;
 }
 
 export function Example() {
-  const setReq = useSetStanValue(req);
+  const [attempt, setAttempt] = useState(0);
+  const refresh = useStanRefresh(resource);
 
   return (
-    <>
-      <button
-        onClick={() => {
-          setReq((prev) => prev + 1);
-        }}
-      >
-        Refresh resource
-      </button>
-
-      <ErrorBoundary fallback={<p>Nope</p>}>
-        <Suspense fallback={<p>Loading data&hellip;</p>}>
-          <DataViewer />
-        </Suspense>
-      </ErrorBoundary>
-    </>
+    <ErrorBoundary
+      key={attempt}
+      fallback={
+        <>
+          <p>Nope</p>
+          <button
+            onClick={() => {
+              refresh();
+              setAttempt((prev) => prev + 1);
+            }}
+          >
+            Retry
+          </button>
+        </>
+      }
+    >
+      <Suspense fallback={<p>Loading&hellip;</p>}>
+        <DataViewer />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
