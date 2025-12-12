@@ -15,10 +15,10 @@ export const identity = <T>(arg: T) => arg;
 export type TypedOmit<T, K extends keyof T> = Omit<T, K>;
 
 const fnTypes = [
-  '[object AsyncFunction]',
-  '[object AsyncGeneratorFunction]',
-  '[object GeneratorFunction]',
   '[object Function]',
+  '[object AsyncFunction]',
+  '[object GeneratorFunction]',
+  '[object AsyncGeneratorFunction]',
 ];
 
 export const isFunction = (
