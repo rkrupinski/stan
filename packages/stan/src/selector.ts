@@ -2,13 +2,13 @@ import {
   erase,
   dejaVu,
   isFunction,
+  depsChanged,
   stableStringify,
   ERASE_TAG,
   REFRESH_TAG,
   MOUNT_TAG,
   UNMOUNT_TAG,
   type TypedOmit,
-  depsChanged,
 } from './internal';
 import { Aborted } from './errors';
 import type { SerializableParam, TagFromParam } from './types';
