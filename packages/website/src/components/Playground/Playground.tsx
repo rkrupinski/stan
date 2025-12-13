@@ -16,7 +16,7 @@ export const Playground: FC = () => (
               borderRadius: '8px',
               overflow: 'hidden',
             }}
-            src="https://stackblitz.com/edit/stan-playground?embed=1&file=App.tsx"
+            src="https://stackblitz.com/edit/stan-todos?embed=1&file=src%2FApp.tsx"
           />
         </div>
       </div>
