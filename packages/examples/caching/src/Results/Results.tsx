@@ -20,7 +20,7 @@ export const Results: FC<ResultsProps> = ({ phrase }) => {
       )}
       {data.type === "error" && (
         <>
-          <p className={styles.text}>Nope: {data.reason}</p>
+          <p className={styles.text}>{String(data.reason)}</p>
           <button onClick={refresh}>Try again</button>
         </>
       )}

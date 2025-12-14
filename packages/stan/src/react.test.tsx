@@ -180,8 +180,9 @@ describe('useStanValueAsync', () => {
     });
   });
 
-  it('should handle error', async () => {
-    const testSelector = selector(() => Promise.reject(new Error('Nope')));
+  it('should handle errors', async () => {
+    const error = new Error('Nope');
+    const testSelector = selector(() => Promise.reject(error));
 
     const { result } = renderHook(() => useStanValueAsync(testSelector), {
       wrapper: StanProvider,
@@ -190,20 +191,7 @@ describe('useStanValueAsync', () => {
     expect(result.current).toEqual({ type: 'loading' });
 
     await waitFor(() => {
-      expect(result.current).toEqual({ type: 'error', reason: 'Nope' });
-    });
-  });
-
-  it('should handle unknown error', async () => {
-    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-    const testSelector = selector(() => Promise.reject('🚗'));
-
-    const { result } = renderHook(() => useStanValueAsync(testSelector), {
-      wrapper: StanProvider,
-    });
-
-    await waitFor(() => {
-      expect(result.current).toEqual({ type: 'error', reason: 'unknown' });
+      expect(result.current).toEqual({ type: 'error', reason: error });
     });
   });
 

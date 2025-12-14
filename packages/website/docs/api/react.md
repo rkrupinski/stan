@@ -110,19 +110,19 @@ function MyComponent() {
 Wraps any Stan state ([`WritableState<T>`](./state.md#writablestatet) or [`ReadonlyState<T>`](./state.md#readonlystatet)) whose type extends `PromiseLike<any>` in a special union type:
 
 ```ts
-type AsyncValue<T> =
+type AsyncValue<T, E = unknown> =
   | { type: 'loading' }
   | { type: 'ready'; value: T }
-  | { type: 'error'; reason: string };
+  | { type: 'error'; reason: E };
 ```
 
 Works with: [`atom`](./atom.md), [`atomFamily`](./atomFamily.md), [`selector`](./selector.md),
 [`selectorFamily`](./selectorFamily.md)
 
 ```ts
-const useStanValueAsync: <T>(
+const useStanValueAsync: <T, E = unknown>(
   scopedState: Scoped<State<PromiseLike<T>>>,
-) => AsyncValue<T>;
+) => AsyncValue<T, E>;
 ```
 
 :::info
@@ -146,7 +146,7 @@ function MyComponent() {
       return <p>Loading&hellip;</p>;
 
     case 'error':
-      return <p>Nope. {result.reason}</p>;
+      return <p>{String(result.reason)}</p>;
 
     case 'ready':
       return <pre>{JSON.stringify(result.value, null, 2)}</pre>;

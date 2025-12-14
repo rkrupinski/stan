@@ -68,17 +68,17 @@ export const useSetStanValue = <T,>(scopedState: Scoped<WritableState<T>>) => {
 export const useStan = <T,>(scopedState: Scoped<WritableState<T>>) =>
   [useStanValue(scopedState), useSetStanValue(scopedState)] as const;
 
-export type AsyncValue<T> =
+export type AsyncValue<T, E = unknown> =
   | { type: 'loading' }
   | { type: 'ready'; value: T }
-  | { type: 'error'; reason: string };
+  | { type: 'error'; reason: E };
 
-export const useStanValueAsync = <T,>(
+export const useStanValueAsync = <T, E = unknown>(
   scopedState: Scoped<State<PromiseLike<T>>>,
-) => {
+): AsyncValue<T, E> => {
   const value = useStanValue(scopedState);
 
-  const [asyncValue, setAsyncValue] = useState<AsyncValue<T>>({
+  const [asyncValue, setAsyncValue] = useState<AsyncValue<T, E>>({
     type: 'loading',
   });
 
@@ -95,13 +95,11 @@ export const useStanValueAsync = <T,>(
             value,
           });
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (err: any) => {
+      (err: unknown) => {
         if (active)
           setAsyncValue({
             type: 'error',
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            reason: err?.message ?? 'unknown',
+            reason: err as E,
           });
       },
     );
