@@ -51,7 +51,7 @@ export function Example() {
       return <pre>Loading...</pre>;
 
     case "error":
-      return <pre>Error: {result.reason}</pre>;
+      return <pre>{String(result.reason)}</pre>;
 
     case "ready":
       return <pre>{JSON.stringify(result.value)}</pre>;
