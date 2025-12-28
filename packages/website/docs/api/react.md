@@ -216,6 +216,67 @@ function MyComponent() {
 }
 ```
 
+## `useStanCallback`
+
+Returns a memoized callback with access to helper functions for interacting with Stan state (setting, refreshing, etc.).
+
+```ts
+const useStanCallback: <A extends unknown[], R>(
+  factory: (helpers: StanCallbackHelpers) => (...args: A) => R,
+  deps?: DependencyList,
+) => (...args: A) => R;
+```
+
+- `factory` – A curried callback function, where:
+  - `helpers` – State helpers:
+    - `set` – A function for setting [`WritableState<T>`](./state.md#writablestatet), with the following signature:
+      ```ts
+      <T>(
+        scopedState: Scoped<WritableState<T>>,
+        valueOrUpdater: T | ((currentValue: T) => T),
+      ) => void
+      ```
+    - `reset` – A function for [resetting](./utils.md#reset) [`WritableState<T>`](./state.md#writablestatet), with the following signature:
+      ```ts
+      <T>(scopedState: Scoped<WritableState<T>>) => void
+      ```
+    - `refresh` – A function for [refreshing](./utils.md#refresh) [`ReadonlyState<T>`](./state.md#readonlystatet), with the following signature:
+      ```ts
+      <T>(scopedState: Scoped<ReadonlyState<T>>) => void
+      ```
+- `deps?` – An array of dependencies (see [`useCallback`](https://react.dev/reference/react/useCallback)).
+
+Example:
+
+```tsx
+const user = selectorFamily<Promise<User>, string>(
+  userId => () => loadUser(userId),
+);
+
+function MyComponent() {
+  const reloadUser = useStanCallback(({ refresh }) => (userId: string) => {
+    refresh(user(userId));
+  });
+
+  return (
+    <ul>
+      {users.map(({ id, name }) => (
+        <li key={id}>
+          {name}{' '}
+          <button
+            onClick={() => {
+              reloadUser(id);
+            }}
+          >
+            Refresh
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
 ## `StanProvider`
 
 Stan, by default, operates in provider-less mode, using [`DEFAULT_STORE`](./store.md#the-store-class). However, if you need to supply a different store (e.g., for [SSR](../guides/ssr.md)) or switch stores dynamically, `StanProvider` comes in handy. Re-mounting `StanProvider` can also serve as a way to reset all state.
