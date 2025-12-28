@@ -11,19 +11,41 @@ describe('atom', () => {
     expect(state.get()).toBe(42);
   });
 
-  it('should disallow updates when not initialized', () => {
+  it('should implicitly initialize when set', () => {
     const state = atom(42)(makeStore());
 
     state.set(43);
 
-    expect(state.get()).toBe(42);
+    expect(state.get()).toBe(43);
   });
 
   it('should let one update value', () => {
     const state = atom(42)(makeStore());
 
-    state.get(); // Initialize
     state.set(43);
+
+    expect(state.get()).toBe(43);
+  });
+
+  it('should run effects when initializing via set', () => {
+    const state = atom(42, {
+      effects: [
+        ({ init }) => {
+          init(43);
+        },
+      ],
+    })(makeStore());
+
+    state.set(prev => prev * 2);
+
+    expect(state.get()).toBe(86);
+  });
+
+  it('should support updater function on uninitialized atom', () => {
+    const state = atom(42)(makeStore());
+
+    // Should initialize to 42, then update to 43
+    state.set((prev: number) => prev + 1);
 
     expect(state.get()).toBe(43);
   });
@@ -31,7 +53,6 @@ describe('atom', () => {
   it('should let one update value via updater', () => {
     const state = atom(42)(makeStore());
 
-    state.get(); // Initialize
     state.set(prev => prev + 1);
 
     expect(state.get()).toBe(43);
@@ -41,7 +62,6 @@ describe('atom', () => {
     const state = atom(42)(makeStore());
     const mockCallback = jest.fn();
 
-    state.get(); // Initialize
     state.subscribe(mockCallback);
     state.set(43);
 
@@ -53,7 +73,6 @@ describe('atom', () => {
     const mockCallback1 = jest.fn();
     const mockCallback2 = jest.fn();
 
-    state.get(); // Initialize
     state.subscribe(mockCallback1);
     state.subscribe(mockCallback2);
     state.set(43);
@@ -65,8 +84,6 @@ describe('atom', () => {
   it('let one unsubscribe', () => {
     const state = atom(42)(makeStore());
     const mockCallback = jest.fn();
-
-    state.get(); // Initialize
 
     const unsubscribe = state.subscribe(mockCallback);
 
@@ -86,7 +103,6 @@ describe('atom', () => {
     const state = atom(initialValue)(makeStore());
     const mockCallback = jest.fn();
 
-    state.get(); // Initialize
     state.subscribe(mockCallback);
     state.set(nextValue);
 
@@ -104,7 +120,6 @@ describe('atom', () => {
     const state = atom(initialValue, { areValuesEqual })(makeStore());
     const mockCallback = jest.fn();
 
-    state.get(); // Initialize
     state.subscribe(mockCallback);
     state.set(nextValue);
 
@@ -116,7 +131,6 @@ describe('atom', () => {
     const state = atom(42)(makeStore());
     const mockCallback = jest.fn();
 
-    state.get(); // Initialize
     state.set(43);
     state.subscribe(mockCallback);
 
@@ -187,8 +201,7 @@ describe('atom', () => {
 
     const mockCallback = jest.fn();
 
-    state.get(); // Initialize
-
+    state.get();
     state.subscribe(mockCallback);
 
     setFn(43);
@@ -206,8 +219,6 @@ describe('atom', () => {
         },
       ],
     })(makeStore());
-
-    state.get(); // Initialize
 
     expect(mockOnSet).not.toHaveBeenCalled();
 
@@ -235,8 +246,7 @@ describe('atom', () => {
       ],
     })(makeStore());
 
-    state.get(); // Initialize
-
+    state.get();
     state.subscribe(outerCallback);
 
     setter(43);
@@ -326,9 +336,6 @@ describe('atomFamily', () => {
     const state1 = family(1)(store);
     const state2 = family(2)(store);
 
-    state1.get(); // Initialize
-    state2.get(); // Initialize
-
     state1.set(43);
     state2.set(44);
 
@@ -349,10 +356,8 @@ describe('atomFamily', () => {
     const store = makeStore();
 
     const state1 = family(1)(store);
-    state1.get(); // Initialize
 
     const state2 = family(2)(store);
-    state2.get(); // Initialize
 
     expect(state1.get()).toBe(43);
     expect(state2.get()).toBe(43);
