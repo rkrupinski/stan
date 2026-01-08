@@ -46,16 +46,33 @@ export const useStanValue = <T,>(scopedState: Scoped<State<T>>) => {
   const prevStateRef = useRef(state);
   const [value, setValue] = useState(() => state.get());
 
-  useEffect(() => {
-    if (state !== prevStateRef.current) {
-      prevStateRef.current = state;
-      setValue(state.get());
-    }
+  let currentValue = value;
+  if (state !== prevStateRef.current) {
+    currentValue = state.get();
+    prevStateRef.current = state;
+    setValue(currentValue);
+  }
 
-    return state.subscribe(setValue);
+  const subscriptionsRef = useRef(new WeakMap<State<T>, () => void>());
+
+  if (!subscriptionsRef.current.has(state)) {
+    subscriptionsRef.current.set(state, state.subscribe(setValue));
+  }
+
+  useEffect(() => {
+    const subscriptions = subscriptionsRef.current;
+
+    return () => {
+      const unsubscribe = subscriptions.get(state);
+
+      if (unsubscribe) {
+        unsubscribe();
+        subscriptions.delete(state);
+      }
+    };
   }, [state]);
 
-  return value;
+  return currentValue;
 };
 
 export const useSetStanValue = <T,>(scopedState: Scoped<WritableState<T>>) => {

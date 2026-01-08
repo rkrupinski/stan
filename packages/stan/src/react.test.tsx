@@ -2,9 +2,9 @@
  * @jest-environment jsdom
  */
 import type { ReactNode } from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor, render } from '@testing-library/react';
 
-import { selector } from './selector';
+import { selector, selectorFamily } from './selector';
 import { makeStore } from './store';
 import { atom } from './atom';
 import {
@@ -162,6 +162,62 @@ describe('useStanValue', () => {
     unmount();
 
     expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+  });
+
+  it('should switch to a new state when the prop changes', () => {
+    const atomA = atom('A');
+    const atomB = atom('B');
+
+    const { result, rerender } = renderHook(({ s }) => useStanValue(s), {
+      initialProps: { s: atomA },
+      wrapper: StanProvider,
+    });
+
+    expect(result.current).toBe('A');
+
+    rerender({ s: atomB });
+
+    expect(result.current).toBe('B');
+  });
+
+  it('should handle LRU cache eviction during simultaneous hook mounting', async () => {
+    const evalCount = jest.fn();
+    const CACHE_SIZE = 2;
+    const ITEM_COUNT = 3; // > CACHE_SIZE
+
+    const testFamily = selectorFamily(
+      (id: number) => () => {
+        evalCount(id);
+        return id;
+      },
+      {
+        cachePolicy: { type: 'lru', maxSize: CACHE_SIZE },
+      },
+    );
+
+    const store = makeStore();
+
+    const Child = ({ id }: { id: number }) => {
+      useStanValue(testFamily(id));
+      return null;
+    };
+
+    const App = () => (
+      <StanProvider store={store}>
+        {Array.from({ length: ITEM_COUNT }, (_, i) => (
+          <Child key={i} id={i} />
+        ))}
+      </StanProvider>
+    );
+
+    render(<App />);
+
+    // Wait a bit to let any potential loops run
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    expect(evalCount).toHaveBeenCalledTimes(ITEM_COUNT);
   });
 });
 

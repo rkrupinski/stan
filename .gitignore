@@ -1,6 +1,7 @@
 node_modules
 dist
 build
+.ai
 .DS_Store
 .eslintcache
 .cache-loader
