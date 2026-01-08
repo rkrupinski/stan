@@ -3,6 +3,7 @@
 # Stan
 
 [![CI](https://github.com/rkrupinski/stan/actions/workflows/ci.yml/badge.svg)](https://github.com/rkrupinski/stan/actions/workflows/ci.yml)
+![NPM Version](https://img.shields.io/npm/v/@rkrupinski/stan)
 ![Bundle size](https://img.shields.io/bundlejs/size/@rkrupinski/stan)
 
 Minimal, type-safe state management
