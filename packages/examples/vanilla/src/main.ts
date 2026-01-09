@@ -1,17 +1,15 @@
-import { atom, selector, makeStore } from "@rkrupinski/stan";
-
-const store = makeStore();
+import { atom, selector, DEFAULT_STORE } from "@rkrupinski/stan";
 
 const multiplier = atom(0);
 
 const result = selector(({ get }) => 42 * get(multiplier));
 
-print(result(store).get());
+print(result(DEFAULT_STORE).get());
 
-result(store).subscribe(print);
+result(DEFAULT_STORE).subscribe(print);
 
 document.querySelector("#button")!.addEventListener("click", () => {
-  multiplier(store).set((prev) => prev + 1);
+  multiplier(DEFAULT_STORE).set((prev) => prev + 1);
 });
 
 function print(value: number) {
