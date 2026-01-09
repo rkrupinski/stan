@@ -2,11 +2,11 @@ import type { Store } from './store';
 
 export { default as stableStringify } from 'fast-json-stable-stringify';
 
-export const REFRESH_TAG = Symbol('@@refresh@@');
-export const RESET_TAG = Symbol('@@reset@@');
-export const ERASE_TAG = Symbol('@@erase@@');
-export const MOUNT_TAG = Symbol('@@mount@@');
-export const UNMOUNT_TAG = Symbol('@@unmount@@');
+export const REFRESH_TAG = Symbol('@@refresh');
+export const RESET_TAG = Symbol('@@reset');
+export const ERASE_TAG = Symbol('@@erase');
+export const MOUNT_TAG = Symbol('@@mount');
+export const UNMOUNT_TAG = Symbol('@@unmount');
 
 export const dejaVu = <T>(a: T, b: T) => a === b;
 

@@ -46,7 +46,7 @@ export const atom = <T>(
     const makeSetter =
       (silent = false): SetterOrUpdater<T> =>
       newValue => {
-        if (!store.initialized.get(key)) return;
+        ensureInitialized();
 
         const prevValue = store.value.get(key) as T;
         const candidate = isFunction(newValue) ? newValue(prevValue) : newValue;
@@ -65,13 +65,18 @@ export const atom = <T>(
     const set = makeSetter();
     const setSilent = makeSetter(true);
 
-    const initialize = () => {
+    const ensureInitialized = () => {
+      if (store.initialized.get(key)) return;
+
       store.value.set(key, defaultValue);
+      store.initialized.set(key, true);
+
+      let isInitializing = true;
 
       effects?.forEach(effectFn =>
         effectFn({
           init(v) {
-            if (!store.initialized.get(key)) {
+            if (isInitializing) {
               store.value.set(key, v);
             }
           },
@@ -81,15 +86,14 @@ export const atom = <T>(
           },
         }),
       );
+
+      isInitializing = false;
     };
 
     return {
       key,
       get() {
-        if (!store.initialized.get(key)) {
-          initialize();
-          store.initialized.set(key, true);
-        }
+        ensureInitialized();
 
         return store.value.get(key) as T;
       },

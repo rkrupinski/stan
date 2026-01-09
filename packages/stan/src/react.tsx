@@ -8,6 +8,7 @@ import {
   useRef,
   type FC,
   type ReactNode,
+  type DependencyList,
 } from 'react';
 
 import type { Scoped, State, ReadonlyState, WritableState } from './state';
@@ -145,4 +146,45 @@ export const useStanReset = <T,>(scopedState: Scoped<WritableState<T>>) => {
   return useCallback(() => {
     reset(state);
   }, [state]);
+};
+
+export type StanCallbackHelpers = {
+  set: <T>(
+    scopedState: Scoped<WritableState<T>>,
+    valueOrUpdater: T | ((currentValue: T) => T),
+  ) => void;
+  reset: <T>(scopedState: Scoped<WritableState<T>>) => void;
+  refresh: <T>(scopedState: Scoped<ReadonlyState<T>>) => void;
+};
+
+export const useStanCallback = <A extends unknown[], R>(
+  factory: (helpers: StanCallbackHelpers) => (...args: A) => R,
+  deps: DependencyList = [],
+) => {
+  const { store } = useStanCtx();
+  const factoryRef = useRef(factory);
+
+  useEffect(() => {
+    factoryRef.current = factory;
+  });
+
+  return useCallback(
+    (...args: A) => {
+      const helpers: StanCallbackHelpers = {
+        set: (scopedState, valueOrUpdater) => {
+          scopedState(store).set(valueOrUpdater);
+        },
+        reset: scopedState => {
+          reset(scopedState(store));
+        },
+        refresh: scopedState => {
+          refresh(scopedState(store));
+        },
+      };
+
+      return factoryRef.current(helpers)(...args);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [store, ...deps],
+  );
 };

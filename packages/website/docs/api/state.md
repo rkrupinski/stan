@@ -55,10 +55,6 @@ It inherits all properties from [`State<T>`](#statet), and additionally defines:
 
   Important: This function is not meant to be called directly (see [utils](./utils.md#reset)).
 
-:::info
-`WritableState<T>` must be initialized before use. Initialization occurs when the state is first read.
-:::
-
 ## `ReadonlyState<T>`
 
 Produced by:
@@ -80,10 +76,6 @@ It inherits all properties from [`State<T>`](#statet), and additionally defines:
   - When called on an _unmounted_ state, it marks the state as uninitialized - meaning it will be re-evaluated the next time it is accessed.
 
   Important: This function is not meant to be called directly (see [utils](./utils.md#refresh)).
-
-:::info
-`ReadonlyState<T>` must be initialized before use. Initialization occurs when the state is first read.
-:::
 
 ### Mounting
 

@@ -14,6 +14,7 @@ import {
   useSetStanValue,
   useStanRefresh,
   useStanReset,
+  useStanCallback,
   StanProvider,
 } from './react';
 
@@ -419,5 +420,155 @@ describe('useStanReset', () => {
     result.current();
 
     expect(testAtom(store).get()).toBe(42);
+  });
+});
+
+describe('useStanCallback', () => {
+  it('should allow setting writable state', () => {
+    const testAtom = atom(42);
+    const store = makeStore();
+
+    const { result } = renderHook(
+      () =>
+        useStanCallback(
+          ({ set }) =>
+            (val: number) =>
+              set(testAtom, val),
+        ),
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    act(() => {
+      result.current(43);
+    });
+
+    expect(testAtom(store).get()).toBe(43);
+  });
+
+  it('should allow resetting writable state', () => {
+    const testAtom = atom(42);
+    const store = makeStore();
+
+    testAtom(store).set(43); // Initialize with non-default value
+
+    const { result } = renderHook(
+      () =>
+        useStanCallback(
+          ({ reset }) =>
+            () =>
+              reset(testAtom),
+        ),
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    act(() => {
+      result.current();
+    });
+
+    expect(testAtom(store).get()).toBe(42);
+  });
+
+  it('should allow refreshing readonly state', () => {
+    const mockFn = jest.fn().mockReturnValue(42);
+    const testSelector = selector(mockFn);
+    const store = makeStore();
+
+    testSelector(store).get(); // Initialize
+    testSelector(store).subscribe(() => {}); // Mount
+    expect(mockFn).toHaveBeenCalledTimes(1);
+
+    const { result } = renderHook(
+      () =>
+        useStanCallback(({ refresh }) => () => {
+          refresh(testSelector);
+        }),
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    act(() => {
+      result.current();
+    });
+
+    expect(mockFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('should support dependencies', () => {
+    const testAtom = atom(42);
+    const store = makeStore();
+
+    const { result, rerender } = renderHook(
+      ({ value }) =>
+        useStanCallback(
+          ({ set }) =>
+            () => {
+              set(testAtom, value);
+            },
+          [value],
+        ),
+      {
+        initialProps: { value: 43 },
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    act(() => {
+      result.current();
+    });
+
+    expect(testAtom(store).get()).toBe(43);
+
+    rerender({ value: 44 });
+
+    act(() => {
+      result.current();
+    });
+
+    expect(testAtom(store).get()).toBe(44);
+  });
+
+  it('should always use the latest callback implementation', () => {
+    const testAtom = atom(42);
+    const store = makeStore();
+
+    const { result, rerender } = renderHook(
+      ({ multiplier }) =>
+        useStanCallback(({ set }) => (val: number) => {
+          set(testAtom, val * multiplier);
+        }),
+      {
+        initialProps: { multiplier: 2 },
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    act(() => {
+      result.current(10);
+    });
+
+    expect(testAtom(store).get()).toBe(20);
+
+    rerender({ multiplier: 3 });
+
+    act(() => {
+      result.current(10);
+    });
+
+    expect(testAtom(store).get()).toBe(30);
   });
 });

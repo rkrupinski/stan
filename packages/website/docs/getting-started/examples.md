@@ -20,3 +20,4 @@ The following examples are available:
 7. [switching-stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/switching-stores) - reset all state by switching stores.
 8. [react-suspense](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-suspense) - use React Suspense with Stan.
 9. [vanilla](https://github.com/rkrupinski/stan/tree/master/packages/examples/vanilla) - use vanilla Stan if you really have to.
+10. [collection-actions](https://github.com/rkrupinski/stan/tree/master/packages/examples/collection-actions) - alter a dynamically referenced Stan state.

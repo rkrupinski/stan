@@ -4,7 +4,14 @@ import { useStan } from "@rkrupinski/stan/react";
 const STORAGE_KEY = "@@@";
 
 const storageEffect: AtomEffect<string> = ({ init, onSet }) => {
-  init(localStorage.getItem(STORAGE_KEY) ?? `${Math.random()}`);
+  let currentValue = localStorage.getItem(STORAGE_KEY);
+
+  if (!currentValue) {
+    currentValue = `${Math.random()}`;
+    localStorage.setItem(STORAGE_KEY, currentValue);
+  }
+
+  init(currentValue);
 
   onSet((newValue) => {
     localStorage.setItem(STORAGE_KEY, newValue);
@@ -20,7 +27,7 @@ export function Example() {
 
   return (
     <>
-      <pre>value: {JSON.stringify(value)}</pre>
+      <pre>Value: {value}</pre>
       <button
         onClick={() => {
           setValue(`${Math.random()}`);
