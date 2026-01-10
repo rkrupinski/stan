@@ -1,0 +1,33 @@
+# Stan
+
+> Minimal, type-safe state management
+
+- **Repository**: https://github.com/rkrupinski/stan
+- **Documentation**: https://stan.party
+
+Stan is a minimal, type-safe state management library. It is framework-agnostic at its core, but comes with first-class React bindings.
+
+## Documentation
+
+- [Introduction](https://stan.party/)
+- [Installation](https://stan.party/docs/getting-started/installation)
+- [Examples](https://stan.party/docs/getting-started/examples)
+
+## API Reference
+
+- [State](https://stan.party/docs/api/state)
+- [atom](https://stan.party/docs/api/atom)
+- [atomFamily](https://stan.party/docs/api/atomFamily)
+- [selector](https://stan.party/docs/api/selector)
+- [selectorFamily](https://stan.party/docs/api/selectorFamily)
+- [Store](https://stan.party/docs/api/store)
+- [Utils](https://stan.party/docs/api/utils)
+- [React](https://stan.party/docs/api/react)
+
+## Guides
+
+- [Type Safety](https://stan.party/docs/guides/type-safety)
+- [Server-Side Rendering](https://stan.party/docs/guides/ssr)
+- [Caching](https://stan.party/docs/guides/caching)
+- [Param Serialization](https://stan.party/docs/guides/param-serialization)
+- [Error Handling](https://stan.party/docs/guides/error-handling)
