@@ -1,0 +1,296 @@
+# Stan
+
+> Minimal, type-safe state management
+
+- **Repository**: https://github.com/rkrupinski/stan
+- **Documentation**: https://stan.party
+- **License**: MIT
+
+Stan is a minimal, type-safe state management library. It is **framework-agnostic** at its core, designed to be composable and extensible. While it includes first-class React bindings out of the box, the core logic depends on no specific framework.
+
+## Core Concepts
+
+### Mental Model
+
+Stan distinguishes between the *definition* of state and the *storage* of state.
+
+- **Atom**: A definition of a writable state unit.
+- **Selector**: A definition of a derived state unit (computed from atoms or other selectors).
+- **Store**: The container that holds the actual values.
+- **State**: The interface for interacting with a specific value in a specific store.
+
+### Scoped State
+
+Primitives like `atom` and `selector` do not hold values themselves. They are factories (specifically, curried functions) that accept a `Store` and return a `State` object.
+
+```typescript
+// Core type definition
+type Scoped<T> = (store: Store) => T;
+```
+
+### State Interfaces
+
+All state in Stan follows a common interface:
+
+```typescript
+interface State<T> {
+  key: string;
+  get(): T;
+  subscribe(callback: (value: T) => void): () => void;
+}
+
+interface WritableState<T> extends State<T> {
+  set(value: T | ((prev: T) => T)): void;
+}
+
+interface ReadonlyState<T> extends State<T> {
+  // Can be refreshed but not set directly
+}
+```
+
+## Core API
+
+### `atom`
+
+Creates a writable state unit. Atoms have no dependencies and are the source of truth in the state graph.
+
+```typescript
+function atom<T>(initialValue: T, options?: AtomOptions<T>): Scoped<WritableState<T>>
+```
+
+**Options:**
+- `tag`: A string (or string-returning function) for debugging purposes.
+- `effects`: Array of [Atom Effects](#atom-effects).
+- `areValuesEqual`: Custom equality check (default: `===`).
+
+```typescript
+const countAtom = atom(0);
+const userAtom = atom({ name: 'John' }, { tag: 'user' });
+```
+
+### `atomFamily`
+
+Returns a memoized function that maps parameters to `atom`s. Useful for collections.
+
+```typescript
+function atomFamily<T, P>(
+  initialValue: T | ((param: P) => T),
+  options?: AtomFamilyOptions<T, P>
+): (param: P) => Scoped<WritableState<T>>
+```
+
+**Constraint**: `P` must be serializable (JSON-compatible).
+
+### `selector`
+
+Creates a derived state unit. Selectors automatically track dependencies accessed via `get`.
+
+```typescript
+function selector<T>(fn: SelectorFn<T>, options?: SelectorOptions): Scoped<ReadonlyState<T>>
+```
+
+**Selector Function:** `({ get, signal }) => T | Promise<T>`
+- `get`: Reads values from other atoms/selectors and subscribes to them.
+- `signal`: `AbortSignal` for cancelling async work.
+
+**Behavior**:
+- **Synchronous**: Re-evaluates immediately when dependencies change.
+- **Asynchronous**: Re-evaluates when dependencies change. The returned `Promise` is cached.
+
+```typescript
+// Synchronous
+const doubleAtom = selector(({ get }) => get(countAtom) * 2);
+
+// Asynchronous
+const userQuery = selector(async ({ get, signal }) => {
+  const res = await fetch('/api/user', { signal });
+  return res.json();
+});
+```
+
+### `selectorFamily`
+
+Returns a memoized function that maps parameters to `selector`s.
+
+```typescript
+function selectorFamily<T, P>(
+  fn: (param: P) => SelectorFn<T>,
+  options?: SelectorFamilyOptions<P>
+): (param: P) => Scoped<ReadonlyState<T>>
+```
+
+**Options**:
+- `cachePolicy`: Configures internal cache behavior.
+    - `{ type: 'keep-all' }` (default): Caches every instance.
+    - `{ type: 'most-recent' }`: Keeps only the last used instance.
+    - `{ type: 'lru', maxSize: number }`: Least Recently Used eviction.
+
+### `Store`
+
+The central state container. Required for Vanilla JS or advanced scoping (e.g., SSR).
+
+- `makeStore()`: Creates a new store instance.
+- `DEFAULT_STORE`: The default instance used by React bindings if no provider is present.
+
+### `utils`
+
+- `reset(state)`: Resets a `WritableState` to its initial value. Notifies subscribers.
+- `refresh(state)`: Refreshes a `ReadonlyState`.
+    - **Mounted**: Re-evaluates immediately.
+    - **Unmounted**: Marks as dirty; re-evaluates on next access.
+
+## React Integration (`@rkrupinski/stan/react`)
+
+Stan provides hooks that automatically handle store context.
+
+### `useStan`
+Similar to `useState`. Returns `[value, setValue]`.
+
+```tsx
+const [count, setCount] = useStan(countAtom);
+```
+
+### `useStanValue`
+Reads a value and subscribes to updates. Works with atoms and selectors.
+
+```tsx
+const double = useStanValue(doubleAtom);
+```
+
+### `useSetStanValue`
+Returns a setter function for an atom. Does not subscribe to value changes (optimization).
+
+```tsx
+const setCount = useSetStanValue(countAtom);
+```
+
+### `useStanValueAsync`
+Specialized hook for `Promise`-based state. Wraps the promise state in a discriminated union for easy rendering.
+
+**Return Type**:
+```typescript
+type AsyncValue<T, E = unknown> =
+  | { type: 'loading' }
+  | { type: 'ready'; value: T }
+  | { type: 'error'; reason: E };
+```
+
+```tsx
+const result = useStanValueAsync(userQuery);
+if (result.type === 'loading') return <Spinner />;
+if (result.type === 'error') return <Error msg={result.reason} />;
+return <div>{result.value.name}</div>;
+```
+
+### `useStanRefresh` / `useStanReset`
+Hooks that return the `refresh` or `reset` functions bound to the specific state.
+
+```tsx
+const refreshUser = useStanRefresh(userQuery);
+const resetCount = useStanReset(countAtom);
+```
+
+### `useStanCallback`
+Create a callback with access to `set`, `reset`, and `refresh` without subscribing the component to state changes.
+
+```typescript
+const cb = useStanCallback(({ set, reset, refresh }) => (arg) => {
+  // Perform actions
+});
+```
+
+### `StanProvider`
+Used for Server-Side Rendering (SSR) to isolate state per request.
+
+```tsx
+import { StanProvider } from '@rkrupinski/stan/react';
+
+export default function App({ children }) {
+  return <StanProvider>{children}</StanProvider>; // Uses a new store context
+}
+```
+
+## Guides & Best Practices
+
+### Type Safety
+Stan leverages TypeScript inference extensively.
+- Atoms infer type from initial value.
+- Selectors infer type from return value.
+- Families require explicit generic arguments for parameters if they cannot be inferred: `atomFamily<ValueType, ParamType>(...)`.
+
+**Refining Types:**
+```typescript
+const atomA = atom<42 | 43>(42); // WritableState<42 | 43>
+```
+
+### Atom Effects
+Use effects for persistence, logging, or synchronization. Effects run in order.
+
+```typescript
+type AtomEffect<T> = (params: {
+  init(value: T): void;       // Set initial value (synchronous only)
+  set(value: T): void;        // Update value
+  onSet(cb: (val: T) => void): void; // Subscribe to changes
+}) => void;
+```
+
+**Example (Persistence):**
+```typescript
+const persistentAtom = atom(0, {
+  effects: [
+    ({ onSet, set }) => {
+      const saved = localStorage.getItem('count');
+      if (saved) set(Number(saved)); 
+      onSet(val => localStorage.setItem('count', String(val)));
+    }
+  ]
+});
+```
+
+### Caching
+- **Internal Cache**: Stan caches values of atoms and selectors.
+- **Eviction**:
+    - Atoms: Cached until reset or updated.
+    - Selectors: Cached until dependencies change.
+    - Families: Controlled by `cachePolicy` (`keep-all`, `most-recent`, `lru`).
+
+### Param Serialization
+Keys for families are generated by serializing parameters.
+- **Supported**: JSON-serializable values (string, number, boolean, null, object, array).
+- **Behavior**: Keys are stable (object property order is normalized).
+
+### Error Handling
+Selectors using `get()` to read dependencies do **not** throw if the dependency is in an error state. They simply propagate the error state or allow you to catch it if using async/await.
+
+```typescript
+const safeSelector = selector(async ({ get }) => {
+  try {
+    return await get(asyncDep);
+  } catch (e) {
+    return 'fallback';
+  }
+});
+```
+
+## Vanilla JS Usage
+
+Stan can be used without React by manually managing the `Store`.
+
+```typescript
+import { atom, makeStore } from '@rkrupinski/stan';
+
+const store = makeStore();
+const count = atom(0);
+
+// Access state scoped to the store
+const countState = count(store);
+
+// Read
+console.log(countState.get()); // 0
+
+// Write
+countState.set(1);
+
+// Subscribe
+const unsubscribe = countState.subscribe(val => console.log(val));
+```
