@@ -43,7 +43,7 @@ export const selector = <T>(
     [UNMOUNT_TAG]: onUnmountCb,
   }: SelectorCtx = {},
 ): Scoped<ReadonlyState<T>> => {
-  const key = `s${tag ? `-${tag}` : ''}-${selectorId++}`;
+  const key = `@@s${tag ? `[${tag}]` : ''}-${++selectorId}`;
 
   return memoize(store => () => {
     const deps = new Map<string, number>();
