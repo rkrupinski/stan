@@ -28,13 +28,12 @@ export const atom = <T>(
   { tag, effects, areValuesEqual = dejaVu }: AtomOptions<T> = {},
 ): Scoped<WritableState<T>> => {
   const defaultValue = initialValue;
-  const key = `a${tag ? `-${tag}` : ''}-${atomId++}`;
+  const key = `@@atom${tag ? `[${tag}]` : ''}-${++atomId}`;
 
   return memoize(store => () => {
     const subscribed = new Set<(newValue: T) => void>();
     const effectSubs = new Set<(newValue: T) => void>();
 
-    store.value.set(key, defaultValue);
     store.version.set(key, 1);
 
     const bumpVersion = () => {
@@ -45,22 +44,22 @@ export const atom = <T>(
 
     const makeSetter =
       (silent = false): SetterOrUpdater<T> =>
-      newValue => {
-        ensureInitialized();
+        newValue => {
+          ensureInitialized();
 
-        const prevValue = store.value.get(key) as T;
-        const candidate = isFunction(newValue) ? newValue(prevValue) : newValue;
+          const prevValue = store.value.get(key) as T;
+          const candidate = isFunction(newValue) ? newValue(prevValue) : newValue;
 
-        if (areValuesEqual(prevValue, candidate)) return;
+          if (areValuesEqual(prevValue, candidate)) return;
 
-        bumpVersion();
+          bumpVersion();
 
-        store.value.set(key, candidate);
+          store.value.set(key, candidate);
 
-        [...subscribed].forEach(cb => cb(candidate));
+          [...subscribed].forEach(cb => cb(candidate));
 
-        if (!silent) effectSubs.forEach(cb => cb(candidate));
-      };
+          if (!silent) effectSubs.forEach(cb => cb(candidate));
+        };
 
     const set = makeSetter();
     const setSilent = makeSetter(true);
