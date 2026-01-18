@@ -28,7 +28,7 @@ export const atom = <T>(
   { tag, effects, areValuesEqual = dejaVu }: AtomOptions<T> = {},
 ): Scoped<WritableState<T>> => {
   const defaultValue = initialValue;
-  const key = `@@a${tag ? `[${tag}]` : ''}-${++atomId}`;
+  const key = `@@atom${tag ? `[${tag}]` : ''}-${++atomId}`;
 
   return memoize(store => () => {
     const subscribed = new Set<(newValue: T) => void>();
