@@ -99,7 +99,7 @@ describe('atom', () => {
 
   it('should use referential equality by default', () => {
     const initialValue = { foo: 'bar' };
-    const nextValue = structuredClone(initialValue);
+    const nextValue = { ...initialValue };
     const state = atom(initialValue)(makeStore());
     const mockCallback = jest.fn();
 
@@ -112,7 +112,7 @@ describe('atom', () => {
 
   it('should let one customize equality function', () => {
     const initialValue = { foo: 'bar' };
-    const nextValue = structuredClone(initialValue);
+    const nextValue = { ...initialValue };
 
     const areValuesEqual = <T>(a: T, b: T) =>
       JSON.stringify(a) === JSON.stringify(b);
