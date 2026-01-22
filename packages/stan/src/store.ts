@@ -2,11 +2,11 @@ type StoreEvent =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   { type: 'SET'; key: string; value: any } | { type: 'DELETE'; key: string };
 
-interface DevToolsHook {
+type DevToolsHook = {
   register(store: Store): void;
   unregister(store: Store): void;
-  send(storeId: string, event: StoreEvent): void;
-}
+  send(storeKey: string, event: StoreEvent): void;
+};
 
 declare global {
   interface Window {
@@ -57,6 +57,7 @@ export type StoreOptions = {
 
 export class Store {
   key: string;
+  libVersion: string = process.env.STAN_VERSION;
 
   deps = new Map<string, Deps>();
   value =
@@ -70,7 +71,7 @@ export class Store {
   initialized = new Map<string, boolean>();
 
   constructor({ tag }: StoreOptions = {}) {
-    this.key = `@@store${tag ? `[${tag}]` : ''}-${++storeId}`;
+    this.key = `@@store${tag ? `[${tag}]` : ''}-${storeId++}`;
   }
 
   destroy() {
