@@ -274,7 +274,7 @@ describe('selector', () => {
 
   it('should use referential equality by default', () => {
     const initialValue = { foo: 'bar' };
-    const nextValue = structuredClone(initialValue);
+    const nextValue = { ...initialValue };
     const producer = jest
       .fn<typeof initialValue, []>()
       .mockReturnValueOnce(initialValue)
@@ -293,7 +293,7 @@ describe('selector', () => {
 
   it('should let one customize equality function', () => {
     const initialValue = { foo: 'bar' };
-    const nextValue = structuredClone(initialValue);
+    const nextValue = { ...initialValue };
     const producer = jest
       .fn<typeof initialValue, []>()
       .mockReturnValueOnce(initialValue)

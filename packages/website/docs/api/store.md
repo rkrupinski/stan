@@ -5,7 +5,7 @@ description: Store API reference
 
 # Store
 
-For several reasons (such as [SSR](../guides/ssr.md)), it's not a good idea for Stan to keep state locally. Instead, it uses a central store: every change is written to the store, and every value is read from it. However, the store-oriented design introduces some semantic overhead in the form of the [`Scoped<T>`](#scopedt) type.
+For several reasons (such as [SSR](../guides/ssr.md)), it's not a good idea for Stan to keep state locally. Instead, it uses a central store: every change is written to the store, and every value is read from it. The store-oriented design introduces some semantic overhead in the form of the [`Scoped<T>`](#scopedt) type.
 
 ## `Scoped<T>`
 
@@ -35,9 +35,23 @@ Manually providing a [`Store`](#the-store-class) instance is only necessary when
 
 While the `Store` class should be treated as opaque and its internals as implementation details, there may be situations where instantiating it is necessary. Stan provides several ways to do this:
 
-- Manual: `new Store()`
-- Using the `makeStore()` helper
+- Using the constructor: `new Store(options?: StoreOptions)`, where:
+  - `options?` - Store configuration:
+    - `tag?` - A string identifier. Useful for debugging.
+- Using the `makeStore(options?: StoreOptions)` helper
 - `DEFAULT_STORE`, the default instance used when working with [React](./react.md)
+
+Store API:
+
+- `destroy()` - Removes all data.
+
+## Example
+
+```ts
+const myStore = makeStore({ tag: 'Data' });
+
+myStore.destroy(); // Free memory
+```
 
 ## See also
 

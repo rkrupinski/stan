@@ -28,14 +28,6 @@ export const isFunction = (
 ): candidate is (...args: any[]) => any =>
   fnTypes.includes(Object.prototype.toString.call(candidate));
 
-export const erase = (store: Store, key: string) => {
-  store.deps.delete(key);
-  store.value.delete(key);
-  store.version.delete(key);
-  store.mounted.delete(key);
-  store.initialized.delete(key);
-};
-
 export const depsChanged = (store: Store, key: string) => {
   const d = store.deps.get(key);
 

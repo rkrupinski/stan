@@ -1,5 +1,4 @@
 import {
-  erase,
   dejaVu,
   isFunction,
   depsChanged,
@@ -59,7 +58,7 @@ export const selector = <T>(
       'abort',
       () => {
         controller?.abort(new Aborted());
-        erase(store, key);
+        store.erase(key);
       },
       { once: true },
     );
