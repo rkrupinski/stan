@@ -156,7 +156,7 @@ describe('atom', () => {
   });
 
   it('should ignore onInit calls after initialization', () => {
-    let initFn: (value: number) => void = () => {};
+    let initFn: (value: number) => void = () => { };
 
     const state = atom(42, {
       effects: [
@@ -189,7 +189,7 @@ describe('atom', () => {
   });
 
   it('should let one modify the value from effects', () => {
-    let setFn: SetterOrUpdater<number> = () => {};
+    let setFn: SetterOrUpdater<number> = () => { };
 
     const state = atom(42, {
       effects: [
@@ -235,7 +235,7 @@ describe('atom', () => {
     const innerCallback = jest.fn();
     const outerCallback = jest.fn();
 
-    let setter: SetterOrUpdater<number> = () => {};
+    let setter: SetterOrUpdater<number> = () => { };
 
     const state = atom(42, {
       effects: [
