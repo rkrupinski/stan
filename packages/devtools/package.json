@@ -1,0 +1,9 @@
+{
+  "name": "devtools",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@rkrupinski/prettierconfig": "1.0.1"
+  },
+  "prettier": "@rkrupinski/prettierconfig"
+}

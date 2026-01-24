@@ -3,6 +3,7 @@
   "workspaces": [
     "packages/stan",
     "packages/website",
+    "packages/devtools",
     "packages/examples/*"
   ],
   "scripts": {
