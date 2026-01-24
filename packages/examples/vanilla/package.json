@@ -12,7 +12,7 @@
     "@rkrupinski/stan": "1.6.0"
   },
   "devDependencies": {
-    "typescript": "~5.7.2",
+    "typescript": "5.9.3",
     "vite": "^6.2.0"
   }
 }
