@@ -16,6 +16,7 @@ export const sanitize = (value: unknown, seen = new WeakSet()): unknown => {
   if (value instanceof Date) return `[Date: ${value.toISOString()}]`;
   if (value instanceof RegExp) return `[RegExp: ${value.toString()}]`;
   if (value instanceof Error) return `[Error: ${value.message}]`;
+  if (value instanceof Promise) return '[Promise]';
 
   if (typeof value !== 'object') return value;
 

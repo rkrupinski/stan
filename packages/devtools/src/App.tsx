@@ -22,7 +22,7 @@ export const App = () => {
 
       port.onMessage.addListener(message => {
         if (isMessage(message) && message.source === RELAY_SOURCE) {
-          // TODO
+          console.log('===>', message);
         }
       });
 

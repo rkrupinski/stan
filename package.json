@@ -7,10 +7,10 @@
     "packages/examples/*"
   ],
   "scripts": {
-    "typecheck": "wsrun -p @rkrupinski/stan -c typecheck",
-    "lint": "wsrun -p @rkrupinski/stan -c lint",
+    "typecheck": "wsrun -p @rkrupinski/stan -p devtools -c typecheck",
+    "lint": "wsrun -p @rkrupinski/stan -p devtools -c lint",
     "test": "wsrun -p @rkrupinski/stan -c test",
-    "build": "wsrun -p @rkrupinski/stan -c build",
+    "build": "wsrun -p @rkrupinski/stan -p devtools -c build",
     "build:docs": "wsrun -p website -c build",
     "build:devtools": "wsrun -p devtools -c build"
   },

@@ -9,15 +9,19 @@ export type Source =
   | typeof PANEL_SOURCE
   | typeof RELAY_INBOUND_SOURCE;
 
-export interface StoreUpdateEvent {
-  type: 'SET' | 'DELETE';
-  key: string;
-  value?: unknown;
-}
+export type UpdateValue =
+  | { type: 'sync'; value: unknown }
+  | { type: 'async-pending' }
+  | { type: 'async-resolved'; value: unknown }
+  | { type: 'async-rejected'; value: unknown };
+
+export type StoreUpdateEvent =
+  | { type: 'SET'; key: string; value: UpdateValue }
+  | { type: 'DELETE'; key: string };
 
 export interface RegisterPayload {
   key: string;
-  value: unknown;
+  value: Array<[string, UpdateValue]>;
 }
 
 export interface UnregisterPayload {
