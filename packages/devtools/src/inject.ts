@@ -18,11 +18,11 @@ const stores = new Map<string, Store>();
 
 const send = <T extends MessageType>(type: T, data?: MessagePayloads[T]) => {
   try {
-    const message: AgentMessage<T> = {
+    const message = {
       source: AGENT_SOURCE,
       type,
       data,
-    };
+    } as AgentMessage<T>;
     window.postMessage(message, '*');
   } catch (e) {
     console.error('Stan DevTools: Failed to send message', e);

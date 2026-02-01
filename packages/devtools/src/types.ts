@@ -43,31 +43,29 @@ export type MessagePayloads = {
 
 export type MessageType = keyof MessagePayloads;
 
-export interface BaseMessage<T extends MessageType = MessageType> {
-  type: T;
-  data?: MessagePayloads[T];
-  tabId?: number;
-}
+type MessageData<T extends MessageType> = MessagePayloads[T] extends undefined
+  ? { data?: undefined }
+  : { data: MessagePayloads[T] };
 
-export interface AgentMessage<T extends MessageType = MessageType>
-  extends BaseMessage<T> {
-  source: typeof AGENT_SOURCE;
-}
+type DistributiveMessage<
+  S extends Source,
+  T extends MessageType,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+> = T extends any
+  ? { source: S; type: T; tabId?: number } & MessageData<T>
+  : never;
 
-export interface RelayMessage<T extends MessageType = MessageType>
-  extends BaseMessage<T> {
-  source: typeof RELAY_SOURCE;
-}
+export type AgentMessage<T extends MessageType = MessageType> =
+  DistributiveMessage<typeof AGENT_SOURCE, T>;
 
-export interface PanelMessage<T extends MessageType = MessageType>
-  extends BaseMessage<T> {
-  source: typeof PANEL_SOURCE;
-}
+export type RelayMessage<T extends MessageType = MessageType> =
+  DistributiveMessage<typeof RELAY_SOURCE, T>;
 
-export interface RelayInboundMessage<T extends MessageType = MessageType>
-  extends BaseMessage<T> {
-  source: typeof RELAY_INBOUND_SOURCE;
-}
+export type PanelMessage<T extends MessageType = MessageType> =
+  DistributiveMessage<typeof PANEL_SOURCE, T>;
+
+export type RelayInboundMessage<T extends MessageType = MessageType> =
+  DistributiveMessage<typeof RELAY_INBOUND_SOURCE, T>;
 
 export type Message =
   | AgentMessage

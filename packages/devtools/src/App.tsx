@@ -21,8 +21,41 @@ export const App = () => {
       });
 
       port.onMessage.addListener(message => {
-        if (isMessage(message) && message.source === RELAY_SOURCE) {
-          console.log('===>', message);
+        if (!isMessage(message) || message.source !== RELAY_SOURCE) return;
+
+        switch (message.type) {
+          case 'RESET':
+            console.log('==> reset devtools');
+            break;
+
+          case 'REGISTER':
+            console.log(
+              '==> register store:',
+              message.data.key,
+              message.data.value,
+            );
+            break;
+
+          case 'UNREGISTER':
+            console.log('==> unregister store:', message.data.key);
+            break;
+
+          case 'UPDATE': {
+            switch (message.data.event.type) {
+              case 'SET':
+                console.log(
+                  `==> set ${message.data.storeKey}->${message.data.event.key}:`,
+                  message.data.event.value,
+                );
+                break;
+
+              case 'DELETE':
+                console.log(
+                  `==> delete ${message.data.storeKey}->${message.data.event.key}`,
+                );
+                break;
+            }
+          }
         }
       });
 
