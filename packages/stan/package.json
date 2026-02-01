@@ -75,7 +75,7 @@
     "react": ">=19.0.0"
   },
   "author": "Rafał Krupiński <rkrupinski.npm@gmail.com> (https://github.com/rkrupinski)",
-  "homepage": "https://github.com/rkrupinski/stan#readme",
+  "homepage": "https://stan.party",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rkrupinski/stan.git"
