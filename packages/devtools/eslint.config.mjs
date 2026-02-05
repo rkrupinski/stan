@@ -14,11 +14,11 @@ export default tseslint.config(
       globals: globals.browser,
     },
     settings: {
-    react: {
-      version: 'detect',
+      react: {
+        version: 'detect',
+      },
     },
-  },
-  plugins: {
+    plugins: {
       'react-hooks': reactHooks,
       react,
     },
@@ -26,6 +26,10 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
+      '@typescript-eslint/consistent-type-imports': [
+        'warn',
+        { prefer: 'type-imports' },
+      ],
     },
   },
 );

@@ -2,14 +2,15 @@ import { sanitize } from './sanitize';
 import {
   AGENT_SOURCE,
   RELAY_INBOUND_SOURCE,
-  MessageType,
-  MessagePayloads,
-  AgentMessage,
+  type MessageType,
+  type MessagePayloads,
+  type AgentMessage,
   isMessage,
 } from './types';
 
 interface Store {
   key: string;
+  libVersion: string;
   value: Map<string, unknown>;
   version: Map<string, number>;
 }
@@ -76,6 +77,7 @@ window.__STAN_DEVTOOLS__ = {
     stores.set(store.key, store);
     send('REGISTER', {
       key: store.key,
+      libVersion: store.libVersion,
       value: Array.from(store.value.entries()).map(([k, v]) => {
         if (v instanceof Promise) {
           trackAsyncState(store, k, v);

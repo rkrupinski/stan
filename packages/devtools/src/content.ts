@@ -4,8 +4,8 @@ import {
   PANEL_SOURCE,
   RELAY_INBOUND_SOURCE,
   isMessage,
-  RelayMessage,
-  RelayInboundMessage,
+  type RelayMessage,
+  type RelayInboundMessage,
 } from './types';
 
 window.addEventListener('message', event => {

@@ -21,6 +21,7 @@ export type StoreUpdateEvent =
 
 export interface RegisterPayload {
   key: string;
+  libVersion: string;
   value: Array<[string, UpdateValue]>;
 }
 
