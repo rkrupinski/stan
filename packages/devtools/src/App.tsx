@@ -1,4 +1,7 @@
 import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+
+import { Toaster } from '@/components/ui/sonner';
 import { PANEL_SOURCE, RELAY_SOURCE, isMessage } from './types';
 
 export const App = () => {
@@ -67,5 +70,10 @@ export const App = () => {
     }
   }, []);
 
-  return <h1>Stan</h1>;
+  return (
+    <>
+      <h1>Stan</h1>
+      <Toaster />
+    </>
+  );
 };
