@@ -1,35 +1,55 @@
-import js from '@eslint/js';
+// @ts-check
 import globals from 'globals';
-import reactHooks from 'eslint-plugin-react-hooks';
-import react from 'eslint-plugin-react';
+import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import jestPlugin from 'eslint-plugin-jest';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import * as importPlugin from 'eslint-plugin-import';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist', '*.mjs'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  // @ts-expect-error
+  importPlugin.flatConfigs.recommended,
+  // @ts-expect-error
+  importPlugin.flatConfigs.typescript,
+  reactPlugin.configs.flat.recommended,
+  reactPlugin.configs.flat['jsx-runtime'],
+  reactHooksPlugin.configs['recommended-latest'],
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
     settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
+      },
       react: {
         version: 'detect',
       },
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      react,
-    },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         { prefer: 'type-imports' },
       ],
+    },
+  },
+  {
+    files: ['**/*.test.{ts,tsx}'],
+    plugins: {
+      jest: jestPlugin,
+    },
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
     },
   },
 );
