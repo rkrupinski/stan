@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@rkrupinski/stan": "1.6.0",
+    "@rkrupinski/stan": "1.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "6.0.0"
