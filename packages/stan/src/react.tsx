@@ -149,6 +149,7 @@ export const useStanReset = <T,>(scopedState: Scoped<WritableState<T>>) => {
 };
 
 export type StanCallbackHelpers = {
+  get: <T>(scopedState: Scoped<State<T>>) => T;
   set: <T>(
     scopedState: Scoped<WritableState<T>>,
     valueOrUpdater: T | ((currentValue: T) => T),
@@ -171,6 +172,7 @@ export const useStanCallback = <A extends unknown[], R>(
   return useCallback(
     (...args: A) => {
       const helpers: StanCallbackHelpers = {
+        get: scopedState => scopedState(store).get(),
         set: (scopedState, valueOrUpdater) => {
           scopedState(store).set(valueOrUpdater);
         },
