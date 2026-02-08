@@ -571,4 +571,110 @@ describe('useStanCallback', () => {
 
     expect(testAtom(store).get()).toBe(30);
   });
+
+  it('should allow getting atom value', () => {
+    const testAtom = atom(42);
+    const store = makeStore();
+
+    let capturedValue;
+    const { result } = renderHook(
+      () =>
+        useStanCallback(({ get }) => () => {
+          capturedValue = get(testAtom);
+        }),
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    act(() => {
+      result.current();
+    });
+
+    expect(capturedValue).toBe(42);
+  });
+
+  it('should allow getting synchronous selector value', () => {
+    const testAtom = atom(42);
+    const testSelector = selector(({ get }) => get(testAtom) * 2);
+    const store = makeStore();
+
+    let capturedValue;
+    const { result } = renderHook(
+      () =>
+        useStanCallback(({ get }) => () => {
+          capturedValue = get(testSelector);
+        }),
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    act(() => {
+      result.current();
+    });
+
+    expect(capturedValue).toBe(84);
+  });
+
+  it('should allow getting resolved asynchronous selector value', async () => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    const testSelector = selector(async () => 42);
+    const store = makeStore();
+
+    let capturedValue;
+    const { result } = renderHook(
+      () =>
+        useStanCallback(({ get }) => async () => {
+          capturedValue = await get(testSelector);
+        }),
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    await act(async () => {
+      await result.current();
+    });
+
+    expect(capturedValue).toBe(42);
+  });
+
+  it('should allow handling rejected asynchronous selector value', async () => {
+    const error = new Error('Nope');
+    // eslint-disable-next-line @typescript-eslint/require-await
+    const testSelector = selector(async () => {
+      throw error;
+    });
+    const store = makeStore();
+
+    let capturedError;
+    const { result } = renderHook(
+      () =>
+        useStanCallback(({ get }) => async () => {
+          try {
+            await get(testSelector);
+          } catch (e) {
+            capturedError = e;
+          }
+        }),
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <StanProvider store={store}>{children}</StanProvider>
+        ),
+      },
+    );
+
+    await act(async () => {
+      await result.current();
+    });
+
+    expect(capturedError).toBe(error);
+  });
 });
