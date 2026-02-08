@@ -229,6 +229,10 @@ const useStanCallback: <A extends unknown[], R>(
 
 - `factory` – A curried callback function, where:
   - `helpers` – State helpers:
+    - `get` – A function for getting [`State<T>`](./state.md#statet) value, with the following signature:
+      ```ts
+      <T>(scopedState: Scoped<State<T>>) => T
+      ```
     - `set` – A function for setting [`WritableState<T>`](./state.md#writablestatet), with the following signature:
       ```ts
       <T>(
