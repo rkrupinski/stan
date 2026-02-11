@@ -65,6 +65,9 @@ export const useDevtoolsBridge = () => {
             set(registeredStoreKeys, prev => prev.filter(k => k !== key));
             set(storeState(key), []);
             set(storeLog(key), []);
+            if (get(selectedStoreKey) === key) {
+              set(selectedStoreKey, null);
+            }
             break;
           }
 
