@@ -24,15 +24,23 @@ const checkVersion = isVersionSupported(SUPPORTED_VERSION_RANGE);
 
 let logId = 0;
 
-export const useConnection = () => {
+export const useDevtoolsBridge = () => {
   const handleMessage = useStanCallback(
     ({ set, get }) =>
       (message: RelayMessage) => {
         switch (message.type) {
-          case 'RESET':
+          case 'RESET': {
+            const keys = get(registeredStoreKeys);
+
+            for (const key of keys) {
+              set(storeState(key), []);
+              set(storeLog(key), []);
+            }
             set(registeredStoreKeys, []);
             set(selectedStoreKey, null);
+            logId = 0;
             break;
+          }
 
           case 'REGISTER': {
             const { key, value, libVersion } = message.data;
@@ -55,6 +63,8 @@ export const useConnection = () => {
             const { key } = message.data;
 
             set(registeredStoreKeys, prev => prev.filter(k => k !== key));
+            set(storeState(key), []);
+            set(storeLog(key), []);
             break;
           }
 

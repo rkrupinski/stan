@@ -1,7 +1,7 @@
 import { useStanValue } from '@rkrupinski/stan/react';
 import { Toaster } from '@/components/ui/sonner';
 
-import { useConnection } from './connection';
+import { useDevtoolsBridge } from './bridge';
 import {
   registeredStoreKeys,
   storeList,
@@ -9,7 +9,7 @@ import {
 } from './state';
 
 export const App = () => {
-  useConnection();
+  useDevtoolsBridge();
 
   const keys = useStanValue(registeredStoreKeys);
   const stores = useStanValue(storeList);
