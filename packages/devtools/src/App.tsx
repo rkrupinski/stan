@@ -1,13 +1,24 @@
+import { useStanValue } from '@rkrupinski/stan/react';
 import { Toaster } from '@/components/ui/sonner';
+
 import { useConnection } from './connection';
+import {
+  registeredStoreKeys,
+  storeList,
+  effectiveSelectedStoreKey,
+} from './state';
 
 export const App = () => {
-  const { stores } = useConnection();
+  useConnection();
+
+  const keys = useStanValue(registeredStoreKeys);
+  const stores = useStanValue(storeList);
+  const selectedKey = useStanValue(effectiveSelectedStoreKey);
 
   return (
     <>
-      <h1>Stan</h1>
-      <pre>{JSON.stringify(stores, null, 2)}</pre>
+      <h1>Stan DevTools</h1>
+      <pre>{JSON.stringify({ keys, stores, selectedKey }, null, 2)}</pre>
       <Toaster />
     </>
   );

@@ -10,7 +10,7 @@
     "typecheck": "wsrun -p @rkrupinski/stan -p devtools -c typecheck",
     "lint": "wsrun -p @rkrupinski/stan -p devtools -c lint",
     "test": "wsrun -p @rkrupinski/stan -p devtools -c test",
-    "build": "wsrun -p @rkrupinski/stan -p devtools -c build"
+    "build": "wsrun -p @rkrupinski/stan -p devtools -tc build"
   },
   "devDependencies": {
     "wsrun": "5.2.4"

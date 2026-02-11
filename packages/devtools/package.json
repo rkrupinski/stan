@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@rkrupinski/stan": "1.7.0",
     "@tailwindcss/vite": "4.1.18",
     "compare-versions": "6.1.1",
     "class-variance-authority": "^0.7.1",
@@ -31,8 +32,8 @@
     "@rkrupinski/prettierconfig": "1.0.1",
     "@types/chrome": "^0.0.306",
     "@types/jest": "29.5.14",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "9.27.0",
     "eslint-import-resolver-typescript": "4.3.5",

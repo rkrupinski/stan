@@ -1,29 +1,118 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
+import { useStanCallback } from '@rkrupinski/stan/react';
 import { toast } from 'sonner';
 
-import { SUPPORTED_VERSION_RANGE } from './constants';
+import { SUPPORTED_VERSION_RANGE, MAX_LOG_ENTRIES } from './constants';
 import { isVersionSupported } from './version';
 import {
   PANEL_SOURCE,
   RELAY_SOURCE,
   isMessage,
   type UpdateValue,
+  type RelayMessage,
 } from './types';
+import {
+  registeredStoreKeys,
+  storeState,
+  storeLog,
+  selectedStoreKey,
+} from './state';
+import type { LogEntry } from './state';
+import { parseKey } from './key';
 
 const checkVersion = isVersionSupported(SUPPORTED_VERSION_RANGE);
 
-export const useConnection = () => {
-  const portRef = useRef<chrome.runtime.Port | null>(null);
-  const registeredStoreKeysRef = useRef<Set<string>>(new Set());
+let logId = 0;
 
-  const [stores, setStores] = useState<
-    Record<string, Array<[string, UpdateValue]>>
-  >({});
+export const useConnection = () => {
+  const handleMessage = useStanCallback(
+    ({ set, get }) =>
+      (message: RelayMessage) => {
+        switch (message.type) {
+          case 'RESET':
+            set(registeredStoreKeys, []);
+            set(selectedStoreKey, null);
+            break;
+
+          case 'REGISTER': {
+            const { key, value, libVersion } = message.data;
+
+            if (!checkVersion(libVersion)) {
+              toast.error('Unsupported Stan Version', {
+                description: `This version of DevTools only supports Stan ${SUPPORTED_VERSION_RANGE}. Detected version: ${libVersion}.`,
+              });
+              return;
+            }
+
+            set(registeredStoreKeys, prev =>
+              prev.includes(key) ? prev : [...prev, key],
+            );
+            set(storeState(key), value);
+            break;
+          }
+
+          case 'UNREGISTER': {
+            const { key } = message.data;
+
+            set(registeredStoreKeys, prev => prev.filter(k => k !== key));
+            break;
+          }
+
+          case 'UPDATE': {
+            const { storeKey, event } = message.data;
+
+            if (!get(registeredStoreKeys).includes(storeKey)) return;
+
+            if (event.type === 'SET') {
+              set(storeState(storeKey), prev => {
+                const idx = prev.findIndex(([k]) => k === event.key);
+                const entry: [string, UpdateValue] = [event.key, event.value];
+
+                return idx >= 0
+                  ? prev.map((e, i) => (i === idx ? entry : e))
+                  : [...prev, entry];
+              });
+
+              const logEntry: LogEntry = {
+                id: String(++logId),
+                timestamp: Date.now(),
+                type: 'set',
+                stateKey: event.key,
+                label: parseKey(event.key)?.label ?? event.key,
+                value: event.value,
+              };
+
+              set(storeLog(storeKey), prev =>
+                [logEntry, ...prev].slice(0, MAX_LOG_ENTRIES),
+              );
+            }
+
+            if (event.type === 'DELETE') {
+              set(storeState(storeKey), prev =>
+                prev.filter(([k]) => k !== event.key),
+              );
+
+              const logEntry: LogEntry = {
+                id: String(++logId),
+                timestamp: Date.now(),
+                type: 'delete',
+                stateKey: event.key,
+                label: parseKey(event.key)?.label ?? event.key,
+              };
+
+              set(storeLog(storeKey), prev =>
+                [logEntry, ...prev].slice(0, MAX_LOG_ENTRIES),
+              );
+            }
+            break;
+          }
+        }
+      },
+  );
 
   useEffect(() => {
     try {
       const port = chrome.runtime.connect({ name: 'stan-devtools' });
-      portRef.current = port;
 
       port.postMessage({
         name: 'init',
@@ -38,65 +127,12 @@ export const useConnection = () => {
 
       port.onMessage.addListener(message => {
         if (!isMessage(message) || message.source !== RELAY_SOURCE) return;
-
-        switch (message.type) {
-          case 'RESET':
-            console.log('==> reset devtools');
-            registeredStoreKeysRef.current.clear();
-            setStores({});
-            break;
-
-          case 'REGISTER': {
-            const { key, value, libVersion } = message.data;
-            console.log('==> register store:', key, value);
-
-            if (!checkVersion(libVersion)) {
-              toast.error('Unsupported Stan Version', {
-                description: `This version of DevTools only supports Stan ${SUPPORTED_VERSION_RANGE}. Detected version: ${libVersion}.`,
-              });
-              return;
-            }
-
-            registeredStoreKeysRef.current.add(key);
-            setStores(prev => ({ ...prev, [key]: value }));
-            break;
-          }
-
-          case 'UNREGISTER':
-            console.log('==> unregister store:', message.data.key);
-            registeredStoreKeysRef.current.delete(message.data.key);
-            setStores(prev => {
-              const next = { ...prev };
-              delete next[message.data.key];
-              return next;
-            });
-            break;
-
-          case 'UPDATE': {
-            const { storeKey, event } = message.data;
-
-            if (!registeredStoreKeysRef.current.has(storeKey)) return;
-
-            switch (event.type) {
-              case 'SET':
-                console.log(`==> set ${storeKey}->${event.key}:`, event.value);
-                break;
-
-              case 'DELETE':
-                console.log(`==> delete ${storeKey}->${event.key}`);
-                break;
-            }
-          }
-        }
+        handleMessage(message);
       });
 
-      return () => {
-        port.disconnect();
-      };
+      return () => port.disconnect();
     } catch (err) {
       console.error('Stan DevTools: Connection failed', err);
     }
-  }, []);
-
-  return { stores };
+  }, [handleMessage]);
 };
