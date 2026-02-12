@@ -2,6 +2,7 @@ node_modules
 dist
 build
 .ai
+CLAUDE.md
 .DS_Store
 .eslintcache
 .cache-loader
