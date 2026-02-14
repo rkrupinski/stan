@@ -3,6 +3,7 @@ import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { type ViewMode, viewMode } from '../state';
+import { LogViewer } from './LogViewer';
 
 export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
   const mode = useStanValue(viewMode);
@@ -28,7 +29,7 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
         Explore: {storeKey}
       </TabsContent>
       <TabsContent value="log" className="min-h-0 flex-1">
-        Log: {storeKey}
+        <LogViewer storeKey={storeKey} />
       </TabsContent>
     </Tabs>
   );

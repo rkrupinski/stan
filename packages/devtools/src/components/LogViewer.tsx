@@ -1,0 +1,94 @@
+import { memo } from 'react';
+import { useStanValue } from '@rkrupinski/stan/react';
+
+import { Badge } from '@/components/ui/badge';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+
+import { type LogEntry, storeLog } from '../state';
+import type { UpdateValue } from '../types';
+
+const formatTime = (ts: number): string => {
+  const d = new Date(ts);
+  return d.toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    fractionalSecondDigits: 3,
+  });
+};
+
+const formatValue = (value: UpdateValue): string => {
+  switch (value.type) {
+    case 'sync':
+    case 'async-resolved':
+    case 'async-rejected':
+      return JSON.stringify(value.value, null, 2);
+    case 'async-pending':
+      return '"pending"';
+  }
+};
+
+const LogEntryRow = ({ entry, odd }: { entry: LogEntry; odd: boolean }) => (
+  <div
+    className={`flex items-baseline gap-2 px-2 py-0.5 ${odd ? 'bg-muted/50' : ''}`}
+  >
+    <span className="shrink-0 font-mono text-xs text-muted-foreground">
+      {formatTime(entry.timestamp)}
+    </span>
+    <span className="break-all text-xs">
+      {entry.type === 'set' ? (
+        <>
+          <Badge variant="outline" className="text-[0.625rem]">
+            SET
+          </Badge>{' '}
+          state <span className="font-medium">{entry.label}</span> to{' '}
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <button className="cursor-pointer font-medium text-primary underline underline-offset-2">
+                value
+              </button>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+              <pre className="max-h-60 overflow-auto text-xs">
+                {formatValue(entry.value)}
+              </pre>
+            </HoverCardContent>
+          </HoverCard>
+        </>
+      ) : (
+        <>
+          <Badge variant="outline" className="text-[0.625rem]">
+            DELETE
+          </Badge>{' '}
+          state <span className="font-medium">{entry.label}</span>
+        </>
+      )}
+    </span>
+  </div>
+);
+
+type LogViewerProps = { storeKey: string };
+
+export const LogViewer = memo<LogViewerProps>(({ storeKey }) => {
+  const log = useStanValue(storeLog(storeKey));
+
+  if (!log.length) {
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+        No log entries yet
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full overflow-y-auto">
+      {[...log].reverse().map((entry, i) => (
+        <LogEntryRow key={entry.id} entry={entry} odd={i % 2 !== 0} />
+      ))}
+    </div>
+  );
+});

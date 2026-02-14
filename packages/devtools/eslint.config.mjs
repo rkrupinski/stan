@@ -39,6 +39,8 @@ export default tseslint.config(
         'warn',
         { prefer: 'type-imports' },
       ],
+      'react/prop-types': 'off',
+      'react/display-name': 'off',
     },
   },
   {
