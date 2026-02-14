@@ -35,7 +35,7 @@ const formatValue = (value: UpdateValue): string => {
 
 const LogEntryRow = ({ entry, odd }: { entry: LogEntry; odd: boolean }) => (
   <div
-    className={`flex items-baseline gap-2 px-2 py-0.5 ${odd ? 'bg-muted/50' : ''}`}
+    className={`flex items-baseline gap-2 px-2 py-0.5 animate-[log-highlight_500ms_ease-out] ${odd ? 'bg-muted/50' : ''}`}
   >
     <span className="shrink-0 font-mono text-xs text-muted-foreground">
       {formatTime(entry.timestamp)}
@@ -88,7 +88,7 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey }) => {
 
   return (
     <div className="h-full overflow-y-auto">
-      {[...log].reverse().map((entry, i) => (
+      {log.map((entry, i) => (
         <LogEntryRow key={entry.id} entry={entry} odd={i % 2 !== 0} />
       ))}
     </div>

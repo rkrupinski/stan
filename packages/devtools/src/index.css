@@ -115,6 +115,11 @@
 }
 }
 
+@keyframes log-highlight {
+  from { background-color: oklch(0.685 0.169 237.323 / 30%); }
+  to { background-color: transparent; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
