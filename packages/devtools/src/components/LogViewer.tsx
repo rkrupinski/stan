@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import { useStanValue } from '@rkrupinski/stan/react';
 
 import { Badge } from '@/components/ui/badge';
@@ -33,9 +33,9 @@ const formatValue = (value: UpdateValue): string => {
   }
 };
 
-const LogEntryRow = ({ entry, odd }: { entry: LogEntry; odd: boolean }) => (
+const LogEntryRow = ({ entry, odd, mountedAt }: { entry: LogEntry; odd: boolean; mountedAt: number }) => (
   <div
-    className={`flex items-baseline gap-2 px-2 py-0.5 animate-[log-highlight_500ms_ease-out] ${odd ? 'bg-muted/50' : ''}`}
+    className={`flex items-baseline gap-2 px-2 py-0.5 ${entry.timestamp > mountedAt ? 'animate-[log-highlight_500ms_ease-out]' : ''} ${odd ? 'bg-muted/50' : ''}`}
   >
     <span className="shrink-0 font-mono text-xs text-muted-foreground">
       {formatTime(entry.timestamp)}
@@ -49,7 +49,7 @@ const LogEntryRow = ({ entry, odd }: { entry: LogEntry; odd: boolean }) => (
           state <span className="font-medium font-mono text-sky-600 dark:text-sky-400">{entry.label}</span> to{' '}
           <HoverCard>
             <HoverCardTrigger asChild>
-              <button className="cursor-pointer font-medium text-sky-600 dark:text-sky-400 underline underline-offset-2">
+              <button className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-400 underline underline-offset-2">
                 value
               </button>
             </HoverCardTrigger>
@@ -76,6 +76,7 @@ const LogEntryRow = ({ entry, odd }: { entry: LogEntry; odd: boolean }) => (
 type LogViewerProps = { storeKey: string };
 
 export const LogViewer = memo<LogViewerProps>(({ storeKey }) => {
+  const mountedAt = useRef(Date.now());
   const log = useStanValue(storeLog(storeKey));
 
   if (!log.length) {
@@ -89,7 +90,7 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey }) => {
   return (
     <div className="h-full overflow-y-auto">
       {log.map((entry, i) => (
-        <LogEntryRow key={entry.id} entry={entry} odd={i % 2 !== 0} />
+        <LogEntryRow key={entry.id} entry={entry} odd={i % 2 !== 0} mountedAt={mountedAt.current} />
       ))}
     </div>
   );
