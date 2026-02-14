@@ -26,12 +26,12 @@ export const StoreSelector = () => {
 
   return (
     <Select value={selectedKey ?? ''} onValueChange={handleChange}>
-      <SelectTrigger className="w-48">
+      <SelectTrigger size="sm" className="w-[200px]">
         <SelectValue placeholder="Select a store" />
       </SelectTrigger>
       <SelectContent>
         {stores.map(store => (
-          <SelectItem key={store.key} value={store.key}>
+          <SelectItem key={store.key} value={store.key} className="max-w-[200px] truncate">
             {store.label}
           </SelectItem>
         ))}

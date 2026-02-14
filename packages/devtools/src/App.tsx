@@ -1,14 +1,14 @@
 import { Toaster } from '@/components/ui/sonner';
 
 import { useDevtoolsBridge } from './bridge';
-import { StoreSelector } from './components/StoreSelector';
+import { Header } from './components/Header';
 
 export const App = () => {
   useDevtoolsBridge();
 
   return (
     <>
-      <StoreSelector />
+      <Header />
       <Toaster />
     </>
   );
