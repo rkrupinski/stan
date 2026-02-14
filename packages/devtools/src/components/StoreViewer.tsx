@@ -1,14 +1,35 @@
-import { useStanValue } from '@rkrupinski/stan/react';
+import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 
-import { storeList } from '../state';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+import { type ViewMode, viewMode } from '../state';
 
 export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
-  const stores = useStanValue(storeList);
-  const store = stores.find(s => s.key === storeKey);
+  const mode = useStanValue(viewMode);
+
+  const handleChange = useStanCallback(
+    ({ set }) =>
+      (value: string) => {
+        set(viewMode, value as ViewMode);
+      },
+  );
 
   return (
-    <div className="h-full w-full p-3">
-      {store?.label}
-    </div>
+    <Tabs
+      value={mode}
+      onValueChange={handleChange}
+      className="flex h-full flex-col px-3 py-2"
+    >
+      <TabsList>
+        <TabsTrigger value="explore">Explore</TabsTrigger>
+        <TabsTrigger value="log">Log</TabsTrigger>
+      </TabsList>
+      <TabsContent value="explore" className="min-h-0 flex-1">
+        Explore: {storeKey}
+      </TabsContent>
+      <TabsContent value="log" className="min-h-0 flex-1">
+        Log: {storeKey}
+      </TabsContent>
+    </Tabs>
   );
 };

@@ -11,6 +11,7 @@ import {
   storeList,
   effectiveSelectedStoreKey,
   selectedStoreKey,
+  viewMode,
 } from '../state';
 
 export const StoreSelector = () => {
@@ -21,6 +22,7 @@ export const StoreSelector = () => {
     ({ set }) =>
       (value: string) => {
         set(selectedStoreKey, value);
+        set(viewMode, 'explore');
       },
   );
 

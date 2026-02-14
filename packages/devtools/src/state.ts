@@ -3,7 +3,7 @@ import { atom, atomFamily, selector, selectorFamily } from '@rkrupinski/stan';
 import type { UpdateValue } from './types';
 import { parseKey } from './key';
 
-export type ViewMode = 'state' | 'log';
+export type ViewMode = 'explore' | 'log';
 
 export type LogEntry = {
   id: string;
@@ -32,7 +32,7 @@ export const registeredStoreKeys = atom<string[]>([]);
 
 export const selectedStoreKey = atom<string | null>(null);
 
-export const viewMode = atom<ViewMode>('state');
+export const viewMode = atom<ViewMode>('explore');
 
 export const selectedStateKey = atom<string | null>(null);
 
