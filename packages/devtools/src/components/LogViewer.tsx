@@ -4,6 +4,7 @@ import { useStanValue } from '@rkrupinski/stan/react';
 import { Badge } from '@/components/ui/badge';
 import {
   HoverCard,
+  HoverCardArrow,
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
@@ -45,17 +46,18 @@ const LogEntryRow = ({ entry, odd }: { entry: LogEntry; odd: boolean }) => (
           <Badge variant="outline" className="text-[0.625rem]">
             SET
           </Badge>{' '}
-          state <span className="font-medium">{entry.label}</span> to{' '}
+          state <span className="font-medium font-mono text-sky-600 dark:text-sky-400">{entry.label}</span> to{' '}
           <HoverCard>
             <HoverCardTrigger asChild>
-              <button className="cursor-pointer font-medium text-primary underline underline-offset-2">
+              <button className="cursor-pointer font-medium text-sky-600 dark:text-sky-400 underline underline-offset-2">
                 value
               </button>
             </HoverCardTrigger>
-            <HoverCardContent className="w-80">
+            <HoverCardContent className="max-w-sm">
               <pre className="max-h-60 overflow-auto text-xs">
                 {formatValue(entry.value)}
               </pre>
+              <HoverCardArrow />
             </HoverCardContent>
           </HoverCard>
         </>
@@ -64,7 +66,7 @@ const LogEntryRow = ({ entry, odd }: { entry: LogEntry; odd: boolean }) => (
           <Badge variant="outline" className="text-[0.625rem]">
             DELETE
           </Badge>{' '}
-          state <span className="font-medium">{entry.label}</span>
+          state <span className="font-medium font-mono text-sky-600 dark:text-sky-400">{entry.label}</span>
         </>
       )}
     </span>
