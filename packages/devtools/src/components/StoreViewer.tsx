@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
+import { useDebouncedValue } from '@tanstack/react-pacer';
 import { Trash2Icon } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
@@ -15,30 +16,15 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
   const log = useStanValue(storeLog(storeKey));
 
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [debouncedQuery] = useDebouncedValue(query, { wait: DEBOUNCE_MS });
 
-  useEffect(() => {
-    const id = setTimeout(() => setDebouncedQuery(query), DEBOUNCE_MS);
-    return () => clearTimeout(id);
-  }, [query]);
+  const handleChange = useStanCallback(({ set }) => (value: string) => {
+    set(viewMode, value as ViewMode);
+  });
 
-  useEffect(() => {
-    if (mode !== 'log') setQuery('');
-  }, [mode]);
-
-  const handleChange = useStanCallback(
-    ({ set }) =>
-      (value: string) => {
-        set(viewMode, value as ViewMode);
-      },
-  );
-
-  const handleClearLog = useStanCallback(
-    ({ set }) =>
-      () => {
-        set(storeLog(storeKey), []);
-      },
-  );
+  const handleClearLog = useStanCallback(({ set }) => () => {
+    set(storeLog(storeKey), []);
+  });
 
   return (
     <Tabs
@@ -57,8 +43,8 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
               type="search"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Filter..."
-              className="h-8 w-[120px] text-xs"
+              placeholder="Filter by state..."
+              className="h-8 w-[130px] text-xs"
             />
             <div className="h-4 w-px bg-border dark:bg-muted-foreground/40" />
             <button
@@ -77,7 +63,10 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
         Explore: {storeKey}
       </TabsContent>
       <TabsContent value="log" className="min-h-0 flex-1">
-        <LogViewer storeKey={storeKey} query={normalizeString(debouncedQuery)} />
+        <LogViewer
+          storeKey={storeKey}
+          query={normalizeString(debouncedQuery)}
+        />
       </TabsContent>
     </Tabs>
   );

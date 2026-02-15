@@ -69,11 +69,11 @@ export const filteredStoreLog = selectorFamily<
     ({ get }) => {
       const log = get(storeLog(storeKey));
       if (!query) return log;
-      return log.filter(entry =>
-        normalizeString(entry.label).includes(query),
-      );
+      return log.filter(entry => normalizeString(entry.label).includes(query));
     },
-  { cachePolicy: { type: 'most-recent' } },
+  {
+    cachePolicy: { type: 'most-recent' },
+  },
 );
 
 export const effectiveSelectedStateKey = selector<string | null>(({ get }) => {

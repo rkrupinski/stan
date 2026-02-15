@@ -13,6 +13,8 @@
   "dependencies": {
     "@rkrupinski/stan": "1.7.0",
     "@tailwindcss/vite": "4.1.18",
+    "@tanstack/react-pacer": "^0.19.4",
+    "@tanstack/react-virtual": "^3.13.18",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "compare-versions": "6.1.1",

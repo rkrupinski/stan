@@ -4121,6 +4121,52 @@
     "@tailwindcss/oxide" "4.1.18"
     tailwindcss "4.1.18"
 
+"@tanstack/devtools-event-client@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/devtools-event-client/-/devtools-event-client-0.4.0.tgz#7c586e5bf4bc18999f8a19d0fa53657e4646e2a5"
+  integrity sha512-RPfGuk2bDZgcu9bAJodvO2lnZeHuz4/71HjZ0bGb/SPg8+lyTA+RLSKQvo7fSmPSi8/vcH3aKQ8EM9ywf1olaw==
+
+"@tanstack/pacer@0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/pacer/-/pacer-0.18.0.tgz#0af7902a70f0ec911530356920fc230d77af2bf7"
+  integrity sha512-qhCRSFei0hokQr3xYcQXqxsRD/LKlgHCxHXtKHrQoImp4x2Zu6tUOpUGVH4y2qexIrzSu3aibQBNNfC3Eay6Mg==
+  dependencies:
+    "@tanstack/devtools-event-client" "^0.4.0"
+    "@tanstack/store" "^0.8.0"
+
+"@tanstack/react-pacer@^0.19.4":
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-pacer/-/react-pacer-0.19.4.tgz#b488ef6e1578b587a51717382eb8dca19ee3087a"
+  integrity sha512-coj8ULAuR0qFpjAKD44gTgRuZyjxU6Xu+IX5MwwYvr4e61OtZcJshaExoOBKpCGde0Edb12jDnzzj2Im13Qm9Q==
+  dependencies:
+    "@tanstack/pacer" "0.18.0"
+    "@tanstack/react-store" "^0.8.0"
+
+"@tanstack/react-store@^0.8.0":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-store/-/react-store-0.8.1.tgz#b6791e234336dfcbf7180a3ae9ce82dfc906d0ac"
+  integrity sha512-XItJt+rG8c5Wn/2L/bnxys85rBpm0BfMbhb4zmPVLXAKY9POrp1xd6IbU4PKoOI+jSEGc3vntPRfLGSgXfE2Ig==
+  dependencies:
+    "@tanstack/store" "0.8.1"
+    use-sync-external-store "^1.6.0"
+
+"@tanstack/react-virtual@^3.13.18":
+  version "3.13.18"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-virtual/-/react-virtual-3.13.18.tgz#9124ee9f08b2ca3c67ffd508dae3732328983362"
+  integrity sha512-dZkhyfahpvlaV0rIKnvQiVoWPyURppl6w4m9IwMDpuIjcJ1sD9YGWrt0wISvgU7ewACXx2Ct46WPgI6qAD4v6A==
+  dependencies:
+    "@tanstack/virtual-core" "3.13.18"
+
+"@tanstack/store@0.8.1", "@tanstack/store@^0.8.0":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/store/-/store-0.8.1.tgz#2a323df1824b399201913b98616513b29bfca1c3"
+  integrity sha512-PtOisLjUZPz5VyPRSCGjNOlwTvabdTBQ2K80DpVL1chGVr35WRxfeavAPdNq6pm/t7F8GhoR2qtmkkqtCEtHYw==
+
+"@tanstack/virtual-core@3.13.18":
+  version "3.13.18"
+  resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.13.18.tgz#586e3c1fe08547ee6abf87e8fb7c99087b9c47ff"
+  integrity sha512-Mx86Hqu1k39icq2Zusq+Ey2J6dDWTjDvEv43PJtRCoEYTLyfaPnxIQ6iy7YAOK0NV/qOEmZQ/uCufrppZxTgcg==
+
 "@testing-library/dom@10.4.0":
   version "10.4.0"
   resolved "https://registry.npmjs.org/@testing-library/dom/-/dom-10.4.0.tgz"

@@ -1,4 +1,5 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanValue } from '@rkrupinski/stan/react';
 
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,9 @@ import {
 import { type LogEntry, filteredStoreLog, storeEntries } from '@/state';
 import type { NormalizedString } from '@/normalize';
 import type { UpdateValue } from '@/types';
+
+const ESTIMATED_SIZE = 24;
+const OVERSCAN = 5;
 
 const formatTime = (ts: number): string => {
   const d = new Date(ts);
@@ -46,55 +50,50 @@ const StateLabel = ({ label, exists }: { label: string; exists: boolean }) =>
 type LogEntryRowProps = {
   entry: LogEntry;
   odd: boolean;
-  mountedAt: number;
   stateExists: boolean;
 };
 
-const LogEntryRow = memo<LogEntryRowProps>(
-  ({ entry, odd, mountedAt, stateExists }) => (
-    <div
-      className={`flex items-baseline gap-2 px-2 py-0.5 ${
-        entry.timestamp > mountedAt
-          ? 'animate-[log-highlight_500ms_ease-out]'
-          : ''
-      } ${odd ? 'bg-muted/50' : ''}`}
-    >
-      <span className="shrink-0 font-mono text-xs text-muted-foreground">
-        {formatTime(entry.timestamp)}
-      </span>
-      <span className="break-all text-xs">
-        {entry.type === 'set' ? (
-          <>
-            <Badge variant="outline" className="text-[0.625rem]">
-              SET
-            </Badge>{' '}
-            state <StateLabel label={entry.label} exists={stateExists} /> to{' '}
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <a className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2">
-                  value
-                </a>
-              </HoverCardTrigger>
-              <HoverCardContent className="max-w-sm">
-                <pre className="max-h-60 overflow-auto text-xs">
-                  {formatValue(entry.value)}
-                </pre>
-                <HoverCardArrow />
-              </HoverCardContent>
-            </HoverCard>
-          </>
-        ) : (
-          <>
-            <Badge variant="outline" className="text-[0.625rem]">
-              DELETE
-            </Badge>{' '}
-            state <StateLabel label={entry.label} exists={stateExists} />
-          </>
-        )}
-      </span>
-    </div>
-  ),
-);
+const LogEntryRow = memo<LogEntryRowProps>(({ entry, odd, stateExists }) => (
+  <div
+    className={`flex items-baseline gap-2 px-2 py-0.5 ${
+      odd ? 'bg-muted/50' : ''
+    }`}
+  >
+    <span className="shrink-0 font-mono text-xs text-muted-foreground">
+      {formatTime(entry.timestamp)}
+    </span>
+    <span className="break-all text-xs">
+      {entry.type === 'set' ? (
+        <>
+          <Badge variant="outline" className="text-[0.625rem]">
+            SET
+          </Badge>{' '}
+          state <StateLabel label={entry.label} exists={stateExists} /> to{' '}
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <a className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2">
+                value
+              </a>
+            </HoverCardTrigger>
+            <HoverCardContent className="max-w-sm">
+              <pre className="max-h-60 overflow-auto text-xs">
+                {formatValue(entry.value)}
+              </pre>
+              <HoverCardArrow />
+            </HoverCardContent>
+          </HoverCard>
+        </>
+      ) : (
+        <>
+          <Badge variant="outline" className="text-[0.625rem]">
+            DELETE
+          </Badge>{' '}
+          state <StateLabel label={entry.label} exists={stateExists} />
+        </>
+      )}
+    </span>
+  </div>
+));
 
 type LogViewerProps = { storeKey: string; query: NormalizedString };
 
@@ -102,31 +101,51 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
   const log = useStanValue(filteredStoreLog({ storeKey, query }));
   const entries = useStanValue(storeEntries(storeKey));
 
-  const mountedAt = useRef(Date.now());
+  const parentRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    mountedAt.current = Date.now();
-  }, [query]);
+  const virtualizer = useVirtualizer({
+    count: log.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ESTIMATED_SIZE,
+    overscan: OVERSCAN,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
 
   if (!log.length) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-        No log entries yet
+      <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
+        No log entries
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto">
-      {log.map((entry, i) => (
-        <LogEntryRow
-          key={entry.id}
-          entry={entry}
-          odd={i % 2 !== 0}
-          mountedAt={mountedAt.current}
-          stateExists={entries.findIndex(e => e.key === entry.stateKey) !== -1}
-        />
-      ))}
+    <div ref={parentRef} className="h-full overflow-y-auto">
+      <div
+        className="relative w-full"
+        style={{ height: virtualizer.getTotalSize() }}
+      >
+        {virtualItems.map(virtualRow => (
+          <div
+            key={log[virtualRow.index].id}
+            data-index={virtualRow.index}
+            ref={virtualizer.measureElement}
+            className="absolute left-0 top-0 w-full"
+            style={{ transform: `translateY(${virtualRow.start}px)` }}
+          >
+            <LogEntryRow
+              entry={log[virtualRow.index]}
+              odd={virtualRow.index % 2 !== 0}
+              stateExists={
+                entries.findIndex(
+                  e => e.key === log[virtualRow.index].stateKey,
+                ) !== -1
+              }
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 });
