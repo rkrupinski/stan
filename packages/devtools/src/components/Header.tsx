@@ -6,7 +6,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="flex items-center gap-3 border-b px-3 py-2">
+    <header className="flex items-center gap-3 border-b dark:border-muted-foreground/40 px-3 py-2">
       <button
         onClick={handleLogoClick}
         className="shrink-0 cursor-pointer"

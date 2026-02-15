@@ -2,6 +2,7 @@ import { atom, atomFamily, selector, selectorFamily } from '@rkrupinski/stan';
 
 import type { UpdateValue } from '@/types';
 import { parseKey } from '@/key';
+import { type NormalizedString, normalizeString } from '@/normalize';
 
 export type ViewMode = 'explore' | 'log';
 
@@ -58,6 +59,21 @@ export const storeEntries = selectorFamily<ParsedStateEntry[], string>(
         label: parseKey(key)?.label ?? key,
         value,
       })),
+);
+
+export const filteredStoreLog = selectorFamily<
+  LogEntry[],
+  { storeKey: string; query: NormalizedString }
+>(
+  ({ storeKey, query }) =>
+    ({ get }) => {
+      const log = get(storeLog(storeKey));
+      if (!query) return log;
+      return log.filter(entry =>
+        normalizeString(entry.label).includes(query),
+      );
+    },
+  { cachePolicy: { type: 'most-recent' } },
 );
 
 export const effectiveSelectedStateKey = selector<string | null>(({ get }) => {
