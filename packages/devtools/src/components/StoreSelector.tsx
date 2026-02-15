@@ -18,13 +18,10 @@ export const StoreSelector = () => {
   const stores = useStanValue(storeList);
   const selectedKey = useStanValue(effectiveSelectedStoreKey);
 
-  const handleChange = useStanCallback(
-    ({ set }) =>
-      (value: string) => {
-        set(selectedStoreKey, value);
-        set(viewMode, 'explore');
-      },
-  );
+  const handleChange = useStanCallback(({ set }) => (value: string) => {
+    set(selectedStoreKey, value);
+    set(viewMode, 'explore');
+  });
 
   return (
     <Select value={selectedKey ?? ''} onValueChange={handleChange}>
@@ -33,7 +30,11 @@ export const StoreSelector = () => {
       </SelectTrigger>
       <SelectContent>
         {stores.map(store => (
-          <SelectItem key={store.key} value={store.key} className="max-w-[200px] truncate">
+          <SelectItem
+            key={store.key}
+            value={store.key}
+            className="max-w-[200px] truncate"
+          >
             {store.label}
           </SelectItem>
         ))}

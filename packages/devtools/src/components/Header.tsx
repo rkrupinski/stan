@@ -12,7 +12,11 @@ export const Header = () => {
         className="shrink-0 cursor-pointer"
         aria-label="Open Stan website"
       >
-        <img src="/icons/icon-32.png" alt="Stan logo" className="size-5 dark:invert" />
+        <img
+          src="/icons/icon-32.png"
+          alt="Stan logo"
+          className="size-5 dark:invert"
+        />
       </button>
       <StoreSelector />
     </header>

@@ -9,11 +9,7 @@ export const ContentArea = () => {
 
   return (
     <main className="min-h-0 flex-1">
-      {selectedKey ? (
-        <StoreViewer storeKey={selectedKey} />
-      ) : (
-        <Placeholder />
-      )}
+      {selectedKey ? <StoreViewer storeKey={selectedKey} /> : <Placeholder />}
     </main>
   );
 };
