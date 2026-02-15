@@ -6,7 +6,7 @@ import {
   isMessage,
   type RelayMessage,
   type RelayInboundMessage,
-} from './types';
+} from '@/types';
 
 window.addEventListener('message', event => {
   if (event.source !== window || !event.data) {

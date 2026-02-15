@@ -2,23 +2,23 @@ import { useEffect } from 'react';
 import { useStanCallback } from '@rkrupinski/stan/react';
 import { toast } from 'sonner';
 
-import { SUPPORTED_VERSION_RANGE, MAX_LOG_ENTRIES } from './constants';
-import { isVersionSupported } from './version';
+import { SUPPORTED_VERSION_RANGE, MAX_LOG_ENTRIES } from '@/constants';
+import { isVersionSupported } from '@/version';
 import {
   PANEL_SOURCE,
   RELAY_SOURCE,
   isMessage,
   type UpdateValue,
   type RelayMessage,
-} from './types';
+} from '@/types';
 import {
   registeredStoreKeys,
   storeState,
   storeLog,
   selectedStoreKey,
-} from './state';
-import type { LogEntry } from './state';
-import { parseKey } from './key';
+} from '@/state';
+import type { LogEntry } from '@/state';
+import { parseKey } from '@/key';
 
 const checkVersion = isVersionSupported(SUPPORTED_VERSION_RANGE);
 

@@ -12,7 +12,7 @@ import {
   effectiveSelectedStoreKey,
   selectedStoreKey,
   viewMode,
-} from '../state';
+} from '@/state';
 
 export const StoreSelector = () => {
   const stores = useStanValue(storeList);

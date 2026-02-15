@@ -1,4 +1,4 @@
-import { StoreSelector } from './StoreSelector';
+import { StoreSelector } from '@/components/StoreSelector';
 
 export const Header = () => {
   const handleLogoClick = () => {

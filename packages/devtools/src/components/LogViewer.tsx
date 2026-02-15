@@ -9,8 +9,8 @@ import {
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
 
-import { type LogEntry, storeEntries, storeLog } from '../state';
-import type { UpdateValue } from '../types';
+import { type LogEntry, storeEntries, storeLog } from '@/state';
+import type { UpdateValue } from '@/types';
 
 const formatTime = (ts: number): string => {
   const d = new Date(ts);

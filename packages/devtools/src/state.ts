@@ -1,7 +1,7 @@
 import { atom, atomFamily, selector, selectorFamily } from '@rkrupinski/stan';
 
-import type { UpdateValue } from './types';
-import { parseKey } from './key';
+import type { UpdateValue } from '@/types';
+import { parseKey } from '@/key';
 
 export type ViewMode = 'explore' | 'log';
 

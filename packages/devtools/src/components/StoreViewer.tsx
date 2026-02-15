@@ -3,8 +3,8 @@ import { Trash2Icon } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { type ViewMode, storeLog, viewMode } from '../state';
-import { LogViewer } from './LogViewer';
+import { type ViewMode, storeLog, viewMode } from '@/state';
+import { LogViewer } from '@/components/LogViewer';
 
 export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
   const mode = useStanValue(viewMode);
