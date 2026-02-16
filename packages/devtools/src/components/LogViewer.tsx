@@ -1,4 +1,10 @@
-import { memo, useCallback, useRef } from 'react';
+import {
+  memo,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  type UIEvent,
+} from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanValue } from '@rkrupinski/stan/react';
 
@@ -39,10 +45,14 @@ const formatValue = (value: UpdateValue): string => {
   }
 };
 
-const highlight = (node: HTMLElement): void => {
-  const glow = getComputedStyle(node).getPropertyValue('--highlight-glow');
+const highlight = (node: HTMLElement) => {
+  const color = getComputedStyle(node).getPropertyValue('--highlight-glow');
+
   node.animate(
-    [{ backgroundColor: glow }, { backgroundColor: 'transparent' }],
+    [
+      { boxShadow: `inset 0 0 0 100px ${color}` },
+      { boxShadow: 'inset 0 0 0 100px transparent' },
+    ],
     {
       duration: 400,
       easing: 'ease-out',
@@ -135,6 +145,12 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
   }
 
   const parentRef = useRef<HTMLDivElement>(null);
+  const stuckRef = useRef(true);
+
+  const handleScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    stuckRef.current = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+  }, []);
 
   const virtualizer = useVirtualizer({
     count: log.length,
@@ -142,6 +158,12 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
     estimateSize: () => ESTIMATED_SIZE,
     overscan: OVERSCAN,
   });
+
+  useLayoutEffect(() => {
+    if (stuckRef.current && log.length > 0) {
+      virtualizer.scrollToIndex(log.length - 1, { align: 'end' });
+    }
+  }, [log.length, virtualizer]);
 
   const virtualItems = virtualizer.getVirtualItems();
 
@@ -154,7 +176,11 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
   }
 
   return (
-    <div ref={parentRef} className="h-full overflow-y-auto">
+    <div
+      ref={parentRef}
+      onScroll={handleScroll}
+      className="h-full overflow-y-auto"
+    >
       <div
         className="relative w-full"
         style={{ height: virtualizer.getTotalSize() }}

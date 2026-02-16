@@ -100,7 +100,7 @@ export const useDevtoolsBridge = () => {
               markFresh(logEntry.id);
 
               set(storeLog(storeKey), prev =>
-                [logEntry, ...prev].slice(0, MAX_LOG_ENTRIES),
+                [...prev, logEntry].slice(-MAX_LOG_ENTRIES),
               );
             }
 
@@ -120,7 +120,7 @@ export const useDevtoolsBridge = () => {
               markFresh(logEntry.id);
 
               set(storeLog(storeKey), prev =>
-                [logEntry, ...prev].slice(0, MAX_LOG_ENTRIES),
+                [...prev, logEntry].slice(-MAX_LOG_ENTRIES),
               );
             }
             break;
