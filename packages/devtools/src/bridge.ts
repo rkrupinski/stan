@@ -19,6 +19,7 @@ import {
 } from '@/state';
 import type { LogEntry } from '@/state';
 import { parseKey } from '@/key';
+import { markFresh, clearAllFresh } from '@/log';
 
 const checkVersion = isVersionSupported(SUPPORTED_VERSION_RANGE);
 
@@ -39,6 +40,7 @@ export const useDevtoolsBridge = () => {
             set(registeredStoreKeys, []);
             set(selectedStoreKey, null);
             logId = 0;
+            clearAllFresh();
             break;
           }
 
@@ -95,6 +97,8 @@ export const useDevtoolsBridge = () => {
                 value: event.value,
               };
 
+              markFresh(logEntry.id);
+
               set(storeLog(storeKey), prev =>
                 [logEntry, ...prev].slice(0, MAX_LOG_ENTRIES),
               );
@@ -112,6 +116,8 @@ export const useDevtoolsBridge = () => {
                 stateKey: event.key,
                 label: parseKey(event.key)?.label ?? event.key,
               };
+
+              markFresh(logEntry.id);
 
               set(storeLog(storeKey), prev =>
                 [logEntry, ...prev].slice(0, MAX_LOG_ENTRIES),
