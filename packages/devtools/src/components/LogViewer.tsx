@@ -3,12 +3,15 @@ import {
   useCallback,
   useLayoutEffect,
   useRef,
+  useState,
   type UIEvent,
 } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanValue } from '@rkrupinski/stan/react';
+import { ArrowDownIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   HoverCard,
   HoverCardArrow,
@@ -146,10 +149,13 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
 
   const parentRef = useRef<HTMLDivElement>(null);
   const stuckRef = useRef(true);
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   const handleScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
-    stuckRef.current = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+    const stuck = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+    stuckRef.current = stuck;
+    setShowScrollBtn(!stuck);
   }, []);
 
   const virtualizer = useVirtualizer({
@@ -164,6 +170,10 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
       virtualizer.scrollToIndex(log.length - 1, { align: 'end' });
     }
   }, [log.length, virtualizer]);
+
+  const scrollToBottom = useCallback(() => {
+    virtualizer.scrollToIndex(log.length - 1, { align: 'end' });
+  }, [virtualizer, log.length]);
 
   const virtualItems = virtualizer.getVirtualItems();
 
@@ -205,6 +215,19 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
           </div>
         ))}
       </div>
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={scrollToBottom}
+        title="Scroll to bottom"
+        className={`absolute bottom-4 right-6 size-9 rounded-full bg-background dark:bg-background transition-all duration-200 ${
+          showScrollBtn
+            ? 'opacity-100 scale-100'
+            : 'opacity-0 scale-90 pointer-events-none'
+        }`}
+      >
+        <ArrowDownIcon className="size-4" />
+      </Button>
     </div>
   );
 });
