@@ -2,7 +2,7 @@ const freshEntries = new Map<string, ReturnType<typeof setTimeout>>();
 
 const EXPIRY_MS = 500;
 
-export const markFresh = (id: string): void => {
+export const markFresh = (id: string) => {
   clearTimeout(freshEntries.get(id));
   freshEntries.set(
     id,
@@ -12,7 +12,7 @@ export const markFresh = (id: string): void => {
   );
 };
 
-export const consumeFresh = (id: string): boolean => {
+export const consumeFresh = (id: string) => {
   const timeout = freshEntries.get(id);
   if (timeout === undefined) return false;
   clearTimeout(timeout);
@@ -20,7 +20,7 @@ export const consumeFresh = (id: string): boolean => {
   return true;
 };
 
-export const clearAllFresh = (): void => {
+export const clearAllFresh = () => {
   for (const timeout of freshEntries.values()) {
     clearTimeout(timeout);
   }
