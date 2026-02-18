@@ -3,6 +3,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 
 import type { NormalizedString } from '@/normalize';
+import { highlightMatch } from '@/highlight';
 import { formatValue } from '@/format';
 import {
   effectiveSelectedStateKey,
@@ -11,7 +12,7 @@ import {
   storeEntries,
 } from '@/state';
 
-const ESTIMATED_SIZE = 24;
+const ESTIMATED_SIZE = 28;
 const OVERSCAN = 5;
 
 type ExploreViewerProps = { storeKey: string; query: NormalizedString };
@@ -65,7 +66,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
     <div className="flex h-full gap-2">
       <div
         ref={parentRef}
-        className="w-[150px] shrink-0 overflow-y-auto border-r dark:border-muted-foreground/40"
+        className="w-[200px] shrink-0 overflow-y-auto border-r dark:border-muted-foreground/40"
       >
         {filteredEntries.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
@@ -90,13 +91,13 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
                 >
                   <button
                     onClick={() => handleSelect(entry.key)}
-                    className={`w-full break-all px-2 py-1 text-left text-xs ${
+                    className={`w-full break-all px-2 py-1 text-left text-sm ${
                       isSelected
                         ? 'cursor-default bg-accent text-accent-foreground'
                         : 'cursor-pointer hover:bg-muted'
                     }`}
                   >
-                    {entry.label}
+                    {highlightMatch(entry.label, query)}
                   </button>
                 </div>
               );

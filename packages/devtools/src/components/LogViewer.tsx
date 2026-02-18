@@ -21,6 +21,7 @@ import {
 
 import { type LogEntry, filteredStoreLog, storeEntries } from '@/state';
 import type { NormalizedString } from '@/normalize';
+import { highlightMatch } from '@/highlight';
 import { formatValue } from '@/format';
 import { consumeFresh, clearAllFresh } from '@/log';
 
@@ -52,74 +53,98 @@ const highlight = (node: HTMLElement) => {
   );
 };
 
-const StateLabel = ({ label, exists }: { label: string; exists: boolean }) =>
+const StateLabel = ({
+  label,
+  exists,
+  query,
+}: {
+  label: string;
+  exists: boolean;
+  query: NormalizedString;
+}) =>
   exists ? (
     <a className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2">
-      {label}
+      {highlightMatch(label, query)}
     </a>
   ) : (
-    <span className="font-mono text-muted-foreground">{label}</span>
+    <span className="font-mono text-muted-foreground">
+      {highlightMatch(label, query)}
+    </span>
   );
 
 type LogEntryRowProps = {
   entry: LogEntry;
   odd: boolean;
   stateExists: boolean;
+  query: NormalizedString;
 };
 
-const LogEntryRow = memo<LogEntryRowProps>(({ entry, odd, stateExists }) => {
-  const animRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (node && consumeFresh(entry.id)) {
-        highlight(node);
-      }
-    },
-    [entry],
-  );
+const LogEntryRow = memo<LogEntryRowProps>(
+  ({ entry, odd, stateExists, query }) => {
+    const animRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        if (node && consumeFresh(entry.id)) {
+          highlight(node);
+        }
+      },
+      [entry],
+    );
 
-  return (
-    <div
-      ref={animRef}
-      className={`flex items-baseline gap-2 px-2 py-0.5 ${
-        odd ? 'bg-muted/60' : ''
-      }`}
-    >
-      <span className="shrink-0 font-mono text-xs text-muted-foreground">
-        {formatTime(entry.timestamp)}
-      </span>
-      <span className="break-all text-xs">
-        {entry.type === 'set' ? (
-          <>
-            <Badge variant="outline" className="text-[0.625rem]">
-              SET
-            </Badge>{' '}
-            state <StateLabel label={entry.label} exists={stateExists} /> to{' '}
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <a className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2">
-                  value
-                </a>
-              </HoverCardTrigger>
-              <HoverCardContent className="max-w-sm">
-                <pre className="max-h-60 overflow-auto text-xs">
-                  {formatValue(entry.value)}
-                </pre>
-                <HoverCardArrow />
-              </HoverCardContent>
-            </HoverCard>
-          </>
-        ) : (
-          <>
-            <Badge variant="outline" className="text-[0.625rem]">
-              DELETE
-            </Badge>{' '}
-            state <StateLabel label={entry.label} exists={stateExists} />
-          </>
-        )}
-      </span>
-    </div>
-  );
-});
+    return (
+      <div
+        ref={animRef}
+        className={`flex items-baseline gap-2 px-2 py-0.5 ${
+          odd ? 'bg-muted/60' : ''
+        }`}
+      >
+        <span className="shrink-0 font-mono text-xs text-muted-foreground">
+          {formatTime(entry.timestamp)}
+        </span>
+        <span className="break-all text-xs">
+          {entry.type === 'set' ? (
+            <>
+              <Badge variant="outline" className="text-[0.625rem]">
+                SET
+              </Badge>{' '}
+              state{' '}
+              <StateLabel
+                label={entry.label}
+                exists={stateExists}
+                query={query}
+              />{' '}
+              to{' '}
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <a className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2">
+                    value
+                  </a>
+                </HoverCardTrigger>
+                <HoverCardContent className="max-w-sm">
+                  <pre className="max-h-60 overflow-auto text-xs">
+                    {formatValue(entry.value)}
+                  </pre>
+                  <HoverCardArrow />
+                </HoverCardContent>
+              </HoverCard>
+            </>
+          ) : (
+            <>
+              <Badge variant="outline" className="text-[0.625rem]">
+                DELETE
+              </Badge>{' '}
+              state{' '}
+              <StateLabel
+                label={entry.label}
+                exists={stateExists}
+                query={query}
+              />
+            </>
+          )}
+        </span>
+      </div>
+    );
+  },
+);
 
 type LogViewerProps = { storeKey: string; query: NormalizedString };
 
@@ -200,6 +225,7 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
                   e => e.key === log[virtualRow.index].stateKey,
                 ) !== -1
               }
+              query={query}
             />
           </div>
         ))}
