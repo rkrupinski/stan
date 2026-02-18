@@ -21,7 +21,7 @@ import {
 
 import { type LogEntry, filteredStoreLog, storeEntries } from '@/state';
 import type { NormalizedString } from '@/normalize';
-import type { UpdateValue } from '@/types';
+import { formatValue } from '@/format';
 import { consumeFresh, clearAllFresh } from '@/log';
 
 const ESTIMATED_SIZE = 24;
@@ -35,17 +35,6 @@ const formatTime = (ts: number): string => {
     second: '2-digit',
     fractionalSecondDigits: 3,
   });
-};
-
-const formatValue = (value: UpdateValue): string => {
-  switch (value.type) {
-    case 'sync':
-    case 'async-resolved':
-    case 'async-rejected':
-      return JSON.stringify(value.value, null, 2);
-    case 'async-pending':
-      return '"pending"';
-  }
 };
 
 const highlight = (node: HTMLElement) => {
@@ -92,7 +81,7 @@ const LogEntryRow = memo<LogEntryRowProps>(({ entry, odd, stateExists }) => {
     <div
       ref={animRef}
       className={`flex items-baseline gap-2 px-2 py-0.5 ${
-        odd ? 'bg-muted/50' : ''
+        odd ? 'bg-muted/60' : ''
       }`}
     >
       <span className="shrink-0 font-mono text-xs text-muted-foreground">

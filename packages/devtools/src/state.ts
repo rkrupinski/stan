@@ -76,6 +76,23 @@ export const filteredStoreLog = selectorFamily<
   },
 );
 
+export const filteredStoreEntries = selectorFamily<
+  ParsedStateEntry[],
+  { storeKey: string; query: NormalizedString }
+>(
+  ({ storeKey, query }) =>
+    ({ get }) => {
+      const entries = get(storeEntries(storeKey));
+      if (!query) return entries;
+      return entries.filter(entry =>
+        normalizeString(entry.label).includes(query),
+      );
+    },
+  {
+    cachePolicy: { type: 'most-recent' },
+  },
+);
+
 export const effectiveSelectedStateKey = selector<string | null>(({ get }) => {
   const storeKey = get(effectiveSelectedStoreKey);
   const stateKey = get(selectedStateKey);
