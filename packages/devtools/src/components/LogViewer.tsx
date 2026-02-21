@@ -131,7 +131,7 @@ const LogEntryRow = memo<LogEntryRowProps>(
               to{' '}
               <HoverCard>
                 <HoverCardTrigger asChild>
-                  <a className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2">
+                  <a className="cursor-help font-medium font-mono text-sky-600 dark:text-sky-600 underline decoration-dotted underline-offset-2">
                     value
                   </a>
                 </HoverCardTrigger>
