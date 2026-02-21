@@ -19,6 +19,7 @@ export const titleAtom = atom<string>("", {
       });
     },
   ],
+  tag: "Title",
 });
 
 export const orderAtom = atom<Order | null>(null, {
@@ -40,4 +41,5 @@ export const orderAtom = atom<Order | null>(null, {
       });
     },
   ],
+  tag: "Order",
 });

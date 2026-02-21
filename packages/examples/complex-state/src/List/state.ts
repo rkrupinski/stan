@@ -15,14 +15,19 @@ const predicate = (order: Order | null) => {
   }
 };
 
-export const allTodos = selector(() => todoService.getTodos());
-
-export const filteredTodos = selector(async ({ get }) => {
-  const todos = await get(allTodos);
-  const title = get(titleAtom).trim().toLocaleLowerCase();
-  const order = get(orderAtom);
-
-  return todos
-    .filter((todo) => todo.title.toLowerCase().includes(title))
-    .sort(predicate(order));
+export const allTodos = selector(() => todoService.getTodos(), {
+  tag: "All todos",
 });
+
+export const filteredTodos = selector(
+  async ({ get }) => {
+    const todos = await get(allTodos);
+    const title = get(titleAtom).trim().toLocaleLowerCase();
+    const order = get(orderAtom);
+
+    return todos
+      .filter((todo) => todo.title.toLowerCase().includes(title))
+      .sort(predicate(order));
+  },
+  { tag: "Filtered todos" }
+);
