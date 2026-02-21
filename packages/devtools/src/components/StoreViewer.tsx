@@ -4,6 +4,7 @@ import { useDebouncedValue } from '@tanstack/react-pacer';
 import { Trash2Icon } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type ViewMode, storeLog, viewMode } from '@/state';
 import { normalizeString } from '@/normalize';
@@ -43,6 +44,7 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
             <TabsTrigger value="explore">Explore</TabsTrigger>
             <TabsTrigger value="log">Log</TabsTrigger>
           </TabsList>
+          <Separator orientation="vertical" className="data-[orientation=vertical]:h-6" />
           <Input
             type="search"
             value={query}

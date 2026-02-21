@@ -28,6 +28,7 @@ export default tseslint.config(
       'import/resolver': {
         typescript: {
           project: './tsconfig.json',
+          conditionNames: ['import', 'require', 'default'],
         },
       },
       react: {
