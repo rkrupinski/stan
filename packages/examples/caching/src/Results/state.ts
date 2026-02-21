@@ -24,6 +24,6 @@ export const swSearch = selectorFamily<Promise<SwResponse>, string>(
       return res.json();
     },
   {
-    cachePolicy: { type: "lru", maxSize: 130 },
+    cachePolicy: { type: "lru", maxSize: 3 },
   }
 );
