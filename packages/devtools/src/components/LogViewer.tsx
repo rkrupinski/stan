@@ -7,7 +7,7 @@ import {
   type UIEvent,
 } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useStanValue } from '@rkrupinski/stan/react';
+import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 import { ArrowDownIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +19,14 @@ import {
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
 
-import { type LogEntry, filteredStoreLog, storeEntries } from '@/state';
+import {
+  type LogEntry,
+  type ViewMode,
+  filteredStoreLog,
+  selectedStateKey,
+  storeEntries,
+  viewMode,
+} from '@/state';
 import type { NormalizedString } from '@/normalize';
 import { highlightMatch } from '@/highlight';
 import { formatValue } from '@/format';
@@ -57,13 +64,18 @@ const StateLabel = ({
   label,
   exists,
   query,
+  onClick,
 }: {
   label: string;
   exists: boolean;
   query: NormalizedString;
+  onClick?: () => void;
 }) =>
   exists ? (
-    <a className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2">
+    <a
+      className="cursor-pointer font-medium font-mono text-sky-600 dark:text-sky-600 underline underline-offset-2"
+      onClick={onClick}
+    >
       {highlightMatch(label, query)}
     </a>
   ) : (
@@ -77,10 +89,11 @@ type LogEntryRowProps = {
   odd: boolean;
   stateExists: boolean;
   query: NormalizedString;
+  onNavigate: (stateKey: string) => void;
 };
 
 const LogEntryRow = memo<LogEntryRowProps>(
-  ({ entry, odd, stateExists, query }) => {
+  ({ entry, odd, stateExists, query, onNavigate }) => {
     const animRef = useCallback(
       (node: HTMLDivElement | null) => {
         if (node && consumeFresh(entry.id)) {
@@ -111,6 +124,9 @@ const LogEntryRow = memo<LogEntryRowProps>(
                 label={entry.label}
                 exists={stateExists}
                 query={query}
+                onClick={
+                  stateExists ? () => onNavigate(entry.stateKey) : undefined
+                }
               />{' '}
               to{' '}
               <HoverCard>
@@ -137,6 +153,9 @@ const LogEntryRow = memo<LogEntryRowProps>(
                 label={entry.label}
                 exists={stateExists}
                 query={query}
+                onClick={
+                  stateExists ? () => onNavigate(entry.stateKey) : undefined
+                }
               />
             </>
           )}
@@ -151,6 +170,11 @@ type LogViewerProps = { storeKey: string; query: NormalizedString };
 export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
   const log = useStanValue(filteredStoreLog({ storeKey, query }));
   const entries = useStanValue(storeEntries(storeKey));
+
+  const handleNavigate = useStanCallback(({ set }) => (stateKey: string) => {
+    set(viewMode, 'explore' as ViewMode);
+    set(selectedStateKey, stateKey);
+  });
 
   const mountedRef = useRef(false);
   const prevQueryRef = useRef<NormalizedString | undefined>(undefined);
@@ -226,6 +250,7 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
                 ) !== -1
               }
               query={query}
+              onNavigate={handleNavigate}
             />
           </div>
         ))}
