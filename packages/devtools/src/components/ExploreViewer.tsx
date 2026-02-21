@@ -1,4 +1,5 @@
 import { memo, useLayoutEffect, useRef } from 'react';
+import { Separator } from '@/components/ui/separator';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 
@@ -12,7 +13,7 @@ import {
   storeEntries,
 } from '@/state';
 
-const ESTIMATED_SIZE = 28;
+const ESTIMATED_SIZE = 24;
 const OVERSCAN = 5;
 
 type ExploreViewerProps = { storeKey: string; query: NormalizedString };
@@ -24,7 +25,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
   const selectedKey = useStanValue(effectiveSelectedStateKey);
 
   const handleSelect = useStanCallback(({ set }) => (key: string) => {
-    set(selectedStateKey, prev => (prev === key ? null : key));
+    set(selectedStateKey, key);
   });
 
   const parentRef = useRef<HTMLDivElement>(null);
@@ -64,10 +65,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
 
   return (
     <div className="flex h-full gap-2">
-      <div
-        ref={parentRef}
-        className="w-[200px] shrink-0 overflow-y-auto border-r dark:border-muted-foreground/40"
-      >
+      <div ref={parentRef} className="w-[180px] shrink-0 overflow-y-auto">
         {filteredEntries.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
             No state
@@ -91,10 +89,10 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
                 >
                   <button
                     onClick={() => handleSelect(entry.key)}
-                    className={`w-full break-all px-2 py-1 text-left text-sm ${
+                    className={`w-full break-all px-2 py-1 text-left text-xs ${
                       isSelected
                         ? 'cursor-default bg-accent text-accent-foreground'
-                        : 'cursor-pointer hover:bg-muted'
+                        : 'cursor-pointer hover:bg-accent/30'
                     }`}
                   >
                     {highlightMatch(entry.label, query)}
@@ -105,6 +103,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
           </div>
         )}
       </div>
+      <Separator orientation="vertical" />
       <div className="min-w-0 flex-1 overflow-auto">
         {selectedEntry ? (
           <div className="p-2">
