@@ -1,5 +1,4 @@
 import { Toaster } from '@/components/ui/sonner';
-
 import { useDevtoolsBridge } from '@/bridge';
 import { ContentArea } from '@/components/ContentArea';
 import { Header } from '@/components/Header';

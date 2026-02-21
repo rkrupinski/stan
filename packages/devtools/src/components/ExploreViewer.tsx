@@ -1,8 +1,8 @@
 import { memo, useLayoutEffect, useRef } from 'react';
-import { Separator } from '@/components/ui/separator';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 
+import { Separator } from '@/components/ui/separator';
 import type { NormalizedString } from '@/normalize';
 import { highlightMatch } from '@/highlight';
 import { formatValue } from '@/format';
