@@ -18,6 +18,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
+import { ValueView } from '@/components/ValueView';
 
 import {
   type LogEntry,
@@ -136,9 +137,7 @@ const LogEntryRow = memo<LogEntryRowProps>(
                   </a>
                 </HoverCardTrigger>
                 <HoverCardContent className="max-w-sm">
-                  <pre className="max-h-60 overflow-auto text-xs">
-                    {JSON.stringify(formatValue(entry.value), null, 2)}
-                  </pre>
+                  <ValueView renderValue={formatValue(entry.value)} />
                   <HoverCardArrow />
                 </HoverCardContent>
               </HoverCard>

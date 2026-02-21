@@ -3,6 +3,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 
 import { Separator } from '@/components/ui/separator';
+import { ValueView } from '@/components/ValueView';
 import type { NormalizedString } from '@/normalize';
 import { highlightMatch } from '@/highlight';
 import { formatValue } from '@/format';
@@ -110,9 +111,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
             <div className="mb-2 break-all text-sm font-medium">
               {selectedEntry.label}
             </div>
-            <pre className="text-xs">
-              {JSON.stringify(formatValue(selectedEntry.value), null, 2)}
-            </pre>
+            <ValueView renderValue={formatValue(selectedEntry.value)} />
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
