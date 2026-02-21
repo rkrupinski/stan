@@ -65,7 +65,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
 
   return (
     <div className="flex h-full gap-2">
-      <div ref={parentRef} className="w-[180px] shrink-0 overflow-y-auto">
+      <div ref={parentRef} className="w-[160px] shrink-0 overflow-y-auto">
         {filteredEntries.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
             No state

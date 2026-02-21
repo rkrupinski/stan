@@ -44,7 +44,10 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
             <TabsTrigger value="explore">Explore</TabsTrigger>
             <TabsTrigger value="log">Log</TabsTrigger>
           </TabsList>
-          <Separator orientation="vertical" className="data-[orientation=vertical]:h-6" />
+          <Separator
+            orientation="vertical"
+            className="data-[orientation=vertical]:h-6"
+          />
           <Input
             type="search"
             value={query}

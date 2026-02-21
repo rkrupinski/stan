@@ -25,7 +25,7 @@ export const StoreSelector = () => {
 
   return (
     <Select value={selectedKey ?? ''} onValueChange={handleChange}>
-      <SelectTrigger size="sm" className="w-[200px]">
+      <SelectTrigger size="sm" className="w-[200px]" disabled={!stores.length}>
         <SelectValue placeholder="Select a store" />
       </SelectTrigger>
       <SelectContent>
