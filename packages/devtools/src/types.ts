@@ -15,6 +15,10 @@ export type UpdateValue =
   | { type: 'async-resolved'; value: unknown }
   | { type: 'async-rejected'; value: unknown };
 
+export type RenderValue =
+  | { type: 'ready'; value: unknown }
+  | { type: 'pending' };
+
 export type StoreUpdateEvent =
   | { type: 'SET'; key: string; value: UpdateValue }
   | { type: 'DELETE'; key: string };

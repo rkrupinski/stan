@@ -1,12 +1,12 @@
-import type { UpdateValue } from '@/types';
+import type { RenderValue, UpdateValue } from '@/types';
 
-export const formatValue = (value: UpdateValue): string => {
-  switch (value.type) {
+export const formatValue = (updateValue: UpdateValue): RenderValue => {
+  switch (updateValue.type) {
     case 'sync':
     case 'async-resolved':
     case 'async-rejected':
-      return JSON.stringify(value.value, null, 2);
+      return { type: 'ready', value: updateValue.value };
     case 'async-pending':
-      return '"pending"';
+      return { type: 'pending' };
   }
 };

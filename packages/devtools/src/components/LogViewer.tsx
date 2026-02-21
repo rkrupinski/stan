@@ -137,7 +137,7 @@ const LogEntryRow = memo<LogEntryRowProps>(
                 </HoverCardTrigger>
                 <HoverCardContent className="max-w-sm">
                   <pre className="max-h-60 overflow-auto text-xs">
-                    {formatValue(entry.value)}
+                    {JSON.stringify(formatValue(entry.value), null, 2)}
                   </pre>
                   <HoverCardArrow />
                 </HoverCardContent>

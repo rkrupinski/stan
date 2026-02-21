@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`formatValue {"type":"async-pending"} 1`] = `
+{
+  "type": "pending",
+}
+`;
+
+exports[`formatValue {"type":"async-rejected","value":"oops"} 1`] = `
+{
+  "type": "ready",
+  "value": "oops",
+}
+`;
+
+exports[`formatValue {"type":"async-resolved","value":"hello"} 1`] = `
+{
+  "type": "ready",
+  "value": "hello",
+}
+`;
+
+exports[`formatValue {"type":"sync","value":42} 1`] = `
+{
+  "type": "ready",
+  "value": 42,
+}
+`;
+
+exports[`formatValue {"type":"sync","value":null} 1`] = `
+{
+  "type": "ready",
+  "value": null,
+}
+`;

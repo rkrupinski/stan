@@ -110,7 +110,9 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
             <div className="mb-2 break-all text-sm font-medium">
               {selectedEntry.label}
             </div>
-            <pre className="text-xs">{formatValue(selectedEntry.value)}</pre>
+            <pre className="text-xs">
+              {JSON.stringify(formatValue(selectedEntry.value), null, 2)}
+            </pre>
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
