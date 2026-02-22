@@ -23,7 +23,7 @@
     "radix-ui": "^1.4.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-json-view": "1.21.3",
+    "react-json-tree": "0.20.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "4.1.18"

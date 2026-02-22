@@ -107,12 +107,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
       <Separator orientation="vertical" />
       <div className="min-w-0 flex-1 overflow-auto">
         {selectedEntry ? (
-          <div className="p-2">
-            <div className="mb-2 break-all text-sm font-medium">
-              {selectedEntry.label}
-            </div>
-            <ValueView renderValue={formatValue(selectedEntry.value)} />
-          </div>
+          <ValueView renderValue={formatValue(selectedEntry.value)} />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
             No state selected

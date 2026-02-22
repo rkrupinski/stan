@@ -136,7 +136,7 @@ const LogEntryRow = memo<LogEntryRowProps>(
                     value
                   </a>
                 </HoverCardTrigger>
-                <HoverCardContent className="max-w-sm">
+                <HoverCardContent className="max-h-(--radix-hover-card-content-available-height) max-w-sm overflow-y-auto p-2">
                   <ValueView renderValue={formatValue(entry.value)} />
                   <HoverCardArrow />
                 </HoverCardContent>

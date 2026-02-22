@@ -1,16 +1,25 @@
-import ReactJson from 'react-json-view';
+import { memo } from 'react';
+import { JSONTree, type LabelRenderer } from 'react-json-tree';
+import { useSystemTheme } from '@/theme';
 import type { RenderValue } from '@/types';
 
-export const ValueView = ({ renderValue }: { renderValue: RenderValue }) => {
-  if (renderValue.type === 'pending') {
-    return <pre className="text-xs">pending</pre>;
-  }
+const labelRenderer: LabelRenderer = keyPath =>
+  keyPath.length === 0 ? null : keyPath[0];
 
-  const { value } = renderValue;
+export const ValueView = memo<{ renderValue: RenderValue }>(
+  ({ renderValue }) => {
+    const invert = useSystemTheme() === 'light';
 
-  if (typeof value === 'object' && value !== null) {
-    return <ReactJson src={value as object} name={null} />;
-  }
+    if (renderValue.type === 'pending')
+      return <pre className="text-xs">pending</pre>;
 
-  return <pre className="text-xs">{JSON.stringify(value)}</pre>;
-};
+    return (
+      <JSONTree
+        data={renderValue.value}
+        theme="bright"
+        invertTheme={invert}
+        labelRenderer={labelRenderer}
+      />
+    );
+  },
+);
