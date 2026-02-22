@@ -90,10 +90,10 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
                 >
                   <button
                     onClick={() => handleSelect(entry.key)}
-                    className={`w-full break-all px-2 py-1 text-left text-xs ${
+                    className={`w-full break-all px-2 py-1 text-left font-mono text-xs ${
                       isSelected
-                        ? 'cursor-default bg-accent text-accent-foreground'
-                        : 'cursor-pointer hover:bg-accent/30'
+                        ? 'cursor-default bg-muted text-accent-foreground'
+                        : 'cursor-pointer hover:bg-muted/60'
                     }`}
                   >
                     {highlightMatch(entry.label, query)}
