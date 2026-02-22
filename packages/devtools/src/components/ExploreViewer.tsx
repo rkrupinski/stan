@@ -1,8 +1,9 @@
-import { memo, useLayoutEffect, useRef } from 'react';
+import { memo, useLayoutEffect, useMemo, useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 
 import { Separator } from '@/components/ui/separator';
+import { CopyValueButton } from '@/components/CopyValueButton';
 import { ValueView } from '@/components/ValueView';
 import type { NormalizedString } from '@/normalize';
 import { highlightMatch } from '@/highlight';
@@ -64,9 +65,14 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
     ? allEntries.find(e => e.key === selectedKey)
     : null;
 
+  const renderValue = useMemo(
+    () => (selectedEntry ? formatValue(selectedEntry.value) : null),
+    [selectedEntry],
+  );
+
   return (
     <div className="flex h-full gap-2">
-      <div ref={parentRef} className="w-[160px] shrink-0 overflow-y-auto">
+      <div ref={parentRef} className="w-[180px] shrink-0 overflow-y-auto">
         {filteredEntries.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
             No state
@@ -105,9 +111,14 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
         )}
       </div>
       <Separator orientation="vertical" />
-      <div className="min-w-0 flex-1 overflow-auto">
-        {selectedEntry ? (
-          <ValueView renderValue={formatValue(selectedEntry.value)} />
+      <div className="relative min-w-0 flex-1 overflow-auto">
+        {renderValue?.type === 'ready' && (
+          <div className="absolute right-1 top-1 z-10">
+            <CopyValueButton value={renderValue.value} />
+          </div>
+        )}
+        {renderValue ? (
+          <ValueView renderValue={renderValue} />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground pointer-events-none">
             No state selected

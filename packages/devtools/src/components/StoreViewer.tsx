@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useStanCallback, useStanValue } from '@rkrupinski/stan/react';
 import { useDebouncedValue } from '@tanstack/react-pacer';
 import { Trash2Icon } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -30,6 +31,7 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
 
   const handleClearLog = useStanCallback(({ set }) => () => {
     set(storeLog(storeKey), []);
+    toast.info('Log cleared');
   });
 
   return (
@@ -59,7 +61,7 @@ export const StoreViewer = ({ storeKey }: { storeKey: string }) => {
         {mode === 'log' && (
           <button
             onClick={handleClearLog}
-            disabled={log.length === 0}
+            disabled={!log.length}
             title="Clear log"
             className="cursor-pointer text-muted-foreground hover:text-foreground disabled:cursor-default disabled:opacity-30 disabled:hover:text-muted-foreground"
             aria-label="Clear log"
