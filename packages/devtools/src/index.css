@@ -78,6 +78,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --highlight-glow: oklch(0.92 0.03 240);
+  --shimmer-highlight: oklch(0.75 0 0);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -114,6 +115,7 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
     --highlight-glow: oklch(0.35 0.08 240);
+    --shimmer-highlight: oklch(0.65 0 0);
   }
 }
 
@@ -124,4 +126,27 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% center;
+  }
+  100% {
+    background-position: 100% center;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--foreground) 35%,
+    var(--shimmer-highlight) 50%,
+    var(--foreground) 65%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 1s linear infinite;
 }

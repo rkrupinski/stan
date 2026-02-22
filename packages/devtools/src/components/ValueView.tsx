@@ -17,7 +17,7 @@ export const ValueView = memo<{ renderValue: RenderValue }>(
     const invert = useSystemTheme() === 'light';
 
     if (renderValue.type === 'pending')
-      return <pre className="text-xs">pending</pre>;
+      return <span className="text-shimmer text-xs">Pending</span>;
 
     return (
       <JSONTree
