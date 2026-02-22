@@ -4,9 +4,9 @@ import { useSystemTheme } from '@/theme';
 import type { RenderValue } from '@/types';
 
 const theme = {
-  scheme: 'bright',
+  extend: 'monokai',
   base00: 'transparent',
-  tree: { margin: 0 },
+  tree: { margin: 0, fontFamily: 'var(--font-mono)' },
 } as const;
 
 const labelRenderer: LabelRenderer = keyPath =>
