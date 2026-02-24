@@ -12,7 +12,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {
-    "@rkrupinski/stan": "1.7.0",
+    "@rkrupinski/stan": "1.7.1",
     "@tailwindcss/vite": "4.1.18",
     "@tanstack/react-pacer": "^0.19.4",
     "@tanstack/react-virtual": "^3.13.18",
