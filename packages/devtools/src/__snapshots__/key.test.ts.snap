@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parseKey valid keys with tags @@atom[Foo]-1 1`] = `
+{
+  "label": "Foo",
+  "orig": "@@atom[Foo]-1",
+}
+`;
+
+exports[`parseKey valid keys with tags @@atom[user-count]-5 1`] = `
+{
+  "label": "user-count",
+  "orig": "@@atom[user-count]-5",
+}
+`;
+
+exports[`parseKey valid keys with tags @@selector[filteredTodos]-2 1`] = `
+{
+  "label": "filteredTodos",
+  "orig": "@@selector[filteredTodos]-2",
+}
+`;
+
+exports[`parseKey valid keys with tags @@store[Default]-0 1`] = `
+{
+  "label": "Default",
+  "orig": "@@store[Default]-0",
+}
+`;
+
+exports[`parseKey valid keys with tags @@store[My store]-3 1`] = `
+{
+  "label": "My store",
+  "orig": "@@store[My store]-3",
+}
+`;
+
+exports[`parseKey valid keys without tags @@atom-1 1`] = `
+{
+  "label": "Atom 1",
+  "orig": "@@atom-1",
+}
+`;
+
+exports[`parseKey valid keys without tags @@atom-9999 1`] = `
+{
+  "label": "Atom 9999",
+  "orig": "@@atom-9999",
+}
+`;
+
+exports[`parseKey valid keys without tags @@selector-42 1`] = `
+{
+  "label": "Selector 42",
+  "orig": "@@selector-42",
+}
+`;
+
+exports[`parseKey valid keys without tags @@store-0 1`] = `
+{
+  "label": "Store 0",
+  "orig": "@@store-0",
+}
+`;

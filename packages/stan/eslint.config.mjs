@@ -2,35 +2,29 @@
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import globals from 'globals';
-import { defineConfig, globalIgnores } from 'eslint/config';
-import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
-import tsParser from '@typescript-eslint/parser';
+import tseslint from 'typescript-eslint';
 import jestPlugin from 'eslint-plugin-jest';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import * as importPlugin from 'eslint-plugin-import';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-});
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig([
-  globalIgnores(['node_modules/*', 'dist/**', '*.mjs']),
-  importPlugin.flatConfigs?.recommended,
-  importPlugin.flatConfigs?.typescript,
+export default tseslint.config(
+  { ignores: ['node_modules/*', 'dist/**', '*.mjs'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
+  // @ts-expect-error
+  importPlugin.flatConfigs.recommended,
+  // @ts-expect-error
+  importPlugin.flatConfigs.typescript,
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
   reactHooksPlugin.configs['recommended-latest'],
-  ...compat.plugins('@typescript-eslint'),
-  ...compat.extends('plugin:@typescript-eslint/recommended-type-checked'),
   {
     files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
-      parser: tsParser,
       parserOptions: {
         project: ['./tsconfig.json'],
         tsconfigRootDir: __dirname,
@@ -77,4 +71,4 @@ export default defineConfig([
       quotes: 'off',
     },
   },
-]);
+);

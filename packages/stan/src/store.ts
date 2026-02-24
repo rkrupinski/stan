@@ -14,18 +14,6 @@ declare global {
   }
 }
 
-const connectToDevTools = (store: Store) => {
-  window.__STAN_DEVTOOLS__?.register(store);
-
-  return (e: StoreEvent) => {
-    window.__STAN_DEVTOOLS__?.send(store.key, e);
-  };
-};
-
-const disconnectFromDevTools = (store: Store) => {
-  window.__STAN_DEVTOOLS__?.unregister(store);
-};
-
 class ObservableMap<K extends string, V> extends Map<K, V> {
   #onUpdate: (e: StoreEvent) => void;
 
@@ -60,18 +48,22 @@ export class Store {
   libVersion: string = process.env.STAN_VERSION;
 
   deps = new Map<string, Deps>();
-  value =
-    process.env.NODE_ENV !== 'production'
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        new ObservableMap<string, any>(connectToDevTools(this))
-      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        new Map<string, any>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value = new Map<string, any>();
   version = new Map<string, number>();
   mounted = new Map<string, boolean>();
   initialized = new Map<string, boolean>();
 
   constructor({ tag }: StoreOptions = {}) {
     this.key = `@@store${tag ? `[${tag}]` : ''}-${storeId++}`;
+
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.value = new ObservableMap<string, any>(e => {
+        window.__STAN_DEVTOOLS__?.send(this.key, e);
+      });
+      window.__STAN_DEVTOOLS__?.register(this);
+    }
   }
 
   destroy() {
@@ -82,7 +74,7 @@ export class Store {
     this.initialized.clear();
 
     if (process.env.NODE_ENV !== 'production') {
-      disconnectFromDevTools(this);
+      window.__STAN_DEVTOOLS__?.unregister(this);
     }
   }
 

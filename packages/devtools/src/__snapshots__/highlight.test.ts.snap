@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`highlightMatch case preserved 1`] = `
+{
+  "$$typeof": Symbol(react.transitional.element),
+  "_owner": null,
+  "_store": {},
+  "key": null,
+  "props": {
+    "children": [
+      "",
+      {
+        "$$typeof": Symbol(react.transitional.element),
+        "_owner": null,
+        "_store": {},
+        "key": null,
+        "props": {
+          "children": "MyATOM",
+          "className": "bg-yellow-200/80 dark:bg-yellow-300/35 rounded-[2px] text-inherit",
+        },
+        "type": "mark",
+      },
+      "",
+    ],
+  },
+  "type": Symbol(react.fragment),
+}
+`;
+
+exports[`highlightMatch empty query 1`] = `"myAtom"`;
+
+exports[`highlightMatch full label match 1`] = `
+{
+  "$$typeof": Symbol(react.transitional.element),
+  "_owner": null,
+  "_store": {},
+  "key": null,
+  "props": {
+    "children": [
+      "",
+      {
+        "$$typeof": Symbol(react.transitional.element),
+        "_owner": null,
+        "_store": {},
+        "key": null,
+        "props": {
+          "children": "atom",
+          "className": "bg-yellow-200/80 dark:bg-yellow-300/35 rounded-[2px] text-inherit",
+        },
+        "type": "mark",
+      },
+      "",
+    ],
+  },
+  "type": Symbol(react.fragment),
+}
+`;
+
+exports[`highlightMatch match at the end 1`] = `
+{
+  "$$typeof": Symbol(react.transitional.element),
+  "_owner": null,
+  "_store": {},
+  "key": null,
+  "props": {
+    "children": [
+      "my",
+      {
+        "$$typeof": Symbol(react.transitional.element),
+        "_owner": null,
+        "_store": {},
+        "key": null,
+        "props": {
+          "children": "Atom",
+          "className": "bg-yellow-200/80 dark:bg-yellow-300/35 rounded-[2px] text-inherit",
+        },
+        "type": "mark",
+      },
+      "",
+    ],
+  },
+  "type": Symbol(react.fragment),
+}
+`;
+
+exports[`highlightMatch match at the start 1`] = `
+{
+  "$$typeof": Symbol(react.transitional.element),
+  "_owner": null,
+  "_store": {},
+  "key": null,
+  "props": {
+    "children": [
+      "",
+      {
+        "$$typeof": Symbol(react.transitional.element),
+        "_owner": null,
+        "_store": {},
+        "key": null,
+        "props": {
+          "children": "atom",
+          "className": "bg-yellow-200/80 dark:bg-yellow-300/35 rounded-[2px] text-inherit",
+        },
+        "type": "mark",
+      },
+      "Count",
+    ],
+  },
+  "type": Symbol(react.fragment),
+}
+`;
+
+exports[`highlightMatch match in the middle 1`] = `
+{
+  "$$typeof": Symbol(react.transitional.element),
+  "_owner": null,
+  "_store": {},
+  "key": null,
+  "props": {
+    "children": [
+      "my",
+      {
+        "$$typeof": Symbol(react.transitional.element),
+        "_owner": null,
+        "_store": {},
+        "key": null,
+        "props": {
+          "children": "Atom",
+          "className": "bg-yellow-200/80 dark:bg-yellow-300/35 rounded-[2px] text-inherit",
+        },
+        "type": "mark",
+      },
+      "X",
+    ],
+  },
+  "type": Symbol(react.fragment),
+}
+`;
+
+exports[`highlightMatch no match 1`] = `"myAtom"`;

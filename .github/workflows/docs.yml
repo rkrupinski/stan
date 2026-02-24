@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build website
-        run: yarn build:docs
+        run: yarn wsrun -p website -c build
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3

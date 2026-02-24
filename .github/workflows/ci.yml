@@ -11,57 +11,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "yarn"
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Type check
-        run: yarn typecheck
+      - uses: ./.github/actions/setup
+      - run: yarn typecheck
 
   Lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "yarn"
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Lint
-        run: yarn lint
+      - uses: ./.github/actions/setup
+      - run: yarn lint
 
   Test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "yarn"
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Test
-        run: yarn test
+      - uses: ./.github/actions/setup
+      - run: yarn test
 
   Build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version: "22"
-          cache: "yarn"
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Build
-        run: yarn build
+          build-stan: "false"
+      - run: yarn build
 
   Post-Summary:
     runs-on: ubuntu-latest

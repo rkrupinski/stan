@@ -67,27 +67,27 @@ export const selector = <T>(
 
     const makeGetter =
       (id: number) =>
-        <D>(scopedState: Scoped<State<D>>) => {
-          const state = scopedState(store);
-          const value = state.get();
+      <D>(scopedState: Scoped<State<D>>) => {
+        const state = scopedState(store);
+        const value = state.get();
 
-          if (!deps.has(state.key) && id === evalId) {
-            deps.set(state.key, store.version.get(state.key) ?? 0);
+        if (!deps.has(state.key) && id === evalId) {
+          deps.set(state.key, store.version.get(state.key) ?? 0);
 
-            const sub = () =>
-              state.subscribe(() => {
-                refresh();
-              });
+          const sub = () =>
+            state.subscribe(() => {
+              refresh();
+            });
 
-            subs.add(sub);
+          subs.add(sub);
 
-            if (store.mounted.get(key)) {
-              unsubs.add(sub());
-            }
+          if (store.mounted.get(key)) {
+            unsubs.add(sub());
           }
+        }
 
-          return value;
-        };
+        return value;
+      };
 
     const cleanup = () => {
       deps.clear();
