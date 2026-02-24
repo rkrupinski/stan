@@ -1,0 +1,24 @@
+name: Setup
+description: Setup Node, install deps, build stan
+
+inputs:
+  build-stan:
+    description: Whether to build the stan package
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+        cache: "yarn"
+    - name: Install dependencies
+      shell: bash
+      run: yarn install --frozen-lockfile
+    - name: Build stan
+      if: inputs.build-stan == 'true'
+      shell: bash
+      run: node_modules/.bin/wsrun -p @rkrupinski/stan -c build
