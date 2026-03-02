@@ -8,6 +8,8 @@
   --ifm-color-primary-lightest: #3cad6e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --announcement-bar-bg: #fff8e1;
+  --announcement-bar-text: #5d4037;
 }
 
 [data-theme='dark'] {
@@ -19,4 +21,11 @@
   --ifm-color-primary-lighter: #32d8b4;
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --announcement-bar-bg: #4e342e;
+  --announcement-bar-text: #ffe0b2;
+}
+
+div[class*='announcementBar'] a {
+  font-weight: bold;
+  text-decoration: underline;
 }
