@@ -49,6 +49,14 @@ const config: Config = {
   ],
 
   themeConfig: {
+    announcementBar: {
+      id: 'devtools',
+      content:
+        'Check out <a target="_blank" href="https://chromewebstore.google.com/detail/stan-devtools/jioipgcofbmgbdfmdjjcmockkjkhagac">Stan DevTools</a> Chrome extension',
+      backgroundColor: 'var(--announcement-bar-bg)',
+      textColor: 'var(--announcement-bar-text)',
+      isCloseable: false,
+    },
     image: 'img/logo.svg',
     navbar: {
       hideOnScroll: true,
