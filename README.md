@@ -8,28 +8,36 @@
 
 Minimal, type-safe state management
 
-[🌐 Website](https://stan.party) &nbsp;&nbsp;|&nbsp;&nbsp;
-[📘 API docs](https://stan.party/docs/api/state) &nbsp;&nbsp;|&nbsp;&nbsp;
-[📝 Examples](https://stan.party/docs/getting-started/examples) &nbsp;&nbsp;|&nbsp;&nbsp;
-[📰 Blog Post](https://rkrupinski.com/post/introducing-stan)
+- [Website](https://stan.party)
+- [API docs](https://stan.party/docs/api/state)
+- [Examples](https://stan.party/docs/getting-started/examples)
+- [Devtools](https://chromewebstore.google.com/detail/stan-devtools/jioipgcofbmgbdfmdjjcmockkjkhagac)
+- [Blog Post](https://rkrupinski.com/post/introducing-stan)
 
-A sneak peek:
+## Install
 
-```tsx
-import { selectorFamily } from "@rkrupinski/stan";
-import { useStanValue } from "@rkrupinski/stan/react";
+```sh
+npm install @rkrupinski/stan
+```
 
-const deepThought = selectorFamily<string, string>(
-  (question) => () => thinkDeep(question)
-);
+## Quick start
 
-const MyApp: FC<{ question: string }> = ({ question }) => {
-  const answer = useStanValue(deepThought(question));
+```jsx
+import { atom, selector } from "@rkrupinski/stan";
+import { useStan, useStanValue } from "@rkrupinski/stan/react";
+
+const count = atom(0);
+const doubled = selector(({ get }) => get(count) * 2);
+
+function Counter() {
+  const [value, setValue] = useStan(count);
+  const double = useStanValue(doubled);
 
   return (
-    <p>
-      The Answer to "{question}" is "{answer}"!
-    </p>
+    <>
+      <button onClick={() => setValue(v => v + 1)}>Count: {value}</button>
+      <p>Doubled: {double}</p>
+    </>
   );
-};
+}
 ```
