@@ -21,7 +21,6 @@ const selector: <T>(
 ```
 
 - `selectorFn` - The function that produces the derived value (invoked every time the selector needs to re-evaluate). It has the following signature: `<T>(arg: { get: GetFn; signal: AbortSignal }) => T`, where:
-
   - `get` - A getter function used to consume the selector's dependencies ([atom](./atom.md)s or other selectors) or other selectors). Calling `get` with a [`State`](./state.md#statet) instance adds that state to the selector's dependency set, meaning the selector will re-evaluate whenever that state changes.
 
     :::info
@@ -31,15 +30,13 @@ const selector: <T>(
   - `signal` - An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) instance associated with the current `selectorFn` call. The next time `selectorFn` is called, the `signal` from the previous call will be aborted (using an instance of `Aborted`, a Stan-specific subclass of `Error`). This is useful for canceling ongoing work, such as HTTP requests.
 
 - `options?` - Selector configuration:
-
-  - `tag?` - A string that gets appended to the `key` (see [`State<T>`](./state.md#statet)). Useful for debugging.
+  - `tag?` - A string that gets appended to the `key` (see [`State<T>`](./state.md#statet)). Useful for [debugging](../guides/debugging.md).
   - `areValuesEqual?` - A function used to determine whether two consecutive selector values are equal. It has the following signature: `<T>(a: T, b: T) => boolean`, and defaults to a simple `a === b` check. If this function returns `true` (or any other truthy value) upon computing the selector's value, the value is considered unchanged, and no subscribers will be notified.
 
     :::info
     `areValuesEqual` is expected to be synchronous.
 
     This means, in particular, that a `Promise` returned from an asynchronous selector will (by default) always be considered a different value unless:
-
     - it is the exact same `Promise` (reference equality), or
     - it can be determined synchronously (e.g., `(a, b) => a.prop === b.prop`) that the values are effectively the same.
       :::

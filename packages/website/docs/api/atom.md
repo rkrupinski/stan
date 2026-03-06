@@ -16,8 +16,7 @@ const atom: <T>(
 
 - `initialValue` - The value used to initialize the atom.
 - `options?` - Atom configuration:
-
-  - `tag?` - A string that gets appended to the `key` (see [`State<T>`](./state.md#statet)). Useful for debugging.
+  - `tag?` - A string that gets appended to the `key` (see [`State<T>`](./state.md#statet)). Useful for [debugging](../guides/debugging.md).
   - `effects?` - An array of [`AtomEffect<T>`](#atom-effects).
   - `areValuesEqual?` - A function used to determine whether two consecutive atom values are equal. It has the following signature: `<T>(a: T, b: T) => boolean`, and defaults to a simple `a === b` check. If this function returns `true` (or any other truthy value) when setting the atom's value, the value is considered unchanged, and no subscribers will be notified.
 
