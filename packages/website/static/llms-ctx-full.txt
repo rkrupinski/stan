@@ -191,10 +191,19 @@ const resetCount = useStanReset(countAtom);
 ```
 
 ### `useStanCallback`
-Create a callback with access to `set`, `reset`, and `refresh` without subscribing the component to state changes.
+Create a callback with access to `get`, `set`, `reset`, and `refresh` without subscribing the component to state changes.
 
 ```typescript
-const cb = useStanCallback(({ set, reset, refresh }) => (arg) => {
+type StanCallbackHelpers = {
+  get: <T>(scopedState: Scoped<State<T>>) => T;
+  set: <T>(scopedState: Scoped<WritableState<T>>, valueOrUpdater: T | ((currentValue: T) => T)) => void;
+  reset: <T>(scopedState: Scoped<WritableState<T>>) => void;
+  refresh: <T>(scopedState: Scoped<ReadonlyState<T>>) => void;
+};
+```
+
+```typescript
+const cb = useStanCallback(({ get, set, reset, refresh }) => (arg) => {
   // Perform actions
 });
 ```
@@ -229,7 +238,7 @@ Use effects for persistence, logging, or synchronization. Effects run in order.
 ```typescript
 type AtomEffect<T> = (params: {
   init(value: T): void;       // Set initial value (synchronous only)
-  set(value: T): void;        // Update value
+  set: (valueOrUpdater: T | ((currentValue: T) => T)) => void; // Update value (supports updater fn)
   onSet(cb: (val: T) => void): void; // Subscribe to changes
 }) => void;
 ```
@@ -270,6 +279,31 @@ const safeSelector = selector(async ({ get }) => {
     return 'fallback';
   }
 });
+```
+
+## Debugging
+
+Stan comes with a dedicated [Chrome DevTools extension](https://chromewebstore.google.com/detail/stan-devtools/jioipgcofbmgbdfmdjjcmockkjkhagac) that lets you:
+- Dynamically switch between all active stores
+- Inspect and track the history of state changes
+- Search and filter state entries
+
+### State tagging
+
+Tag your state for meaningful labels in DevTools (atoms and selectors both accept `tag`):
+
+```typescript
+atom('all', { tag: 'View' });
+selector(fn, { tag: 'Filtered todos' });
+```
+
+For families, use a function tag (maps param → label):
+
+```typescript
+const searchResults = selectorFamily<Promise<SearchResult[]>, string>(
+  phrase => () => getResults(phrase),
+  { tag: phrase => `Search results for: ${phrase}` },
+);
 ```
 
 ## Vanilla JS Usage

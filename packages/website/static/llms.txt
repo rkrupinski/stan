@@ -12,6 +12,8 @@ Stan is a minimal, type-safe state management library. It is framework-agnostic 
 - [Introduction](https://stan.party/)
 - [Installation](https://stan.party/docs/getting-started/installation)
 - [Examples](https://stan.party/docs/getting-started/examples)
+- [Frameworks](https://stan.party/docs/getting-started/frameworks)
+- [DevTools](https://stan.party/docs/getting-started/devtools)
 
 ## API Reference
 
@@ -31,3 +33,4 @@ Stan is a minimal, type-safe state management library. It is framework-agnostic 
 - [Caching](https://stan.party/docs/guides/caching)
 - [Param Serialization](https://stan.party/docs/guides/param-serialization)
 - [Error Handling](https://stan.party/docs/guides/error-handling)
+- [Debugging](https://stan.party/docs/guides/debugging)
