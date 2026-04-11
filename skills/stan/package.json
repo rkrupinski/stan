@@ -1,0 +1,24 @@
+{
+  "name": "skill",
+  "description": "Agent Skill for @rkrupinski/stan",
+  "version": "1.7.2",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write \"**/*.md\"",
+    "validate": "skills-ref validate ."
+  },
+  "devDependencies": {
+    "@rkrupinski/prettierconfig": "1.0.1",
+    "prettier": "^3.8.1",
+    "skills-ref": "0.1.5"
+  },
+  "author": "Rafał Krupiński <rkrupinski.npm@gmail.com> (https://github.com/rkrupinski)",
+  "homepage": "https://stan.party",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rkrupinski/stan.git",
+    "directory": "skills/stan"
+  },
+  "license": "MIT",
+  "prettier": "@rkrupinski/prettierconfig"
+}
