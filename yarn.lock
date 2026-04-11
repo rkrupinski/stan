@@ -6333,6 +6333,11 @@ commander@^10.0.0:
   resolved "https://registry.npmjs.org/commander/-/commander-10.0.1.tgz"
   integrity sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==
 
+commander@^12.1.0:
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-12.1.0.tgz#01423b36f501259fdaac4d0e4d60c96c991585d3"
+  integrity sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==
+
 commander@^2.20.0:
   version "2.20.3"
   resolved "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz"
@@ -14035,6 +14040,14 @@ sitemap@^7.1.1:
     "@types/sax" "^1.2.1"
     arg "^5.0.0"
     sax "^1.2.4"
+
+skills-ref@0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/skills-ref/-/skills-ref-0.1.5.tgz#08bd74d5bc30038eaba26acbe4b58da8b051aa5e"
+  integrity sha512-C2vyZbUQqt3PXA9vcdUmJ0lwbH9jK19C9fwQjl/ICPy2e5bzV3CaropViakJCv+HLt/9zsgjZ/NLJ5xEri0jSA==
+  dependencies:
+    commander "^12.1.0"
+    js-yaml "^4.1.0"
 
 skin-tone@^2.0.0:
   version "2.0.0"

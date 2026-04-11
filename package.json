@@ -4,13 +4,15 @@
     "packages/stan",
     "packages/website",
     "packages/devtools",
-    "packages/examples/*"
+    "packages/examples/*",
+    "skills/*"
   ],
   "scripts": {
     "typecheck": "wsrun -p @rkrupinski/stan -p devtools -c typecheck",
     "lint": "wsrun -p @rkrupinski/stan -p devtools -c lint",
     "test": "wsrun -p @rkrupinski/stan -p devtools -c test",
     "build": "wsrun -p @rkrupinski/stan -p devtools -tc build",
+    "validate": "wsrun -p skill -c validate",
     "format": "wsrun -mc format"
   },
   "devDependencies": {
