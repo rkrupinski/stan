@@ -1,6 +1,6 @@
 ---
 name: stan
-description: Guidance for working with @rkrupinski/stan, a minimal, type-safe, framework-agnostic state management library for JavaScript. Ships with first-class React bindings today, with more framework integrations planned. Use when the user is using, learning, or integrating Stan atoms, selectors, the vanilla store, or any framework bindings.
+description: Guidance for working with @rkrupinski/stan, a minimal, type-safe, framework-agnostic state management library for JavaScript. Ships with first-class React and Vue bindings today, with more framework integrations planned. Use when the user is using, learning, or integrating Stan atoms, selectors, the vanilla store, or any framework bindings.
 license: MIT
 metadata:
   homepage: https://stan.party
@@ -9,19 +9,21 @@ metadata:
 
 # Working with `@rkrupinski/stan`
 
-Stan is a minimal, type-safe, framework-agnostic state management library. The core has no framework dependency; React bindings ship alongside today, with more integrations planned.
+Stan is a minimal, type-safe, framework-agnostic state management library. The core has no framework dependency; React and Vue bindings ship alongside today, with more integrations planned.
 
 ## Mental model
 
-- **Two entry points — use the right one:**
+- **Three entry points — use the right one:**
   - `@rkrupinski/stan` — core primitives (atoms, selectors, store, utils). Framework-agnostic.
-  - `@rkrupinski/stan/react` — React hooks and `StanProvider`. Peer dep: React ≥19. **Never import hooks from the core entry point.**
+  - `@rkrupinski/stan/react` — React hooks and `StanProvider`. Peer dep: React ≥19.
+  - `@rkrupinski/stan/vue` — Vue composables, `StanProvider` component, and `provideStan`. Peer dep: Vue ≥3.4.
+  - **Never import framework bindings from the core entry point**, and don't mix React and Vue bindings in the same app.
 - Atoms and selectors are **scoped factory functions**, not values:
   ```ts
   type Scoped<T> = (store: Store) => T;
   ```
   `myAtom(store)` returns the per-store `State` handle (memoized — same call, same instance).
-- A `Store` holds values; primitives only define shape. When there's no `StanProvider`, React hooks fall back to `DEFAULT_STORE`.
+- A `Store` holds values; primitives only define shape. When there's no `StanProvider`, framework bindings fall back to `DEFAULT_STORE`.
 - `atom` → `WritableState<T>` (has `.set`). `selector` → `ReadonlyState<T>` (read-only, supports `refresh`).
 
 ## Core API
@@ -155,6 +157,128 @@ The second argument is a React deps list (default `[]`). The returned callback r
 
 If no `store` prop is passed, the provider creates a fresh store. Use it for SSR (per-request isolation) and multi-store apps. Without any provider, hooks use `DEFAULT_STORE`.
 
+## Vue bindings
+
+```ts
+import {
+  StanProvider,
+  provideStan,
+  useStan,
+  useStanValue,
+  useStanValueAsync,
+  useStanRefresh,
+  useStanReset,
+  useStanCallback,
+} from '@rkrupinski/stan/vue';
+```
+
+All examples use `<script setup lang="ts">` SFCs. Peer dep: Vue ≥3.4.
+
+### Reading / writing
+
+`useStan` returns a `WritableComputedRef<T>` — reading `.value` subscribes, assigning to `.value` writes. Works with `v-model`. `useStanValue` returns a `Readonly<Ref<T>>` for read-only state.
+
+```vue
+<script setup lang="ts">
+import { atom, selector } from '@rkrupinski/stan';
+import { useStan, useStanValue } from '@rkrupinski/stan/vue';
+
+const countAtom = atom(0);
+const doubleAtom = selector(({ get }) => get(countAtom) * 2);
+
+const count = useStan(countAtom); // read + write
+const double = useStanValue(doubleAtom); // read only
+</script>
+
+<template>
+  <input v-model.number="count" type="number" />
+  <pre>{{ double }}</pre>
+</template>
+```
+
+There is **no `useSetStanValue` equivalent** in the Vue API — use `useStan` and ignore the read side, or reach for `useStanCallback`'s `set` helper when you explicitly don't want a subscription.
+
+### Async selectors
+
+```vue
+<script setup lang="ts">
+import { useStanValueAsync } from '@rkrupinski/stan/vue';
+
+const result = useStanValueAsync(userQuery);
+</script>
+
+<template>
+  <Spinner v-if="result.type === 'loading'" />
+  <Error v-else-if="result.type === 'error'" :reason="result.reason" />
+  <div v-else>{{ result.value.name }}</div>
+</template>
+```
+
+`AsyncValue<T, E>` is identical to the React version: `{ type: 'loading' } | { type: 'ready'; value: T } | { type: 'error'; reason: E }`.
+
+### Imperative refresh / reset
+
+```ts
+const refreshUser = useStanRefresh(userQuery);
+const resetCount = useStanReset(countAtom);
+```
+
+### `useStanCallback`
+
+Same `{ get, set, reset, refresh }` helpers as the React version. **Takes no deps list** — Vue's `setup()` runs once, so the returned callback already closes over the latest values.
+
+```vue
+<script setup lang="ts">
+import { useStanCallback } from '@rkrupinski/stan/vue';
+
+const reloadUser = useStanCallback(({ refresh }) => (id: string) => {
+  refresh(userQuery(id));
+});
+</script>
+```
+
+Unlike the other composables, `useStanCallback` reads the store at invocation time — so it picks up a new store even if the component's already set up.
+
+### `StanProvider` / `provideStan`
+
+Two equivalent ways to supply a store. The component form:
+
+```vue
+<script setup lang="ts">
+import { makeStore } from '@rkrupinski/stan';
+import { StanProvider } from '@rkrupinski/stan/vue';
+
+const myStore = makeStore();
+</script>
+
+<template>
+  <StanProvider :store="myStore">
+    <App />
+  </StanProvider>
+</template>
+```
+
+Or call `provideStan` inside `setup()` when wrapping the template is awkward:
+
+```vue
+<script setup lang="ts">
+import { makeStore } from '@rkrupinski/stan';
+import { provideStan } from '@rkrupinski/stan/vue';
+
+provideStan(makeStore());
+</script>
+```
+
+To **switch stores dynamically**, put `:key` on `StanProvider` to force a remount. Composables bind to the store at setup time, so swapping only the `:store` prop won't re-subscribe them (`useStanCallback` is the exception noted above).
+
+```vue
+<StanProvider :store="stores[active]" :key="active">
+  <App />
+</StanProvider>
+```
+
+Without any provider, composables use `DEFAULT_STORE` — same fallback as React.
+
 ## Vanilla usage
 
 The core API works standalone — everything the hooks do is available directly:
@@ -275,7 +399,9 @@ function UserName() {
 
 ## Gotchas
 
-- **Import hooks from `@rkrupinski/stan/react`**, never from `@rkrupinski/stan`.
+- **Import framework bindings from their dedicated entry point** (`@rkrupinski/stan/react` or `@rkrupinski/stan/vue`), never from `@rkrupinski/stan`.
+- **Vue has no `useSetStanValue`.** Use `useStan` (and ignore the read side) or `useStanCallback`'s `set` when you want to write without subscribing.
+- **Changing `<StanProvider>`'s `:store` prop (Vue) does not re-subscribe already-set-up composables** — they bind to the store at setup time. Add `:key` to the provider to force a remount. `useStanCallback` is the exception; it reads the store at invocation time.
 - **Selectors are lazy when unmounted.** No subscribers → no re-evaluation until next `.get()`. Don't expect a selector to update in the background if nothing is reading it.
 - **Async selectors auto-abort on dep change.** Always pass `signal` through to `fetch` (or other cancellable APIs) — otherwise in-flight work leaks and results can race.
 - **Family params must be JSON-serializable.** Keys are normalized via `fast-json-stable-stringify` (property order doesn't matter), but functions, symbols, class instances, and `Date`s will either break or stringify unstably.
