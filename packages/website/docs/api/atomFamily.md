@@ -5,6 +5,9 @@ description: atomFamily API reference
 
 # `atomFamily`
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 When you need to map a values to atoms, `atomFamily` comes in handy. It returns a memoized function that outputs [`atoms`](./atom.md) based on a given parameter (which must be [serializable](../guides/param-serialization.md)).
 
 ```ts
@@ -43,7 +46,10 @@ type User = {
 const scores = atomFamily<number, User>(user => user.score);
 ```
 
-Increase the score using React:
+Increase the score:
+
+<Tabs groupId="framework">
+<TabItem value="react" label="React" default>
 
 ```tsx
 const Scoreboard: FC<{ user: User }> = ({ user }) => {
@@ -58,7 +64,27 @@ const Scoreboard: FC<{ user: User }> = ({ user }) => {
 };
 ```
 
+</TabItem>
+<TabItem value="vue" label="Vue">
+
+```vue
+<script setup lang="ts">
+const props = defineProps<{ user: User }>();
+
+const score = useStan(scores(props.user));
+</script>
+
+<template>
+  <h1>{{ score }}</h1>
+  <button @click="score++">+</button>
+</template>
+```
+
+</TabItem>
+</Tabs>
+
 ## See also
 
 - [`atom`](./atom.md)
 - [Using Stan with React](./react.md)
+- [Using Stan with Vue](./vue.md)

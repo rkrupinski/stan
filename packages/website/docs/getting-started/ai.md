@@ -16,5 +16,5 @@ npx skills add rkrupinski/stan
 Once installed, your agent will have up-to-date guidance on:
 
 - Atoms, selectors, and the vanilla store API
-- React bindings and async patterns
+- React and Vue bindings, and async patterns
 - Common gotchas and best practices

@@ -5,6 +5,9 @@ description: selectorFamily API reference
 
 # `selectorFamily`
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Similarly to [`atomFamily`](./atomFamily.md), the use case for `selectorFamily` is mapping values to Stan primitives. It returns a memoized function that produces [`selectors`](./selector.md) based on a given parameter (which must be [serializable](../guides/param-serialization.md)).
 
 Among other things, it can be especially useful for:
@@ -81,7 +84,10 @@ const userNameById = selectorFamily<Promise<string>, string>(
 );
 ```
 
-Render with React:
+Render:
+
+<Tabs groupId="framework">
+<TabItem value="react" label="React" default>
 
 ```tsx
 const MyComponent: FC<{ userId: string }> = ({ userId }) => {
@@ -100,8 +106,29 @@ const MyComponent: FC<{ userId: string }> = ({ userId }) => {
 };
 ```
 
+</TabItem>
+<TabItem value="vue" label="Vue">
+
+```vue
+<script setup lang="ts">
+const props = defineProps<{ userId: string }>();
+
+const result = useStanValueAsync(userNameById(props.userId));
+</script>
+
+<template>
+  <p v-if="result.type === 'loading'">Loading&hellip;</p>
+  <p v-else-if="result.type === 'error'">Nope</p>
+  <p v-else>Name: {{ result.value }}</p>
+</template>
+```
+
+</TabItem>
+</Tabs>
+
 ## See also
 
 - [`selector`](./selector.md)
 - [Using Stan with React](./react.md)
+- [Using Stan with Vue](./vue.md)
 - [Caching](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-caching) (example)
