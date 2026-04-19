@@ -88,4 +88,4 @@ function MyComponent() {
 
 - [`atomFamily`](./atomFamily.md)
 - [Using Stan with React](./react.md)
-- [Atom effects](https://github.com/rkrupinski/stan/tree/master/packages/examples/atom-effects) (example)
+- [Atom effects](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-atom-effects) (example)

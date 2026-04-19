@@ -96,6 +96,6 @@ const MyComponent: FC = () => {
 
 - [`selectorFamily`](./selectorFamily.md)
 - [Using Stan with React](./react.md)
-- [Aborting work](https://github.com/rkrupinski/stan/tree/master/packages/examples/aborting-work) (example)
-- [Asynchronous state](https://github.com/rkrupinski/stan/tree/master/packages/examples/asynchronous-state) (example)
-- [Dynamic dependencies](https://github.com/rkrupinski/stan/tree/master/packages/examples/dynamic-dependencies) (example)
+- [Aborting work](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-aborting-work) (example)
+- [Asynchronous state](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-asynchronous-state) (example)
+- [Dynamic dependencies](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-dynamic-dependencies) (example)

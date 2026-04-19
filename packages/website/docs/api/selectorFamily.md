@@ -104,4 +104,4 @@ const MyComponent: FC<{ userId: string }> = ({ userId }) => {
 
 - [`selector`](./selector.md)
 - [Using Stan with React](./react.md)
-- [Caching](https://github.com/rkrupinski/stan/tree/master/packages/examples/caching) (example)
+- [Caching](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-caching) (example)

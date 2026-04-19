@@ -332,4 +332,4 @@ const useStanStore: () => StanStoreInjection;
 
 - [State](./state.md)
 - [Store](./store.md)
-- [Examples](../getting-started/examples.md)
+- [Examples](../getting-started/examples.mdx)

@@ -57,5 +57,5 @@ myStore.destroy(); // Free memory
 
 - [State](./state.md)
 - [Using Stan with React](./react.md)
-- [Vanilla](https://github.com/rkrupinski/stan/tree/master/packages/examples/vanilla) (example)
-- [Switching stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/switching-stores) (example)
+- [Vanilla](https://github.com/rkrupinski/stan/tree/master/packages/examples/vanilla-state) (example)
+- [Switching stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-switching-stores) (example)

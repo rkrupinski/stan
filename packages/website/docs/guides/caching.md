@@ -19,7 +19,7 @@ Wherever the term "caching" appears in the context of Stan, it refers to Stan's 
 
 ## `Store`
 
-Every state change in Stan occurs within the context of a store (see [`Scoped<T>`](../api/store.md#scopedt)). You can think of it as each piece of state being cached using the `Store` instance as the cache key. A state change scoped to a specific store exists only within that store - which can, in fact, be leveraged to your advantage (see [switching stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/switching-stores)).
+Every state change in Stan occurs within the context of a store (see [`Scoped<T>`](../api/store.md#scopedt)). You can think of it as each piece of state being cached using the `Store` instance as the cache key. A state change scoped to a specific store exists only within that store - which can, in fact, be leveraged to your advantage (see [switching stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-switching-stores)).
 
 ## `atom`
 
