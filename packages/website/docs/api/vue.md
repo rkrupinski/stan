@@ -254,7 +254,7 @@ Using `StanProvider` creates an isolation boundary:
 - **`StanProvider` without `store` prop** — creates a fresh, isolated store
 - **`StanProvider` with `store` prop** — uses the provided store
 
-:::tip
+:::info
 To switch stores dynamically, use the `:key` attribute on `StanProvider` to re-mount the subtree. Composables like `useStan` and `useStanValue` bind to the store at setup time, so changing the `:store` prop alone won't re-subscribe them. [`useStanCallback`](#usestancallback) is the exception — it reads the store at invocation time and will automatically pick up a new store.
 :::
 
