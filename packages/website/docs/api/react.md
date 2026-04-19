@@ -283,7 +283,14 @@ function MyComponent() {
 
 ## `StanProvider`
 
-Stan, by default, operates in provider-less mode, using [`DEFAULT_STORE`](./store.md#the-store-class). However, if you need to supply a different store (e.g., for [SSR](../guides/ssr.md)) or switch stores dynamically, `StanProvider` comes in handy. Re-mounting `StanProvider` can also serve as a way to reset all state.
+Stan, by default, operates in provider-less mode, using [`DEFAULT_STORE`](./store.md#the-store-class). However, if you need to supply a different store (e.g., for [SSR](../guides/ssr.md)) or switch stores dynamically, `StanProvider` comes in handy.
+
+Using `StanProvider` creates an isolation boundary:
+- **No provider** — hooks use `DEFAULT_STORE`
+- **`StanProvider` without `store` prop** — creates a fresh, isolated store
+- **`StanProvider` with `store` prop** — uses the provided store
+
+Re-mounting `StanProvider` (e.g., via the `key` prop) can also serve as a way to reset all state.
 
 ```ts
 const StanProvider: FC<StanProviderProps>;
