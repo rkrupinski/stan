@@ -16,7 +16,7 @@ export const swSearch = selectorFamily<Promise<SwResponse>, string>(
     async ({ signal }) => {
       const res = await fetch(
         `https://www.swapi.tech/api/people/?name=${encodeURIComponent(phrase)}`,
-        { signal }
+        { signal },
       );
 
       if (!res.ok) throw new Error(res.statusText);
@@ -25,5 +25,6 @@ export const swSearch = selectorFamily<Promise<SwResponse>, string>(
     },
   {
     cachePolicy: { type: "lru", maxSize: 3 },
-  }
+    tag: (phrase) => `${JSON.stringify(phrase)}`,
+  },
 );
