@@ -1,12 +1,19 @@
 /**
  * @jest-environment jsdom
  */
-import { defineComponent, h, nextTick, type PropType } from 'vue';
+import {
+  computed,
+  defineComponent,
+  h,
+  nextTick,
+  ref,
+  type PropType,
+} from 'vue';
 import { mount, flushPromises, enableAutoUnmount } from '@vue/test-utils';
 
 import { selector, selectorFamily } from './selector';
 import { DEFAULT_STORE, makeStore, type Store } from './store';
-import { atom } from './atom';
+import { atom, atomFamily } from './atom';
 import {
   useStan,
   useStanValue,
@@ -80,6 +87,50 @@ describe('useStan', () => {
 
     expect(vm.state).toBe(43);
   });
+
+  it('should react to input ref changes', async () => {
+    const testFamily = atomFamily<number, string>(() => 0);
+    const store = makeStore();
+    const param = ref('a');
+
+    testFamily('a')(store).set(1);
+    testFamily('b')(store).set(2);
+
+    const { vm } = render<{ state: number }>(
+      () => ({ state: useStan(computed(() => testFamily(param.value))) }),
+      store,
+    );
+
+    expect(vm.state).toBe(1);
+
+    param.value = 'b';
+    await nextTick();
+
+    expect(vm.state).toBe(2);
+  });
+
+  it('should write through to the current member when input ref changes', async () => {
+    const testFamily = atomFamily<number, string>(() => 0);
+    const store = makeStore();
+    const param = ref('a');
+
+    const { vm } = render<{ state: number }>(
+      () => ({ state: useStan(computed(() => testFamily(param.value))) }),
+      store,
+    );
+
+    vm.state = 10;
+    await nextTick();
+    expect(testFamily('a')(store).get()).toBe(10);
+
+    param.value = 'b';
+    await nextTick();
+
+    vm.state = 20;
+    await nextTick();
+    expect(testFamily('b')(store).get()).toBe(20);
+    expect(testFamily('a')(store).get()).toBe(10);
+  });
 });
 
 describe('useStanValue', () => {
@@ -136,6 +187,97 @@ describe('useStanValue', () => {
     wrapper.unmount();
 
     expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+  });
+
+  it('should react to input ref changes', async () => {
+    const testFamily = selectorFamily<number, string>(
+      id => () => id.length,
+    );
+    const store = makeStore();
+    const param = ref('a');
+
+    const { vm } = render<{ value: number }>(
+      () => ({
+        value: useStanValue(computed(() => testFamily(param.value))),
+      }),
+      store,
+    );
+
+    expect(vm.value).toBe(1);
+
+    param.value = 'aaa';
+    await nextTick();
+
+    expect(vm.value).toBe(3);
+  });
+
+  it('should unsubscribe from the previous state when input ref changes', async () => {
+    const testFamily = selectorFamily<number, string>(
+      id => () => id.length,
+    );
+    const store = makeStore();
+    const param = ref('a');
+
+    const mockUnsubscribe = jest.fn();
+    jest
+      .spyOn(testFamily('a')(store), 'subscribe')
+      .mockReturnValueOnce(mockUnsubscribe);
+
+    render(
+      () => ({ value: useStanValue(computed(() => testFamily(param.value))) }),
+      store,
+    );
+
+    param.value = 'b';
+    await nextTick();
+
+    expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+  });
+
+  it('should re-subscribe when the StanProvider store prop changes', async () => {
+    const testAtom = atom(0);
+    const testSelector = selector(({ get }) => get(testAtom));
+    const storeA = makeStore();
+    const storeB = makeStore();
+
+    testAtom(storeA).set(10);
+    testAtom(storeB).set(20);
+
+    const Probe = defineComponent({
+      name: 'TestProbe',
+      setup() {
+        return { value: useStanValue(testSelector) };
+      },
+      render: () => null,
+    });
+
+    const App = defineComponent({
+      props: {
+        store: { type: Object as PropType<Store>, required: true },
+      },
+      setup(props, { slots }) {
+        return () =>
+          h(
+            StanProvider,
+            { store: props.store },
+            { default: () => slots.default?.() },
+          );
+      },
+    });
+
+    const wrapper = mount(App, {
+      props: { store: storeA },
+      slots: { default: () => h(Probe) },
+    });
+
+    const probe = wrapper.findComponent(Probe).vm as unknown as {
+      value: number;
+    };
+    expect(probe.value).toBe(10);
+
+    await wrapper.setProps({ store: storeB });
+
+    expect(probe.value).toBe(20);
   });
 
   it('should handle LRU cache eviction during simultaneous hook mounting', async () => {
@@ -259,6 +401,32 @@ describe('useStanValueAsync', () => {
 
     expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
   });
+
+  it('should react to input ref changes', async () => {
+    const testFamily = selectorFamily<Promise<number>, string>(
+      id => () => Promise.resolve(id.length),
+    );
+    const store = makeStore();
+    const param = ref('a');
+
+    const { vm } = render<{ async: AsyncValue<number> }>(
+      () => ({
+        async: useStanValueAsync(computed(() => testFamily(param.value))),
+      }),
+      store,
+    );
+
+    expect(vm.async).toEqual({ type: 'loading' });
+
+    await flushPromises();
+    expect(vm.async).toEqual({ type: 'ready', value: 1 });
+
+    param.value = 'aaa';
+    expect(vm.async).toEqual({ type: 'loading' });
+
+    await flushPromises();
+    expect(vm.async).toEqual({ type: 'ready', value: 3 });
+  });
 });
 
 describe('useStanRefresh', () => {
@@ -300,6 +468,40 @@ describe('useStanRefresh', () => {
     expect(mockSelectorFn).toHaveBeenCalledTimes(3);
     expect(testSelector(store).get()).toBe(44);
   });
+
+  it('should target the current state when input ref changes', () => {
+    const mockA = jest.fn().mockReturnValue(1);
+    const mockB = jest.fn().mockReturnValue(2);
+    const testFamily = selectorFamily<number, string>(
+      id => () => (id === 'a' ? mockA() : mockB()) as number,
+    );
+    const store = makeStore();
+    const param = ref('a');
+
+    // Prime the caches and mount both members so refresh re-evaluates eagerly.
+    testFamily('a')(store).get();
+    testFamily('b')(store).get();
+    testFamily('a')(store).subscribe(() => {});
+    testFamily('b')(store).subscribe(() => {});
+    expect(mockA).toHaveBeenCalledTimes(1);
+    expect(mockB).toHaveBeenCalledTimes(1);
+
+    const { vm } = render<{ refresh: () => void }>(
+      () => ({
+        refresh: useStanRefresh(computed(() => testFamily(param.value))),
+      }),
+      store,
+    );
+
+    vm.refresh();
+    expect(mockA).toHaveBeenCalledTimes(2);
+    expect(mockB).toHaveBeenCalledTimes(1);
+
+    param.value = 'b';
+    vm.refresh();
+    expect(mockA).toHaveBeenCalledTimes(2);
+    expect(mockB).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('useStanReset', () => {
@@ -319,6 +521,30 @@ describe('useStanReset', () => {
     vm.reset();
 
     expect(testAtom(store).get()).toBe(42);
+  });
+
+  it('should target the current state when input ref changes', () => {
+    const testFamily = atomFamily<number, string>(() => 0);
+    const store = makeStore();
+    const param = ref('a');
+
+    testFamily('a')(store).set(10);
+    testFamily('b')(store).set(20);
+
+    const { vm } = render<{ reset: () => void }>(
+      () => ({
+        reset: useStanReset(computed(() => testFamily(param.value))),
+      }),
+      store,
+    );
+
+    vm.reset();
+    expect(testFamily('a')(store).get()).toBe(0);
+    expect(testFamily('b')(store).get()).toBe(20);
+
+    param.value = 'b';
+    vm.reset();
+    expect(testFamily('b')(store).get()).toBe(0);
   });
 });
 

@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useStanValueAsync, useStanRefresh } from "@rkrupinski/stan/vue";
 
 import { swSearch } from "./state";
 
 const props = defineProps<{ phrase: string }>();
 
-const data = useStanValueAsync(swSearch(props.phrase));
-const refresh = useStanRefresh(swSearch(props.phrase));
+const query = computed(() => swSearch(props.phrase));
+
+const data = useStanValueAsync(query);
+const refresh = useStanRefresh(query);
 </script>
 
 <template>

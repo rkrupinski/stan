@@ -22,7 +22,7 @@ npm install @rkrupinski/stan
 
 ## Quick start
 
-Stan is framework-agnostic. This example uses React — see [Frameworks](https://stan.party/docs/getting-started/frameworks) for the rest.
+Stan is framework-agnostic. This example uses React - see [Frameworks](https://stan.party/docs/getting-started/frameworks) for the rest.
 
 ```jsx
 import { atom, selector } from "@rkrupinski/stan";
@@ -37,7 +37,7 @@ function Counter() {
 
   return (
     <>
-      <button onClick={() => setValue(v => v + 1)}>Count: {value}</button>
+      <button onClick={() => setValue((v) => v + 1)}>Count: {value}</button>
       <p>Doubled: {double}</p>
     </>
   );

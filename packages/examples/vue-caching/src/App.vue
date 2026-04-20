@@ -14,11 +14,7 @@ const debouncedPhrase = refDebounced(phrase, 300);
     <label for="search">Search Star Wars characters:</label>
     <div class="inputWrapper">
       <input id="search" v-model="value" />
-      <Results
-        v-if="debouncedPhrase.length"
-        :key="debouncedPhrase"
-        :phrase="debouncedPhrase"
-      />
+      <Results v-if="debouncedPhrase.length" :phrase="debouncedPhrase" />
     </div>
   </div>
 </template>

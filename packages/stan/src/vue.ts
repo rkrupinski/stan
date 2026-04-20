@@ -2,7 +2,7 @@ import {
   computed,
   defineComponent,
   inject,
-  onScopeDispose,
+  isRef,
   provide,
   readonly,
   shallowRef,
@@ -54,39 +54,56 @@ export const StanProvider = defineComponent({
   },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const resolveScoped = <T extends State<any>>(
+  input: Scoped<T> | Ref<Scoped<T>>,
+) => (isRef(input) ? input.value : input);
+
 export const useStanValue = <T>(
-  scopedState: Scoped<ReadonlyState<T>>,
+  scopedState: Scoped<ReadonlyState<T>> | Ref<Scoped<ReadonlyState<T>>>,
 ): Readonly<Ref<T>> => {
   const { store } = useStanStore();
-  const state = scopedState(store.value);
-  const value = shallowRef(state.get()) as Ref<T>;
+  const stateRef = computed(() => resolveScoped(scopedState)(store.value));
+  const value = shallowRef(stateRef.value.get()) as Ref<T>;
 
-  const unsubscribe = state.subscribe(newValue => {
-    value.value = newValue;
-  });
-
-  onScopeDispose(unsubscribe);
+  watch(
+    stateRef,
+    (state, _prev, onCleanup) => {
+      value.value = state.get();
+      const unsubscribe = state.subscribe(newValue => {
+        value.value = newValue;
+      });
+      onCleanup(unsubscribe);
+    },
+    { immediate: true, flush: 'sync' },
+  );
 
   return readonly(value) as Readonly<Ref<T>>;
 };
 
 export const useStan = <T>(
-  scopedState: Scoped<WritableState<T>>,
+  scopedState: Scoped<WritableState<T>> | Ref<Scoped<WritableState<T>>>,
 ): WritableComputedRef<T> => {
   const { store } = useStanStore();
-  const state = scopedState(store.value);
-  const value = shallowRef(state.get()) as Ref<T>;
+  const stateRef = computed(() => resolveScoped(scopedState)(store.value));
+  const value = shallowRef(stateRef.value.get()) as Ref<T>;
 
-  const unsubscribe = state.subscribe(newValue => {
-    value.value = newValue;
-  });
-
-  onScopeDispose(unsubscribe);
+  watch(
+    stateRef,
+    (state, _prev, onCleanup) => {
+      value.value = state.get();
+      const unsubscribe = state.subscribe(newValue => {
+        value.value = newValue;
+      });
+      onCleanup(unsubscribe);
+    },
+    { immediate: true, flush: 'sync' },
+  );
 
   return computed({
     get: () => value.value,
     set: (newValue: T) => {
-      state.set(newValue);
+      stateRef.value.set(newValue);
     },
   });
 };
@@ -97,7 +114,9 @@ export type AsyncValue<T, E = unknown> =
   | { type: 'error'; reason: E };
 
 export const useStanValueAsync = <T, E = unknown>(
-  scopedState: Scoped<ReadonlyState<PromiseLike<T>>>,
+  scopedState:
+    | Scoped<ReadonlyState<PromiseLike<T>>>
+    | Ref<Scoped<ReadonlyState<PromiseLike<T>>>>,
 ): Readonly<Ref<AsyncValue<T, E>>> => {
   const promiseRef = useStanValue(scopedState);
 
@@ -129,21 +148,23 @@ export const useStanValueAsync = <T, E = unknown>(
   return readonly(asyncValue) as Readonly<Ref<AsyncValue<T, E>>>;
 };
 
-export const useStanRefresh = <T>(scopedState: Scoped<ReadonlyState<T>>) => {
+export const useStanRefresh = <T>(
+  scopedState: Scoped<ReadonlyState<T>> | Ref<Scoped<ReadonlyState<T>>>,
+) => {
   const { store } = useStanStore();
-  const state = scopedState(store.value);
 
   return () => {
-    refresh(state);
+    refresh(resolveScoped(scopedState)(store.value));
   };
 };
 
-export const useStanReset = <T>(scopedState: Scoped<WritableState<T>>) => {
+export const useStanReset = <T>(
+  scopedState: Scoped<WritableState<T>> | Ref<Scoped<WritableState<T>>>,
+) => {
   const { store } = useStanStore();
-  const state = scopedState(store.value);
 
   return () => {
-    reset(state);
+    reset(resolveScoped(scopedState)(store.value));
   };
 };
 

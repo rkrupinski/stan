@@ -7,6 +7,26 @@ description: Vue API reference
 
 [Vue](https://vuejs.org) bindings for Stan (`@rkrupinski/stan/vue`).
 
+## Reactive inputs
+
+All value-returning composables ([`useStan`](#usestan), [`useStanValue`](#usestanvalue), [`useStanValueAsync`](#usestanvalueasync), [`useStanRefresh`](#usestanrefresh), [`useStanReset`](#usestanreset)) accept either a plain [`Scoped<State<T>>`](./state.md) or a `Ref<Scoped<State<T>>>`. Wrap family calls in `computed` to feed a reactive parameter - the composable will re-subscribe automatically whenever the underlying scoped state changes.
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+import { selectorFamily } from '@rkrupinski/stan';
+import { useStanValueAsync } from '@rkrupinski/stan/vue';
+
+const user = selectorFamily<Promise<User>, string>(
+  userId => () => loadUser(userId),
+);
+
+const props = defineProps<{ userId: string }>();
+
+const data = useStanValueAsync(computed(() => user(props.userId)));
+</script>
+```
+
 ## `useStan`
 
 Returns a [`WritableComputedRef`](https://vuejs.org/api/reactivity-core.html#computed) for [`WritableState<T>`](./state.md#writablestatet). Reading `.value` subscribes to state changes; assigning to `.value` writes through to the store. Works with `v-model`.
@@ -15,7 +35,7 @@ Works with: [`atom`](./atom.md), [`atomFamily`](./atomFamily.md)
 
 ```ts
 const useStan: <T>(
-  scopedState: Scoped<WritableState<T>>,
+  scopedState: Scoped<WritableState<T>> | Ref<Scoped<WritableState<T>>>,
 ) => WritableComputedRef<T>;
 ```
 
@@ -49,7 +69,7 @@ Works with: [`selector`](./selector.md), [`selectorFamily`](./selectorFamily.md)
 
 ```ts
 const useStanValue: <T>(
-  scopedState: Scoped<ReadonlyState<T>>,
+  scopedState: Scoped<ReadonlyState<T>> | Ref<Scoped<ReadonlyState<T>>>,
 ) => Readonly<Ref<T>>;
 ```
 
@@ -91,7 +111,9 @@ Works with: [`selector`](./selector.md), [`selectorFamily`](./selectorFamily.md)
 
 ```ts
 const useStanValueAsync: <T, E = unknown>(
-  scopedState: Scoped<ReadonlyState<PromiseLike<T>>>,
+  scopedState:
+    | Scoped<ReadonlyState<PromiseLike<T>>>
+    | Ref<Scoped<ReadonlyState<PromiseLike<T>>>>,
 ) => Readonly<Ref<AsyncValue<T, E>>>;
 ```
 
@@ -129,13 +151,16 @@ Wraps [`refresh`](./utils.md#refresh) and returns a function that refreshes [`Re
 Works with: [`selector`](./selector.md), [`selectorFamily`](./selectorFamily.md)
 
 ```ts
-const useStanRefresh: <T>(scopedState: Scoped<ReadonlyState<T>>) => () => void;
+const useStanRefresh: <T>(
+  scopedState: Scoped<ReadonlyState<T>> | Ref<Scoped<ReadonlyState<T>>>,
+) => () => void;
 ```
 
 Example:
 
 ```vue
 <script setup lang="ts">
+import { computed } from 'vue';
 import { selectorFamily } from '@rkrupinski/stan';
 import { useStanRefresh } from '@rkrupinski/stan/vue';
 
@@ -143,7 +168,7 @@ const props = defineProps<{ userId: string }>();
 
 const users = selectorFamily<Promise<User>, string>(id => () => getUser(id));
 
-const refresh = useStanRefresh(users(props.userId));
+const refresh = useStanRefresh(computed(() => users(props.userId)));
 </script>
 
 <template>
@@ -159,7 +184,9 @@ Wraps [`reset`](./utils.md#reset) and returns a function that resets [`WritableS
 Works with: [`atom`](./atom.md), [`atomFamily`](./atomFamily.md)
 
 ```ts
-const useStanReset: <T>(scopedState: Scoped<WritableState<T>>) => () => void;
+const useStanReset: <T>(
+  scopedState: Scoped<WritableState<T>> | Ref<Scoped<WritableState<T>>>,
+) => () => void;
 ```
 
 Example:
@@ -250,12 +277,12 @@ Stan, by default, operates in provider-less mode, using [`DEFAULT_STORE`](./stor
 
 Using `StanProvider` creates an isolation boundary:
 
-- **No provider** — composables use `DEFAULT_STORE`
-- **`StanProvider` without `store` prop** — creates a fresh, isolated store
-- **`StanProvider` with `store` prop** — uses the provided store
+- **No provider** - composables use `DEFAULT_STORE`
+- **`StanProvider` without `store` prop** - creates a fresh, isolated store
+- **`StanProvider` with `store` prop** - uses the provided store
 
 :::info
-To switch stores dynamically, use the `:key` attribute on `StanProvider` to re-mount the subtree. Composables like `useStan` and `useStanValue` bind to the store at setup time, so changing the `:store` prop alone won't re-subscribe them. [`useStanCallback`](#usestancallback) is the exception — it reads the store at invocation time and will automatically pick up a new store.
+Composables track the current store through Vue's reactivity - changing `StanProvider`'s `:store` prop re-subscribes them automatically. Use `:key` on `StanProvider` only when you actually want to tear down and recreate the subtree (e.g., to discard local component state alongside the store switch).
 :::
 
 ```ts

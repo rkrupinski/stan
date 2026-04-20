@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
 ## Vue / Nuxt
 
-The same applies to Vue: to scope and isolate state per request during server-side rendering, wrap the root of your app in `StanProvider` — or call `provideStan` in its `setup()`:
+The same applies to Vue: to scope and isolate state per request during server-side rendering, wrap the root of your app in `StanProvider` - or call `provideStan` in its `setup()`:
 
 ```vue
 <script setup lang="ts">

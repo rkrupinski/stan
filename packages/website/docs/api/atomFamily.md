@@ -69,9 +69,11 @@ const Scoreboard: FC<{ user: User }> = ({ user }) => {
 
 ```vue
 <script setup lang="ts">
+import { computed } from 'vue';
+
 const props = defineProps<{ user: User }>();
 
-const score = useStan(scores(props.user));
+const score = useStan(computed(() => scores(props.user)));
 </script>
 
 <template>

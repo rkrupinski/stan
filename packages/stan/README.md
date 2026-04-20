@@ -22,11 +22,11 @@ npm install @rkrupinski/stan
 
 ## Quick start
 
-Stan is framework-agnostic. This example uses React — see [Frameworks](https://stan.party/docs/getting-started/frameworks) for the rest.
+Stan is framework-agnostic. This example uses React - see [Frameworks](https://stan.party/docs/getting-started/frameworks) for the rest.
 
 ```jsx
-import { atom, selector } from "@rkrupinski/stan";
-import { useStan, useStanValue } from "@rkrupinski/stan/react";
+import { atom, selector } from '@rkrupinski/stan';
+import { useStan, useStanValue } from '@rkrupinski/stan/react';
 
 const count = atom(0);
 const doubled = selector(({ get }) => get(count) * 2);

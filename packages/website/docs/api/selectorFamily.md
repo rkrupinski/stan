@@ -111,9 +111,11 @@ const MyComponent: FC<{ userId: string }> = ({ userId }) => {
 
 ```vue
 <script setup lang="ts">
+import { computed } from 'vue';
+
 const props = defineProps<{ userId: string }>();
 
-const result = useStanValueAsync(userNameById(props.userId));
+const result = useStanValueAsync(computed(() => userNameById(props.userId)));
 </script>
 
 <template>

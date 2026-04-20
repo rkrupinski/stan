@@ -231,7 +231,7 @@ const useStanCallback: <A extends unknown[], R>(
   - `helpers` – State helpers:
     - `get` – A function for getting [`State<T>`](./state.md#statet) value, with the following signature:
       ```ts
-      <T>(scopedState: Scoped<State<T>>) => T
+      <T>(scopedState: Scoped<State<T>>) => T;
       ```
     - `set` – A function for setting [`WritableState<T>`](./state.md#writablestatet), with the following signature:
       ```ts
@@ -286,9 +286,10 @@ function MyComponent() {
 Stan, by default, operates in provider-less mode, using [`DEFAULT_STORE`](./store.md#the-store-class). However, if you need to supply a different store (e.g., for [SSR](../guides/ssr.md)) or switch stores dynamically, `StanProvider` comes in handy.
 
 Using `StanProvider` creates an isolation boundary:
-- **No provider** — hooks use `DEFAULT_STORE`
-- **`StanProvider` without `store` prop** — creates a fresh, isolated store
-- **`StanProvider` with `store` prop** — uses the provided store
+
+- **No provider** - hooks use `DEFAULT_STORE`
+- **`StanProvider` without `store` prop** - creates a fresh, isolated store
+- **`StanProvider` with `store` prop** - uses the provided store
 
 Re-mounting `StanProvider` (e.g., via the `key` prop) can also serve as a way to reset all state.
 

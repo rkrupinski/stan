@@ -49,7 +49,6 @@ It inherits all properties from [`State<T>`](#statet), and additionally defines:
 
 - `set` - A function for updating the state value.
 - `[RESET_TAG]` - A function that resets the state.
-
   - Reverts the state value to its default.
   - Notifies all subscribers about the change.
 
@@ -62,7 +61,7 @@ Produced by:
 - [`selector`](./selector.md)
 - [`selectorFamily`](./selectorFamily.md)
 
-As the name implies, this is a state that can only be read from. However, that doesn't mean it cannot change — it absolutely can:
+As the name implies, this is a state that can only be read from. However, that doesn't mean it cannot change - it absolutely can:
 
 - When it's refreshed (see [utils](./utils.md#refresh))
 - When its dependencies change (see [`selector`](./selector.md))
@@ -71,7 +70,6 @@ As the name implies, this is a state that can only be read from. However, that d
 It inherits all properties from [`State<T>`](#statet), and additionally defines:
 
 - `[REFRESH_TAG]` - A function that refreshes the state.
-
   - When called on a _mounted_ state, it re-evaluates the state immediately.
   - When called on an _unmounted_ state, it marks the state as uninitialized - meaning it will be re-evaluated the next time it is accessed.
 
