@@ -37,6 +37,7 @@ export const ExploreViewer = memo<ExploreViewerProps>(({ storeKey, query }) => {
     getScrollElement: () => parentRef.current,
     estimateSize: () => ESTIMATED_SIZE,
     overscan: OVERSCAN,
+    getItemKey: index => filteredEntries[index].key,
   });
 
   useLayoutEffect(() => {

@@ -5,6 +5,9 @@ description: selector API reference
 
 # `selector`
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Among other things, selectors enable:
 
 - Computing derived state:
@@ -73,9 +76,12 @@ const sum = selector(async ({ get }) => {
 });
 ```
 
-Render with React:
+Render:
 
-```ts
+<Tabs groupId="framework">
+<TabItem value="react" label="React" default>
+
+```tsx
 const MyComponent: FC = () => {
   const result = useStanValueAsync(sum);
 
@@ -92,10 +98,29 @@ const MyComponent: FC = () => {
 };
 ```
 
+</TabItem>
+<TabItem value="vue" label="Vue">
+
+```vue
+<script setup lang="ts">
+const result = useStanValueAsync(sum);
+</script>
+
+<template>
+  <p v-if="result.type === 'loading'">Loading&hellip;</p>
+  <p v-else-if="result.type === 'error'">Nope</p>
+  <p v-else>{{ result.value }}</p>
+</template>
+```
+
+</TabItem>
+</Tabs>
+
 ## See also
 
 - [`selectorFamily`](./selectorFamily.md)
 - [Using Stan with React](./react.md)
-- [Aborting work](https://github.com/rkrupinski/stan/tree/master/packages/examples/aborting-work) (example)
-- [Asynchronous state](https://github.com/rkrupinski/stan/tree/master/packages/examples/asynchronous-state) (example)
-- [Dynamic dependencies](https://github.com/rkrupinski/stan/tree/master/packages/examples/dynamic-dependencies) (example)
+- [Using Stan with Vue](./vue.md)
+- [Aborting work](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-aborting-work) (example)
+- [Asynchronous state](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-asynchronous-state) (example)
+- [Dynamic dependencies](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-dynamic-dependencies) (example)

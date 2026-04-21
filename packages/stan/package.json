@@ -18,12 +18,20 @@
       "import": "./dist/react.esm.js",
       "require": "./dist/react.js",
       "types": "./dist/react.d.ts"
+    },
+    "./vue": {
+      "import": "./dist/vue.esm.js",
+      "require": "./dist/vue.js",
+      "types": "./dist/vue.d.ts"
     }
   },
   "typesVersions": {
     "*": {
       "react": [
         "dist/react.d.ts"
+      ],
+      "vue": [
+        "dist/vue.d.ts"
       ]
     }
   },
@@ -68,10 +76,21 @@
     "ts-jest": "29.3.0",
     "tslib": "2.8.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.32.1"
+    "typescript-eslint": "8.32.1",
+    "vue": "^3.5.0",
+    "@vue/test-utils": "^2.4.6"
   },
   "peerDependencies": {
-    "react": ">=19.0.0"
+    "react": ">=19.0.0",
+    "vue": ">=3.4.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
   },
   "author": "Rafał Krupiński <rkrupinski.npm@gmail.com> (https://github.com/rkrupinski)",
   "homepage": "https://stan.party",

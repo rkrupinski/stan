@@ -5,6 +5,9 @@ description: atom API reference
 
 # `atom`
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 In Stan, atoms are value containers. They have no dependencies and can be considered source vertices in the Stan state graph. They're designed for synchronous state but can theoretically work with any type of data (for async, make sure to check out [`selector`](./selector.md)).
 
 ```ts
@@ -68,7 +71,10 @@ const myAtom = atom(42, {
 });
 ```
 
-Reading and writing an atom value in React:
+Reading and writing an atom value:
+
+<Tabs groupId="framework">
+<TabItem value="react" label="React" default>
 
 ```tsx
 function MyComponent() {
@@ -84,8 +90,25 @@ function MyComponent() {
 }
 ```
 
+</TabItem>
+<TabItem value="vue" label="Vue">
+
+```vue
+<script setup lang="ts">
+const value = useStan(myAtom);
+</script>
+
+<template>
+  <input v-model.number="value" type="number" />
+</template>
+```
+
+</TabItem>
+</Tabs>
+
 ## See also
 
 - [`atomFamily`](./atomFamily.md)
 - [Using Stan with React](./react.md)
-- [Atom effects](https://github.com/rkrupinski/stan/tree/master/packages/examples/atom-effects) (example)
+- [Using Stan with Vue](./vue.md)
+- [Atom effects](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-atom-effects) (example)

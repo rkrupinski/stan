@@ -12,6 +12,7 @@ export default {
   input: {
     index: 'src/index.ts',
     react: 'src/react.tsx',
+    vue: 'src/vue.ts',
   },
   output: [
     {
@@ -39,5 +40,5 @@ export default {
     commonjs(),
     terser(),
   ],
-  external: ['react', 'react/jsx-runtime'],
+  external: ['react', 'react/jsx-runtime', 'vue'],
 };

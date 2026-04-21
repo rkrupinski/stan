@@ -2,7 +2,7 @@
 
 # Stan Skill
 
-[Agent Skill](https://agentskills.io) for [`@rkrupinski/stan`](https://stan.party) — reusable guidance for AI coding agents working with Stan.
+[Agent Skill](https://agentskills.io) for [`@rkrupinski/stan`](https://stan.party) - reusable guidance for AI coding agents working with Stan.
 
 ## Install
 

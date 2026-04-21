@@ -200,6 +200,7 @@ export const LogViewer = memo<LogViewerProps>(({ storeKey, query }) => {
     getScrollElement: () => parentRef.current,
     estimateSize: () => ESTIMATED_SIZE,
     overscan: OVERSCAN,
+    getItemKey: index => log[index].id,
   });
 
   useLayoutEffect(() => {

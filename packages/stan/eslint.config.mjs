@@ -19,9 +19,6 @@ export default tseslint.config(
   importPlugin.flatConfigs.recommended,
   // @ts-expect-error
   importPlugin.flatConfigs.typescript,
-  reactPlugin.configs.flat.recommended,
-  reactPlugin.configs.flat['jsx-runtime'],
-  reactHooksPlugin.configs['recommended-latest'],
   {
     files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
@@ -39,22 +36,30 @@ export default tseslint.config(
           project: './tsconfig.json',
         },
       },
-      react: {
-        version: 'detect',
-      },
     },
   },
   {
-    files: ['src/**/*.tsx'],
+    files: ['src/react.tsx', 'src/react.test.tsx'],
+    ...reactPlugin.configs.flat.recommended,
+    ...reactPlugin.configs.flat['jsx-runtime'],
     languageOptions: {
       ...reactPlugin.configs.flat.recommended.languageOptions,
     },
     plugins: {
       react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
     },
     rules: {
+      ...reactPlugin.configs.flat.recommended.rules,
+      ...reactPlugin.configs.flat['jsx-runtime'].rules,
+      ...reactHooksPlugin.configs['recommended-latest'].rules,
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'error',
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
     },
   },
   {

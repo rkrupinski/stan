@@ -6,7 +6,7 @@
 - **Documentation**: https://stan.party
 - **License**: MIT
 
-Stan is a minimal, type-safe state management library. It is **framework-agnostic** at its core, designed to be composable and extensible. While it includes first-class React bindings out of the box, the core logic depends on no specific framework.
+Stan is a minimal, type-safe state management library. It is **framework-agnostic** at its core, designed to be composable and extensible. While it includes first-class React and Vue bindings out of the box, the core logic depends on no specific framework.
 
 ## Core Concepts
 
@@ -218,6 +218,118 @@ export default function App({ children }) {
   return <StanProvider>{children}</StanProvider>; // Uses a new store context
 }
 ```
+
+## Vue Integration (`@rkrupinski/stan/vue`)
+
+Stan provides composables for Vue 3 (peer dep: `vue >=3.4.0`). All composables bind to the store provided via `StanProvider` / `provideStan`, falling back to `DEFAULT_STORE`. Value-returning composables accept either a plain `Scoped<State<T>>` or a `Ref<Scoped<State<T>>>`; wrap family calls in `computed` for reactive parameters. Bare getters (`() => family(param)`) are deliberately **not** accepted - `Scoped<T>` is itself a function, so the two forms can't be disambiguated.
+
+### `useStan`
+Returns a `WritableComputedRef<T>` for writable state (atoms only). Reading `.value` subscribes; assigning writes through. Works with `v-model`.
+
+```ts
+const useStan: <T>(
+  scopedState: Scoped<WritableState<T>> | Ref<Scoped<WritableState<T>>>,
+) => WritableComputedRef<T>;
+```
+
+```vue
+<script setup lang="ts">
+import { atom } from '@rkrupinski/stan';
+import { useStan } from '@rkrupinski/stan/vue';
+
+const countAtom = atom(0);
+const count = useStan(countAtom);
+</script>
+
+<template>
+  <pre>{{ count }}</pre>
+  <button @click="count++">Add one</button>
+</template>
+```
+
+### `useStanValue`
+Returns `Readonly<Ref<T>>`. Works with atoms and selectors.
+
+```ts
+const useStanValue: <T>(
+  scopedState: Scoped<ReadonlyState<T>> | Ref<Scoped<ReadonlyState<T>>>,
+) => Readonly<Ref<T>>;
+```
+
+Reactive usage:
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue';
+
+const props = defineProps<{ userId: string }>();
+const data = useStanValueAsync(computed(() => userQuery(props.userId)));
+</script>
+```
+
+### `useStanValueAsync`
+Wraps a `PromiseLike<T>` selector in a readonly `Ref` of the `AsyncValue<T, E>` discriminated union defined above (`loading` / `ready` / `error`).
+
+```ts
+const useStanValueAsync: <T, E = unknown>(
+  scopedState:
+    | Scoped<ReadonlyState<PromiseLike<T>>>
+    | Ref<Scoped<ReadonlyState<PromiseLike<T>>>>,
+) => Readonly<Ref<AsyncValue<T, E>>>;
+```
+
+### `useStanRefresh` / `useStanReset`
+Return bound `() => void` functions for the given state. Resolve the scoped state at call time, so they always target the current member when passed a ref.
+
+```ts
+const useStanRefresh: <T>(
+  scopedState: Scoped<ReadonlyState<T>> | Ref<Scoped<ReadonlyState<T>>>,
+) => () => void;
+const useStanReset: <T>(
+  scopedState: Scoped<WritableState<T>> | Ref<Scoped<WritableState<T>>>,
+) => () => void;
+```
+
+### `useStanCallback`
+Create a callback with access to `get`, `set`, `reset`, and `refresh` without subscribing the component to state changes. Unlike the React version, it takes no `deps` array - a Vue component's `setup()` runs once, so the returned callback captures the latest values via closure.
+
+```ts
+const useStanCallback: <A extends unknown[], R>(
+  factory: (helpers: StanCallbackHelpers) => (...args: A) => R,
+) => (...args: A) => R;
+```
+
+### `StanProvider`
+Vue component that provides a store to descendants. Without a `store` prop, creates a fresh isolated store. Changing the `:store` prop re-subscribes composables automatically through Vue's reactivity; use `:key` only when you want to tear down local component state alongside the swap.
+
+```ts
+const StanProvider: DefineComponent<{ store?: Store }>;
+```
+
+```vue
+<script setup lang="ts">
+import { makeStore } from '@rkrupinski/stan';
+import { StanProvider } from '@rkrupinski/stan/vue';
+
+const myStore = makeStore();
+</script>
+
+<template>
+  <StanProvider :store="myStore">
+    <RouterView />
+  </StanProvider>
+</template>
+```
+
+### `provideStan`
+Alternative to `StanProvider`: call from a component's `setup()` to provide a store to descendants.
+
+```ts
+const provideStan: (store?: Store) => void;
+```
+
+### `useStanStore`
+Low-level (unstable) API returning the current Stan store injection - a `{ store: ComputedRef<Store> }`.
 
 ## Guides & Best Practices
 
