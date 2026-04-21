@@ -11,7 +11,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
-    "@rkrupinski/stan": "1.7.2",
+    "@rkrupinski/stan": "1.7.3",
     "todomvc-app-css": "^2.4.3",
     "vue": "^3.5.31"
   },
