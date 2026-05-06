@@ -25,7 +25,7 @@ const ArrowIcon: FC = () => (
 
 export const Hero: FC = () => {
   const { siteConfig } = useDocusaurusContext();
-  const [showGlyph, setShowGlyph] = useState(true);
+  const [showGlyph, setShowGlyph] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia(GLYPH_QUERY);
