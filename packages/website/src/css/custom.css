@@ -25,6 +25,11 @@
   --announcement-bar-text: #ffe0b2;
 }
 
+[data-theme='dark'] .hero--primary {
+  --ifm-hero-background-color: #2e8555;
+  --ifm-hero-text-color: var(--ifm-color-white);
+}
+
 div[class*='announcementBar'] a {
   font-weight: bold;
   text-decoration: underline;
