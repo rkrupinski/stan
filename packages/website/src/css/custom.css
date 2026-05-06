@@ -10,6 +10,11 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --announcement-bar-bg: #fff8e1;
   --announcement-bar-text: #5d4037;
+  --accent: #ffd166;
+  --rule: rgba(0, 0, 0, 0.12);
+  --rule-soft: rgba(0, 0, 0, 0.06);
+  --ink-2: #444950;
+  --ink-3: #606770;
 }
 
 :root[data-theme='dark'] {
@@ -23,6 +28,10 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
   --announcement-bar-bg: #4e342e;
   --announcement-bar-text: #ffe0b2;
+  --rule: rgba(255, 255, 255, 0.12);
+  --rule-soft: rgba(255, 255, 255, 0.07);
+  --ink-2: #c9c9c9;
+  --ink-3: #a0a0a4;
 }
 
 [data-theme='dark'] .hero--primary {
@@ -33,4 +42,13 @@
 div[class*='announcementBar'] a {
   font-weight: bold;
   text-decoration: underline;
+}
+
+.footer {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.footer .container {
+  max-width: 1240px;
 }

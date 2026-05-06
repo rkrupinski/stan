@@ -1,0 +1,215 @@
+.hero {
+  position: relative;
+  background: var(--ifm-color-primary);
+  color: #fff;
+  overflow: hidden;
+  padding: 120px 0 132px;
+}
+
+:global([data-theme='dark']) .hero {
+  background: #205d3b;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 28%, rgba(255, 255, 255, 0.14), transparent 35%),
+    radial-gradient(circle at 80% 78%, rgba(255, 209, 102, 0.18), transparent 40%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+.heroInner {
+  position: relative;
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.heroTitle {
+  font-size: 156px;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  font-weight: 800;
+  margin: 0 0 20px;
+  color: #fff;
+}
+
+.heroTitleDot {
+  color: var(--accent);
+}
+
+.heroTagline {
+  font-size: 26px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 36px;
+  max-width: 480px;
+  font-weight: 400;
+  text-wrap: pretty;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 28px;
+  border-radius: 10px;
+  background: #fff;
+  color: #1c1e21;
+  font-size: 16px;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.08s, box-shadow 0.15s;
+  box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.4);
+}
+
+.cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.45);
+  color: #1c1e21;
+  text-decoration: none;
+}
+
+.ctaArrow {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  border-radius: 50%;
+  color: #1c1e21;
+}
+
+.heroGlyph {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: 64px;
+}
+
+.heroGlyph svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.18));
+}
+
+.floater {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1c1e21;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.3);
+  animation: floaty 4s ease-in-out infinite;
+}
+
+.swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #2e8555;
+}
+
+.floaterB {
+  animation-delay: -1.4s;
+}
+
+.floaterB .swatch {
+  background: var(--accent);
+}
+
+.floaterC {
+  animation-delay: -2.6s;
+}
+
+.floaterC .swatch {
+  background: #2e8555;
+  opacity: 0.5;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@media (max-width: 980px) {
+  .hero {
+    padding: 80px 0 88px;
+  }
+  .heroInner {
+    gap: 32px;
+  }
+  .heroTitle {
+    font-size: 112px;
+  }
+  .heroTagline {
+    font-size: 22px;
+  }
+  .heroGlyph {
+    max-width: 280px;
+    margin-right: 72px;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero {
+    text-align: center;
+    padding: 64px 0 72px;
+  }
+  .heroInner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .heroText {
+    align-items: center;
+  }
+  .heroTitle {
+    font-size: 72px;
+  }
+  .heroTagline {
+    font-size: 18px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .heroGlyph {
+    margin: 0 auto;
+    max-width: 320px;
+  }
+}
