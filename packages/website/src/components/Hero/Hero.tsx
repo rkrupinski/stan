@@ -109,14 +109,14 @@ export const Hero: FC = () => {
             </div>
             <div
               className={`${styles.floater} ${styles.floaterB}`}
-              style={{ top: '68%', left: '-4%' }}
+              style={{ top: '78%', left: '-4%' }}
             >
               <span className={styles.swatch} />
               derived state
             </div>
             <div
               className={`${styles.floater} ${styles.floaterC}`}
-              style={{ top: '68%', right: '-6%' }}
+              style={{ top: '78%', right: '-6%' }}
             >
               <span className={styles.swatch} />
               async derived state
