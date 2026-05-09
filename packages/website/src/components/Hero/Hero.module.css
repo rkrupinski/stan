@@ -208,4 +208,7 @@
     margin-left: auto;
     margin-right: auto;
   }
+  .heroGlyph {
+    display: none;
+  }
 }
