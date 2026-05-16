@@ -54,74 +54,77 @@ export const Hero: FC = () => {
           </div>
 
           {showGlyph && (
-          <div className={styles.heroGlyph} aria-hidden="true">
-            <svg viewBox="0 0 460 460">
-              <defs>
-                <linearGradient id="stan-line" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#fff" stopOpacity="0.7" />
-                  <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
-                </linearGradient>
-              </defs>
-              <line
-                x1="230"
-                y1="80"
-                x2="80"
-                y2="340"
-                stroke="url(#stan-line)"
-                strokeWidth="4"
-                strokeDasharray="6 6"
+            <div className={styles.heroGlyph} aria-hidden="true">
+              <svg viewBox="0 0 460 460">
+                <defs>
+                  <linearGradient id="stan-line" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#fff" stopOpacity="0.7" />
+                    <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
+                  </linearGradient>
+                </defs>
+                <line
+                  x1="230"
+                  y1="80"
+                  x2="80"
+                  y2="340"
+                  stroke="url(#stan-line)"
+                  strokeWidth="4"
+                  strokeDasharray="6 6"
+                >
+                  <animate
+                    attributeName="stroke-dashoffset"
+                    from="0"
+                    to="-24"
+                    dur="1.6s"
+                    repeatCount="indefinite"
+                  />
+                </line>
+                <line
+                  x1="230"
+                  y1="80"
+                  x2="380"
+                  y2="340"
+                  stroke="url(#stan-line)"
+                  strokeWidth="4"
+                  strokeDasharray="6 6"
+                >
+                  <animate
+                    attributeName="stroke-dashoffset"
+                    from="0"
+                    to="-24"
+                    dur="1.6s"
+                    repeatCount="indefinite"
+                  />
+                </line>
+                <circle cx="230" cy="80" r="38" fill="#fff" opacity="0.18" />
+                <circle cx="230" cy="80" r="22" fill="#fff" />
+                <circle cx="80" cy="340" r="34" fill="#fff" opacity="0.18" />
+                <circle cx="80" cy="340" r="20" fill="#fff" />
+                <circle cx="380" cy="340" r="34" fill="#fff" opacity="0.18" />
+                <circle cx="380" cy="340" r="20" fill="#fff" />
+              </svg>
+              <div
+                className={styles.floater}
+                style={{ top: '4%', left: '40%' }}
               >
-                <animate
-                  attributeName="stroke-dashoffset"
-                  from="0"
-                  to="-24"
-                  dur="1.6s"
-                  repeatCount="indefinite"
-                />
-              </line>
-              <line
-                x1="230"
-                y1="80"
-                x2="380"
-                y2="340"
-                stroke="url(#stan-line)"
-                strokeWidth="4"
-                strokeDasharray="6 6"
+                <span className={styles.swatch} />
+                state
+              </div>
+              <div
+                className={`${styles.floater} ${styles.floaterB}`}
+                style={{ top: '78%', left: '-4%' }}
               >
-                <animate
-                  attributeName="stroke-dashoffset"
-                  from="0"
-                  to="-24"
-                  dur="1.6s"
-                  repeatCount="indefinite"
-                />
-              </line>
-              <circle cx="230" cy="80" r="38" fill="#fff" opacity="0.18" />
-              <circle cx="230" cy="80" r="22" fill="#fff" />
-              <circle cx="80" cy="340" r="34" fill="#fff" opacity="0.18" />
-              <circle cx="80" cy="340" r="20" fill="#fff" />
-              <circle cx="380" cy="340" r="34" fill="#fff" opacity="0.18" />
-              <circle cx="380" cy="340" r="20" fill="#fff" />
-            </svg>
-            <div className={styles.floater} style={{ top: '4%', left: '40%' }}>
-              <span className={styles.swatch} />
-              state
+                <span className={styles.swatch} />
+                derived state
+              </div>
+              <div
+                className={`${styles.floater} ${styles.floaterC}`}
+                style={{ top: '78%', right: '-6%' }}
+              >
+                <span className={styles.swatch} />
+                async derived state
+              </div>
             </div>
-            <div
-              className={`${styles.floater} ${styles.floaterB}`}
-              style={{ top: '78%', left: '-4%' }}
-            >
-              <span className={styles.swatch} />
-              derived state
-            </div>
-            <div
-              className={`${styles.floater} ${styles.floaterC}`}
-              style={{ top: '78%', right: '-6%' }}
-            >
-              <span className={styles.swatch} />
-              async derived state
-            </div>
-          </div>
           )}
         </div>
       </div>

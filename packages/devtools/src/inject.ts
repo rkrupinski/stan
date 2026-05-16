@@ -11,8 +11,8 @@ import {
 interface Store {
   key: string;
   libVersion: string;
-  value: Map<string, unknown>;
-  version: Map<string, number>;
+  entries(): IterableIterator<[string, unknown]>;
+  versionOf(key: string): number;
 }
 
 const stores = new Map<string, Store>();
@@ -41,12 +41,12 @@ const trackAsyncState = (
   key: string,
   promise: Promise<unknown>,
 ) => {
-  const currentVersion = store.version.get(key);
+  const currentVersion = store.versionOf(key);
 
   promise
     .then((res: unknown) => {
       if (!stores.has(store.key)) return;
-      if (store.version.get(key) !== currentVersion) return;
+      if (store.versionOf(key) !== currentVersion) return;
 
       send('UPDATE', {
         storeKey: store.key,
@@ -59,7 +59,7 @@ const trackAsyncState = (
     })
     .catch((err: unknown) => {
       if (!stores.has(store.key)) return;
-      if (store.version.get(key) !== currentVersion) return;
+      if (store.versionOf(key) !== currentVersion) return;
 
       send('UPDATE', {
         storeKey: store.key,
@@ -78,7 +78,7 @@ window.__STAN_DEVTOOLS__ = {
     send('REGISTER', {
       key: store.key,
       libVersion: store.libVersion,
-      value: Array.from(store.value.entries()).map(([k, v]) => {
+      value: Array.from(store.entries()).map(([k, v]) => {
         if (v instanceof Promise) {
           trackAsyncState(store, k, v);
           return [k, { type: 'async-pending' }];

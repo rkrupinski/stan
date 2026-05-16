@@ -26,7 +26,8 @@
 }
 
 .featureNum {
-  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  font-family:
+    ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;

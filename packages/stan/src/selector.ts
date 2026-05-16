@@ -1,7 +1,6 @@
 import {
   dejaVu,
   isFunction,
-  depsChanged,
   stableStringify,
   ERASE_TAG,
   REFRESH_TAG,
@@ -45,10 +44,6 @@ export const selector = <T>(
   const key = `@@selector${tag ? `[${tag}]` : ''}-${++selectorId}`;
 
   return memoize(store => () => {
-    const deps = new Map<string, number>();
-
-    store.deps.set(key, deps);
-
     const subs = new Set<() => () => void>();
     const unsubs = new Set<() => void>();
 
@@ -71,9 +66,7 @@ export const selector = <T>(
         const state = scopedState(store);
         const value = state.get();
 
-        if (!deps.has(state.key) && id === evalId) {
-          deps.set(state.key, store.version.get(state.key) ?? 0);
-
+        if (id === evalId && store.trackDep(key, state.key)) {
           const sub = () =>
             state.subscribe(() => {
               refresh();
@@ -81,7 +74,7 @@ export const selector = <T>(
 
           subs.add(sub);
 
-          if (store.mounted.get(key)) {
+          if (store.isMounted(key)) {
             unsubs.add(sub());
           }
         }
@@ -90,20 +83,14 @@ export const selector = <T>(
       };
 
     const cleanup = () => {
-      deps.clear();
+      store.resetDeps(key);
       subs.clear();
       unsubs.forEach(unsub => unsub());
       unsubs.clear();
     };
 
-    const bumpVersion = () => {
-      const currentVersion = store.version.get(key) ?? 0;
-
-      store.version.set(key, currentVersion + 1);
-    };
-
     const notifySubscribers = () => {
-      [...subscribers].forEach(cb => cb(store.value.get(key) as T));
+      [...subscribers].forEach(cb => cb(store.peek<T>(key)));
     };
 
     let evalId = 0;
@@ -120,23 +107,20 @@ export const selector = <T>(
       });
 
       const valueChanged =
-        !store.value.has(key) ||
-        !areValuesEqual(store.value.get(key), candidate);
+        !store.has(key) || !areValuesEqual(store.peek<T>(key), candidate);
 
       if (!valueChanged) return;
 
-      bumpVersion();
-
-      store.value.set(key, candidate);
+      store.commit(key, candidate);
 
       notifySubscribers();
     };
 
     const refresh = () => {
-      if (store.mounted.get(key)) {
+      if (store.isMounted(key)) {
         evaluate();
       } else {
-        store.initialized.set(key, false);
+        store.markStale(key);
       }
     };
 
@@ -144,7 +128,7 @@ export const selector = <T>(
       subs.forEach(sub => {
         unsubs.add(sub());
       });
-      store.mounted.set(key, true);
+      store.mount(key);
       onMountCb?.();
     };
 
@@ -153,7 +137,7 @@ export const selector = <T>(
         unsub();
       });
       unsubs.clear();
-      store.mounted.set(key, false);
+      store.unmount(key);
       onUnmountCb?.();
     };
 
@@ -161,12 +145,12 @@ export const selector = <T>(
       key,
       get() {
         switch (true) {
-          case !store.initialized.get(key):
+          case !store.isReady(key):
             evaluate();
-            store.initialized.set(key, true);
+            store.markReady(key);
             break;
 
-          case depsChanged(store, key):
+          case store.depsChanged(key):
             evaluate();
             break;
 
@@ -174,7 +158,7 @@ export const selector = <T>(
             break;
         }
 
-        return store.value.get(key) as T;
+        return store.peek<T>(key);
       },
       subscribe(cb) {
         if (subscribers.size === 0) onMount();

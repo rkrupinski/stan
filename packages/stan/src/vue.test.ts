@@ -190,9 +190,7 @@ describe('useStanValue', () => {
   });
 
   it('should react to input ref changes', async () => {
-    const testFamily = selectorFamily<number, string>(
-      id => () => id.length,
-    );
+    const testFamily = selectorFamily<number, string>(id => () => id.length);
     const store = makeStore();
     const param = ref('a');
 
@@ -212,9 +210,7 @@ describe('useStanValue', () => {
   });
 
   it('should unsubscribe from the previous state when input ref changes', async () => {
-    const testFamily = selectorFamily<number, string>(
-      id => () => id.length,
-    );
+    const testFamily = selectorFamily<number, string>(id => () => id.length);
     const store = makeStore();
     const param = ref('a');
 

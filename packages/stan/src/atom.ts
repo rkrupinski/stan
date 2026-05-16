@@ -34,27 +34,17 @@ export const atom = <T>(
     const subscribed = new Set<(newValue: T) => void>();
     const effectSubs = new Set<(newValue: T) => void>();
 
-    store.version.set(key, 1);
-
-    const bumpVersion = () => {
-      const currentVersion = store.version.get(key) ?? 0;
-
-      store.version.set(key, currentVersion + 1);
-    };
-
     const makeSetter =
       (silent = false): SetterOrUpdater<T> =>
       newValue => {
         ensureInitialized();
 
-        const prevValue = store.value.get(key) as T;
+        const prevValue = store.peek<T>(key);
         const candidate = isFunction(newValue) ? newValue(prevValue) : newValue;
 
         if (areValuesEqual(prevValue, candidate)) return;
 
-        bumpVersion();
-
-        store.value.set(key, candidate);
+        store.commit(key, candidate);
 
         [...subscribed].forEach(cb => cb(candidate));
 
@@ -65,10 +55,10 @@ export const atom = <T>(
     const setSilent = makeSetter(true);
 
     const ensureInitialized = () => {
-      if (store.initialized.get(key)) return;
+      if (store.isReady(key)) return;
 
-      store.value.set(key, defaultValue);
-      store.initialized.set(key, true);
+      store.seed(key, defaultValue);
+      store.markReady(key);
 
       let isInitializing = true;
 
@@ -76,7 +66,7 @@ export const atom = <T>(
         effectFn({
           init(v) {
             if (isInitializing) {
-              store.value.set(key, v);
+              store.seed(key, v);
             }
           },
           set: setSilent,
@@ -94,7 +84,7 @@ export const atom = <T>(
       get() {
         ensureInitialized();
 
-        return store.value.get(key) as T;
+        return store.peek<T>(key);
       },
       set,
       subscribe(cb) {
