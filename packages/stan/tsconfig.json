@@ -7,6 +7,7 @@
     "skipLibCheck": true,
     "strict": true,
     "declaration": true,
+    "stripInternal": true,
     "outDir": "dist",
     "noEmit": true,
     "jsx": "react-jsx"

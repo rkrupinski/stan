@@ -1,5 +1,3 @@
-import type { Store } from './store';
-
 export { default as stableStringify } from 'fast-json-stable-stringify';
 
 export const REFRESH_TAG = Symbol('@@refresh');
@@ -27,19 +25,3 @@ export const isFunction = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): candidate is (...args: any[]) => any =>
   fnTypes.includes(Object.prototype.toString.call(candidate));
-
-export const depsChanged = (store: Store, key: string) => {
-  const d = store.deps.get(key);
-
-  if (!d || !d.size) return false;
-
-  for (const [k, v] of d.entries()) {
-    if (store.version.get(k) !== v) return true;
-  }
-
-  for (const k of d.keys()) {
-    if (depsChanged(store, k)) return true;
-  }
-
-  return false;
-};
