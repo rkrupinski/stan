@@ -41,94 +41,133 @@ const trackAsyncState = (
   key: string,
   promise: Promise<unknown>,
 ) => {
-  const currentVersion = store.versionOf(key);
+  let currentVersion: number;
+
+  try {
+    currentVersion = store.versionOf(key);
+  } catch (err) {
+    console.error('Stan DevTools: trackAsyncState init failed', err);
+    return;
+  }
 
   promise
     .then((res: unknown) => {
-      if (!stores.has(store.key)) return;
-      if (store.versionOf(key) !== currentVersion) return;
+      try {
+        if (!stores.has(store.key)) return;
+        if (store.versionOf(key) !== currentVersion) return;
 
-      send('UPDATE', {
-        storeKey: store.key,
-        event: {
-          type: 'SET',
-          key,
-          value: { type: 'async-resolved', value: sanitize(res) },
-        },
-      });
+        send('UPDATE', {
+          storeKey: store.key,
+          event: {
+            type: 'SET',
+            key,
+            value: { type: 'async-resolved', value: sanitize(res) },
+          },
+        });
+      } catch (err) {
+        console.error('Stan DevTools: trackAsyncState resolve failed', err);
+      }
     })
     .catch((err: unknown) => {
-      if (!stores.has(store.key)) return;
-      if (store.versionOf(key) !== currentVersion) return;
+      try {
+        if (!stores.has(store.key)) return;
+        if (store.versionOf(key) !== currentVersion) return;
 
-      send('UPDATE', {
-        storeKey: store.key,
-        event: {
-          type: 'SET',
-          key,
-          value: { type: 'async-rejected', value: sanitize(err) },
-        },
-      });
+        send('UPDATE', {
+          storeKey: store.key,
+          event: {
+            type: 'SET',
+            key,
+            value: { type: 'async-rejected', value: sanitize(err) },
+          },
+        });
+      } catch (innerErr) {
+        console.error('Stan DevTools: trackAsyncState reject failed', innerErr);
+      }
     });
 };
 
 window.__STAN_DEVTOOLS__ = {
   register(store: Store) {
-    stores.set(store.key, store);
-    send('REGISTER', {
-      key: store.key,
-      libVersion: store.libVersion,
-      value: Array.from(store.entries()).map(([k, v]) => {
-        if (v instanceof Promise) {
-          trackAsyncState(store, k, v);
-          return [k, { type: 'async-pending' }];
-        }
+    try {
+      stores.set(store.key, store);
 
-        return [k, { type: 'sync', value: sanitize(v) }];
-      }),
-    });
+      let value: MessagePayloads['REGISTER']['value'] = [];
+
+      try {
+        value = Array.from(store.entries()).map(([k, v]) => {
+          if (v instanceof Promise) {
+            trackAsyncState(store, k, v);
+            return [k, { type: 'async-pending' }];
+          }
+
+          return [k, { type: 'sync', value: sanitize(v) }];
+        });
+      } catch (snapshotErr) {
+        console.error(
+          'Stan DevTools: store snapshot failed (incompatible Stan version?)',
+          snapshotErr,
+        );
+      }
+
+      send('REGISTER', {
+        key: store.key,
+        libVersion: store.libVersion,
+        value,
+      });
+    } catch (err) {
+      console.error('Stan DevTools: register failed', err);
+    }
   },
   unregister(store: Store) {
-    stores.delete(store.key);
-    send('UNREGISTER', { key: store.key });
+    try {
+      stores.delete(store.key);
+      send('UNREGISTER', { key: store.key });
+    } catch (err) {
+      console.error('Stan DevTools: unregister failed', err);
+    }
   },
   send(storeKey: string, event: StanStoreEvent) {
-    if (event.type === 'DELETE') {
-      send('UPDATE', {
-        storeKey,
-        event: { type: 'DELETE', key: event.key },
-      });
-      return;
-    }
+    try {
+      if (event.type === 'DELETE') {
+        send('UPDATE', {
+          storeKey,
+          event: { type: 'DELETE', key: event.key },
+        });
+        return;
+      }
 
-    const store = stores.get(storeKey);
+      const store = stores.get(storeKey);
 
-    if (!store) return;
+      if (!store) return;
 
-    const { value } = event;
+      const { value } = event;
 
-    if (value instanceof Promise) {
+      if (value instanceof Promise) {
+        send('UPDATE', {
+          storeKey,
+          event: {
+            type: 'SET',
+            key: event.key,
+            value: { type: 'async-pending' },
+          },
+        });
+
+        trackAsyncState(store, event.key, value);
+        return;
+      }
+
       send('UPDATE', {
         storeKey,
         event: {
           type: 'SET',
           key: event.key,
-          value: { type: 'async-pending' },
+          value: { type: 'sync', value: sanitize(value) },
         },
       });
-
-      trackAsyncState(store, event.key, value);
-      return;
+    } catch (err) {
+      console.error('Stan DevTools: send failed', err);
     }
-
-    send('UPDATE', {
-      storeKey,
-      event: {
-        type: 'SET',
-        key: event.key,
-        value: { type: 'sync', value: sanitize(value) },
-      },
-    });
   },
 };
 
@@ -143,9 +182,13 @@ window.addEventListener('message', event => {
     return;
   }
 
-  send('RESET');
+  try {
+    send('RESET');
 
-  for (const store of stores.values()) {
-    window.__STAN_DEVTOOLS__?.register(store);
+    for (const store of stores.values()) {
+      window.__STAN_DEVTOOLS__?.register(store);
+    }
+  } catch (err) {
+    console.error('Stan DevTools: refresh failed', err);
   }
 });
