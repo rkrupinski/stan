@@ -15,8 +15,16 @@
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(circle at 20% 28%, rgba(255, 255, 255, 0.14), transparent 35%),
-    radial-gradient(circle at 80% 78%, rgba(255, 209, 102, 0.18), transparent 40%);
+    radial-gradient(
+      circle at 20% 28%,
+      rgba(255, 255, 255, 0.14),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 80% 78%,
+      rgba(255, 209, 102, 0.18),
+      transparent 40%
+    );
   pointer-events: none;
 }
 
@@ -29,7 +37,11 @@
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 56px 56px;
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    black 30%,
+    transparent 75%
+  );
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
 }
 
@@ -83,7 +95,9 @@
   font-size: 16px;
   font-weight: 600;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: transform 0.08s, box-shadow 0.15s;
+  transition:
+    transform 0.08s,
+    box-shadow 0.15s;
   box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.4);
 }
 
@@ -126,7 +140,8 @@
   color: #1c1e21;
   border-radius: 8px;
   padding: 6px 10px;
-  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  font-family:
+    ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
   font-size: 12px;
   display: inline-flex;
   align-items: center;
