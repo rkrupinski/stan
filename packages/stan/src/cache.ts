@@ -2,6 +2,7 @@ import { identity } from './internal';
 
 type CacheEntry<V> = {
   value: V;
+  expiresAt: number;
   controller: AbortController;
 };
 
@@ -21,11 +22,13 @@ class LRUCache<K, V> implements Cache<K, V> {
   #cache: Map<K, CacheEntry<V>>;
   #refCounts: Map<K, number>;
   #maxSize: number;
+  #ttl: number;
 
-  constructor(maxSize: number) {
+  constructor(maxSize: number, ttl: number = Number.POSITIVE_INFINITY) {
     this.#cache = new Map();
     this.#refCounts = new Map();
     this.#maxSize = maxSize;
+    this.#ttl = ttl;
   }
 
   #dispose(key: K) {
@@ -37,7 +40,7 @@ class LRUCache<K, V> implements Cache<K, V> {
     }
   }
 
-  #evict(): void {
+  #evict() {
     for (const key of this.#cache.keys()) {
       if ((this.#refCounts.get(key) ?? 0) > 0) {
         continue;
@@ -48,11 +51,21 @@ class LRUCache<K, V> implements Cache<K, V> {
     }
   }
 
+  #tryEvictExpired(key: K) {
+    const entry = this.#cache.get(key);
+    if (!entry || entry.expiresAt > Date.now()) return;
+    if ((this.#refCounts.get(key) ?? 0) > 0) return;
+    this.#dispose(key);
+  }
+
   has(key: K) {
+    this.#tryEvictExpired(key);
     return this.#cache.has(key);
   }
 
   get(key: K) {
+    this.#tryEvictExpired(key);
+
     const entry = this.#cache.get(key);
 
     if (!entry) return undefined;
@@ -76,6 +89,7 @@ class LRUCache<K, V> implements Cache<K, V> {
     this.#cache.set(key, {
       value: value(controller.signal),
       controller,
+      expiresAt: Date.now() + this.#ttl,
     });
   }
 
@@ -113,18 +127,18 @@ class LRUCache<K, V> implements Cache<K, V> {
 }
 
 export type CachePolicy =
-  | { type: 'keep-all' }
-  | { type: 'most-recent' }
-  | { type: 'lru'; maxSize: number };
+  | { type: 'keep-all'; ttl?: number }
+  | { type: 'most-recent'; ttl?: number }
+  | { type: 'lru'; maxSize: number; ttl?: number };
 
 const cacheFromPolicy = <K, V>(policy: CachePolicy): Cache<K, V> => {
   switch (policy.type) {
     case 'keep-all':
-      return new LRUCache<K, V>(Number.POSITIVE_INFINITY);
+      return new LRUCache<K, V>(Number.POSITIVE_INFINITY, policy.ttl);
     case 'most-recent':
-      return new LRUCache<K, V>(1);
+      return new LRUCache<K, V>(1, policy.ttl);
     case 'lru':
-      return new LRUCache<K, V>(policy.maxSize);
+      return new LRUCache<K, V>(policy.maxSize, policy.ttl);
     default:
       return policy satisfies never;
   }
