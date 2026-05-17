@@ -31,6 +31,8 @@ const selectorFamily: <T, P extends SerializableParam>(
     - `{ type: 'most-recent' }` - Only the last parameter's selector instance will be cached.
     - `{ type: 'lru'; maxSize: number }` - Only the most recent `maxSize` selector instances will be cached.
 
+    Every variant additionally accepts an optional `ttl: number` (in milliseconds). The timer starts when an entry is added to the cache, and the expired entry is evicted lazily on the next access. While an entry has active subscribers (i.e. it's [mounted](./state.md#mounting)), eviction is deferred - the entry remains stable until it is unreferenced again.
+
 :::info
 Stan does not rely on referential equality for `selectorFamily` parameters, so there's no need to maintain stable references. Cache keys are computed by serializing (stable stringification) the parameter values - hence the [serializability](../guides/param-serialization.md) requirement.
 :::
@@ -66,6 +68,23 @@ const userById = selectorFamily<Promise<User>, string>(
     cachePolicy: {
       type: 'lru',
       maxSize: 5,
+    },
+  },
+);
+```
+
+Same, but also refresh each cached request after a minute:
+
+```ts
+const userById = selectorFamily<Promise<User>, string>(
+  userId =>
+    ({ signal }) =>
+      getUser(userId, { signal }),
+  {
+    cachePolicy: {
+      type: 'lru',
+      maxSize: 5,
+      ttl: 60_000,
     },
   },
 );

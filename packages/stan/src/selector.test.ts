@@ -504,4 +504,148 @@ describe('selectorFamily', () => {
     expect(signals[0].aborted).toBe(true);
     expect(signals[1].aborted).toBe(false);
   });
+
+  it('should expire cached entry when ttl elapses', () => {
+    jest.useFakeTimers();
+
+    try {
+      const family = selectorFamily<number, { multiplier: number }>(
+        ({ multiplier }) =>
+          () =>
+            multiplier * 42,
+        {
+          cachePolicy: { type: 'keep-all', ttl: 1000 },
+        },
+      );
+      const store = makeStore();
+
+      const state1 = family({ multiplier: 2 })(store);
+
+      expect(family({ multiplier: 2 })(store)).toBe(state1);
+
+      jest.advanceTimersByTime(1001);
+
+      expect(family({ multiplier: 2 })(store)).not.toBe(state1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('should keep cached entry while within ttl', () => {
+    jest.useFakeTimers();
+
+    try {
+      const family = selectorFamily<number, { multiplier: number }>(
+        ({ multiplier }) =>
+          () =>
+            multiplier * 42,
+        {
+          cachePolicy: { type: 'keep-all', ttl: 1000 },
+        },
+      );
+      const store = makeStore();
+
+      const state1 = family({ multiplier: 2 })(store);
+
+      jest.advanceTimersByTime(500);
+
+      expect(family({ multiplier: 2 })(store)).toBe(state1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('should defer ttl eviction while mounted', () => {
+    jest.useFakeTimers();
+
+    try {
+      const family = selectorFamily<number, { multiplier: number }>(
+        ({ multiplier }) =>
+          () =>
+            multiplier * 42,
+        {
+          cachePolicy: { type: 'keep-all', ttl: 1000 },
+        },
+      );
+      const store = makeStore();
+
+      const state1 = family({ multiplier: 2 })(store);
+      const unsub = state1.subscribe(jest.fn());
+
+      jest.advanceTimersByTime(1001);
+
+      expect(family({ multiplier: 2 })(store)).toBe(state1);
+
+      unsub();
+
+      expect(family({ multiplier: 2 })(store)).not.toBe(state1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('should combine ttl with size cap', () => {
+    jest.useFakeTimers();
+
+    try {
+      const family = selectorFamily<number, { multiplier: number }>(
+        ({ multiplier }) =>
+          () =>
+            multiplier * 42,
+        {
+          cachePolicy: { type: 'lru', maxSize: 2, ttl: 1000 },
+        },
+      );
+      const store = makeStore();
+
+      const state1 = family({ multiplier: 2 })(store);
+      const state2 = family({ multiplier: 3 })(store);
+
+      // Size cap evicts {multiplier:2} on third insertion
+      const state3 = family({ multiplier: 4 })(store);
+
+      expect(family({ multiplier: 4 })(store)).toBe(state3);
+      expect(family({ multiplier: 3 })(store)).toBe(state2);
+      expect(family({ multiplier: 2 })(store)).not.toBe(state1);
+
+      // TTL evicts what's left on next access
+      jest.advanceTimersByTime(1001);
+
+      expect(family({ multiplier: 3 })(store)).not.toBe(state2);
+      expect(family({ multiplier: 4 })(store)).not.toBe(state3);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('should abort work when evicted due to ttl', () => {
+    jest.useFakeTimers();
+
+    try {
+      const signals: AbortSignal[] = [];
+      const family = selectorFamily(
+        (n: number) =>
+          ({ signal }) => {
+            signals.push(signal);
+            return n;
+          },
+        {
+          cachePolicy: { type: 'keep-all', ttl: 1000 },
+        },
+      );
+      const store = makeStore();
+
+      family(1)(store).get();
+      expect(signals[0].aborted).toBe(false);
+
+      jest.advanceTimersByTime(1001);
+
+      family(1)(store).get();
+
+      expect(signals[0].aborted).toBe(true);
+      expect(signals[1].aborted).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });

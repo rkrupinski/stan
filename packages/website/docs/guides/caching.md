@@ -17,6 +17,8 @@ I'm not entirely sure what he meant, but let's talk about caching. Unlike [Jotai
 
 Wherever the term "caching" appears in the context of Stan, it refers to Stan's internal cache. Depending on the caching policy, this cache can store a single value, multiple values, or an unlimited number of values (effectively capped by system memory). When the cache limit is reached, the least recently used item is evicted, provided it is not mounted (see [mounting](../api/state.md#mounting)). Eviction is deferred while an item is in a mounted state.
 
+In addition to size-based eviction, every cache policy supports an optional time-based one - see the `ttl` setting in the [`selectorFamily`](../api/selectorFamily.md) documentation. The same defer-while-mounted rule applies.
+
 ## `Store`
 
 Every state change in Stan occurs within the context of a store (see [`Scoped<T>`](../api/store.md#scopedt)). You can think of it as each piece of state being cached using the `Store` instance as the cache key. A state change scoped to a specific store exists only within that store - which can, in fact, be leveraged to your advantage (see [switching stores](https://github.com/rkrupinski/stan/tree/master/packages/examples/react-switching-stores)).
