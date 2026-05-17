@@ -83,7 +83,7 @@ const searchResults = selectorFamily<SearchResult[], string>(
 );
 ```
 
-`cachePolicy`: `{ type: 'keep-all' }` (default) | `{ type: 'most-recent' }` | `{ type: 'lru', maxSize }`.
+`cachePolicy`: `{ type: 'keep-all' }` (default) | `{ type: 'most-recent' }` | `{ type: 'lru', maxSize }`. Every variant additionally accepts an optional `ttl: number` (ms); the timer starts when an entry is added and expired entries are evicted lazily on next access. Eviction is deferred while an entry has subscribers (same defer-while-mounted rule as size-based eviction).
 
 ### `refresh` / `reset`
 
@@ -371,9 +371,11 @@ const results = selectorFamily<Result[], string>(
       const res = await fetch(`/api/search?q=${query}`, { signal });
       return res.json();
     },
-  { cachePolicy: { type: 'lru', maxSize: 5 } },
+  { cachePolicy: { type: 'lru', maxSize: 5, ttl: 60_000 } },
 );
 ```
+
+`maxSize` caps how many parameterized instances are retained; `ttl` (optional, ms) additionally evicts entries that have outlived the window on next access. Both rules respect mounted entries.
 
 ### Refresh one member of a family
 
@@ -421,7 +423,7 @@ function UserName() {
 - **Async selectors auto-abort on dep change.** Always pass `signal` through to `fetch` (or other cancellable APIs) - otherwise in-flight work leaks and results can race.
 - **Family params must be JSON-serializable.** Keys are normalized via `fast-json-stable-stringify` (property order doesn't matter), but functions, symbols, class instances, and `Date`s will either break or stringify unstably.
 - **`atomFamily` retains every member for the life of the store.** It has no eviction policy and no `cachePolicy` option. Each unique param creates a permanent atom (and runs its effects). Don't feed unbounded user input into an atom family.
-- **`selectorFamily`'s `cachePolicy` controls which family _members_ are retained, not whether their _values_ are memoized.** A selector always re-evaluates when its dependencies change - `cachePolicy` (`keep-all` | `most-recent` | `lru`) only decides how many parameterized selector instances the family remembers. It is not a "cache the result for N seconds" knob.
+- **`selectorFamily`'s `cachePolicy` controls which family _members_ are retained, not whether their _values_ are memoized.** A selector always re-evaluates when its dependencies change - `cachePolicy` (`keep-all` | `most-recent` | `lru`) decides how many parameterized selector instances the family remembers, and the optional `ttl` adds time-based eviction of those instances (an evicted instance is rebuilt and re-evaluated on next access). It is not a per-value "cache the result for N ms" knob.
 - **Equality defaults to strict equality.** Setting an object or array produces a new reference and will always notify subscribers, even if the contents are identical. Pass `areValuesEqual` when structural equality matters.
 - **Atom effects run lazily** on first access, not at `atom(...)` definition time. `init()` is only valid during that first-read phase; calling it later is a no-op.
 - **Errors in selectors:** synchronous errors throw out of `.get()`; async errors surface through `useStanValueAsync` as `{ type: 'error', reason }`. Wrap your own try/catch inside the selector if you want a fallback value instead.
