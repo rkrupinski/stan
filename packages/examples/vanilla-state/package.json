@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@rkrupinski/stan": "2.0.0"
+    "@rkrupinski/stan": "workspace:*"
   },
   "devDependencies": {
     "typescript": "5.9.3",

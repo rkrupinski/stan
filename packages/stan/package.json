@@ -42,7 +42,7 @@
     "test": "jest",
     "build": "rm -rf dist && rollup --config",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "prepublishOnly": "yarn typecheck && yarn lint && yarn test && yarn build"
+    "prepublishOnly": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
     "fast-json-stable-stringify": "2.1.0"
@@ -58,8 +58,10 @@
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.2.0",
     "@types/jest": "29.5.14",
+    "@types/node": "^22.19.19",
     "@types/react": ">=19.0.0",
     "@types/react-dom": ">=19.0.0",
+    "@vue/test-utils": "^2.4.6",
     "eslint": "9.27.0",
     "eslint-import-resolver-typescript": "4.3.5",
     "eslint-plugin-import": "2.31.0",
@@ -77,8 +79,7 @@
     "tslib": "2.8.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.32.1",
-    "vue": "^3.5.0",
-    "@vue/test-utils": "^2.4.6"
+    "vue": "^3.5.0"
   },
   "peerDependencies": {
     "react": ">=19.0.0",
