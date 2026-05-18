@@ -1,21 +1,12 @@
 {
   "private": true,
-  "workspaces": [
-    "packages/stan",
-    "packages/website",
-    "packages/devtools",
-    "packages/examples/*",
-    "skills/*"
-  ],
+  "packageManager": "pnpm@11.1.3",
   "scripts": {
-    "typecheck": "wsrun -p @rkrupinski/stan -p devtools -c typecheck",
-    "lint": "wsrun -p @rkrupinski/stan -p devtools -c lint",
-    "test": "wsrun -p @rkrupinski/stan -p devtools -c test",
-    "build": "wsrun -p @rkrupinski/stan -p devtools -tc build",
-    "validate": "wsrun -p skill -c validate",
-    "format": "wsrun -mc format"
-  },
-  "devDependencies": {
-    "wsrun": "5.2.4"
+    "typecheck": "pnpm --filter @rkrupinski/stan --filter devtools typecheck",
+    "lint": "pnpm --filter @rkrupinski/stan --filter devtools lint",
+    "test": "pnpm --filter @rkrupinski/stan --filter devtools test",
+    "build": "pnpm --filter @rkrupinski/stan --filter devtools build",
+    "validate": "pnpm --filter skill validate",
+    "format": "pnpm -r --if-present format"
   }
 }

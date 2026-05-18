@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@rkrupinski/stan": "2.0.0",
+    "@rkrupinski/stan": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "yup": "1.6.1"

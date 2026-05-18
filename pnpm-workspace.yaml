@@ -1,0 +1,10 @@
+packages:
+  - "packages/stan"
+  - "packages/website"
+  - "packages/devtools"
+  - "packages/examples/*"
+  - "skills/*"
+allowBuilds:
+  core-js: true
+  esbuild: true
+  unrs-resolver: true
