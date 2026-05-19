@@ -2,6 +2,7 @@ packages:
   - "packages/stan"
   - "packages/website"
   - "packages/devtools"
+  - "packages/benchmark"
   - "packages/examples/*"
   - "skills/*"
 allowBuilds:
