@@ -66,50 +66,45 @@ export const selector = <T>(
 
     const subscribers = new Set<(newValue: T) => void>();
 
-    const makeGetter =
-      (id: number, nextDeps: Map<string, DepEntry>) =>
-      <D>(scopedState: Scoped<State<D>>) => {
-        const state = scopedState(store);
-        const value = state.get();
-
-        if (id === evalId && store.trackDep(key, state.key)) {
-          const existing = deps.get(state.key);
-
-          if (existing) {
-            nextDeps.set(state.key, existing);
-            deps.delete(state.key);
-          } else {
-            const entry: DepEntry = { state };
-
-            if (store.isMounted(key)) {
-              entry.unsub = state.subscribe(() => refresh());
-            }
-
-            nextDeps.set(state.key, entry);
-          }
-        }
-
-        return value;
-      };
-
     const notifySubscribers = () => {
       [...subscribers].forEach(cb => cb(store.peek<T>(key)));
     };
-
-    let evalId = 0;
 
     const evaluate = () => {
       store.resetDeps(key);
 
       controller?.abort(new Aborted());
       controller = new AbortController();
+      const signal = controller.signal;
 
       const nextDeps = new Map<string, DepEntry>();
 
       evaluating = true;
       const candidate = selectorFn({
-        get: makeGetter(++evalId, nextDeps),
-        signal: controller.signal,
+        get: <D>(scopedState: Scoped<State<D>>) => {
+          const state = scopedState(store);
+          const value = state.get();
+
+          if (!signal.aborted && store.trackDep(key, state.key)) {
+            const existing = deps.get(state.key);
+
+            if (existing) {
+              nextDeps.set(state.key, existing);
+              deps.delete(state.key);
+            } else {
+              const entry: DepEntry = { state };
+
+              if (store.isMounted(key)) {
+                entry.unsub = state.subscribe(() => refresh());
+              }
+
+              nextDeps.set(state.key, entry);
+            }
+          }
+
+          return value;
+        },
+        signal,
       });
       evaluating = false;
 
