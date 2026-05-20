@@ -1,5 +1,8 @@
 import { atomFamily as stanAtomFamily, makeStore } from '@rkrupinski/stan';
-import { atom as jotaiAtom, createStore as createJotaiStore } from 'jotai/vanilla';
+import {
+  atom as jotaiAtom,
+  createStore as createJotaiStore,
+} from 'jotai/vanilla';
 import { atomFamily as jotaiAtomFamily } from 'jotai/vanilla/utils';
 
 import type { Scenario } from '../libs/types';
@@ -36,9 +39,10 @@ export const s7Family: Scenario = {
     },
     jotai: () => {
       const store = createJotaiStore();
-      const family = jotaiAtomFamily<number, ReturnType<typeof jotaiAtom<number>>>(
-        () => jotaiAtom(0),
-      );
+      const family = jotaiAtomFamily<
+        number,
+        ReturnType<typeof jotaiAtom<number>>
+      >(() => jotaiAtom(0));
       for (let k = 0; k < FAMILY_SIZE; k++) family(k);
       let i = 0;
       let sink = 0;

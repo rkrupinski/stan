@@ -1,5 +1,8 @@
 import { atom as stanAtom, makeStore, selector } from '@rkrupinski/stan';
-import { atom as jotaiAtom, createStore as createJotaiStore } from 'jotai/vanilla';
+import {
+  atom as jotaiAtom,
+  createStore as createJotaiStore,
+} from 'jotai/vanilla';
 
 import type { Scenario } from '../libs/types';
 

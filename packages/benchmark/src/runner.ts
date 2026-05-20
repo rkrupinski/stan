@@ -73,8 +73,7 @@ export async function runScenario(scenario: Scenario): Promise<Row[]> {
       continue;
     }
     const hz = r.throughput.mean;
-    const ratio =
-      stanHz && stanHz > 0 ? hz / stanHz : Number.POSITIVE_INFINITY;
+    const ratio = stanHz && stanHz > 0 ? hz / stanHz : Number.POSITIVE_INFINITY;
     rows.push({
       Scenario: scenario.name,
       Library: lib,
