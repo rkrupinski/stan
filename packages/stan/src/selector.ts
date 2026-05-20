@@ -32,6 +32,11 @@ type SelectorCtx = {
   [UNMOUNT_TAG]?: () => void;
 };
 
+type DepEntry = {
+  state: State<unknown>;
+  unsub?: () => void;
+};
+
 export const selector = <T>(
   selectorFn: SelectorFn<T>,
   { tag, areValuesEqual = dejaVu }: SelectorOptions = {},
@@ -44,8 +49,9 @@ export const selector = <T>(
   const key = `@@selector${tag ? `[${tag}]` : ''}-${++selectorId}`;
 
   return memoize(store => () => {
-    const subs = new Set<() => () => void>();
-    const unsubs = new Set<() => void>();
+    let deps = new Map<string, DepEntry>();
+
+    let evaluating = false;
 
     let controller: AbortController | null = null;
 
@@ -61,33 +67,30 @@ export const selector = <T>(
     const subscribers = new Set<(newValue: T) => void>();
 
     const makeGetter =
-      (id: number) =>
+      (id: number, nextDeps: Map<string, DepEntry>) =>
       <D>(scopedState: Scoped<State<D>>) => {
         const state = scopedState(store);
         const value = state.get();
 
         if (id === evalId && store.trackDep(key, state.key)) {
-          const sub = () =>
-            state.subscribe(() => {
-              refresh();
-            });
+          const existing = deps.get(state.key);
 
-          subs.add(sub);
+          if (existing) {
+            nextDeps.set(state.key, existing);
+            deps.delete(state.key);
+          } else {
+            const entry: DepEntry = { state };
 
-          if (store.isMounted(key)) {
-            unsubs.add(sub());
+            if (store.isMounted(key)) {
+              entry.unsub = state.subscribe(() => refresh());
+            }
+
+            nextDeps.set(state.key, entry);
           }
         }
 
         return value;
       };
-
-    const cleanup = () => {
-      store.resetDeps(key);
-      subs.clear();
-      unsubs.forEach(unsub => unsub());
-      unsubs.clear();
-    };
 
     const notifySubscribers = () => {
       [...subscribers].forEach(cb => cb(store.peek<T>(key)));
@@ -96,15 +99,22 @@ export const selector = <T>(
     let evalId = 0;
 
     const evaluate = () => {
-      cleanup();
+      store.resetDeps(key);
 
       controller?.abort(new Aborted());
       controller = new AbortController();
 
+      const nextDeps = new Map<string, DepEntry>();
+
+      evaluating = true;
       const candidate = selectorFn({
-        get: makeGetter(++evalId),
+        get: makeGetter(++evalId, nextDeps),
         signal: controller.signal,
       });
+      evaluating = false;
+
+      deps.forEach(entry => entry.unsub?.());
+      deps = nextDeps;
 
       const valueChanged =
         !store.has(key) || !areValuesEqual(store.peek<T>(key), candidate);
@@ -117,6 +127,8 @@ export const selector = <T>(
     };
 
     const refresh = () => {
+      if (evaluating) return;
+
       if (store.isMounted(key)) {
         evaluate();
       } else {
@@ -125,18 +137,18 @@ export const selector = <T>(
     };
 
     const onMount = () => {
-      subs.forEach(sub => {
-        unsubs.add(sub());
+      deps.forEach(entry => {
+        entry.unsub = entry.state.subscribe(() => refresh());
       });
       store.mount(key);
       onMountCb?.();
     };
 
     const onUnmount = () => {
-      unsubs.forEach(unsub => {
-        unsub();
+      deps.forEach(entry => {
+        entry.unsub?.();
+        entry.unsub = undefined;
       });
-      unsubs.clear();
       store.unmount(key);
       onUnmountCb?.();
     };
