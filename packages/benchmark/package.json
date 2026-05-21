@@ -1,0 +1,31 @@
+{
+  "name": "benchmark",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "bench": "NODE_ENV=production tsx src/index.ts",
+    "lint": "eslint --cache --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@rkrupinski/stan": "workspace:*",
+    "jotai": "^2.10.3",
+    "tinybench": "^3.0.6",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.27.0",
+    "@rkrupinski/prettierconfig": "1.0.1",
+    "@types/node": "^22.10.2",
+    "eslint": "9.27.0",
+    "eslint-import-resolver-typescript": "4.3.5",
+    "eslint-plugin-import": "2.31.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.19.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.32.1"
+  },
+  "prettier": "@rkrupinski/prettierconfig"
+}

@@ -2,8 +2,8 @@
   "private": true,
   "packageManager": "pnpm@11.1.3",
   "scripts": {
-    "typecheck": "pnpm --filter @rkrupinski/stan --filter devtools typecheck",
-    "lint": "pnpm --filter @rkrupinski/stan --filter devtools lint",
+    "typecheck": "pnpm --filter @rkrupinski/stan --filter devtools --filter benchmark typecheck",
+    "lint": "pnpm --filter @rkrupinski/stan --filter devtools --filter benchmark lint",
     "test": "pnpm --filter @rkrupinski/stan --filter devtools test",
     "build": "pnpm --filter @rkrupinski/stan --filter devtools build",
     "validate": "pnpm --filter skill validate",
