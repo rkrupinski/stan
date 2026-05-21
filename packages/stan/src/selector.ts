@@ -54,6 +54,8 @@ export const selector = <T>(
     let evaluating = false;
 
     let controller: AbortController | null = null;
+    let gen = 0;
+    let active = 0;
 
     eraseSignal?.addEventListener(
       'abort',
@@ -74,8 +76,12 @@ export const selector = <T>(
       store.resetDeps(key);
 
       controller?.abort(new Aborted());
-      controller = new AbortController();
-      const signal = controller.signal;
+      controller = null;
+
+      const myGen = ++gen;
+      active = myGen;
+
+      let mySignal: AbortSignal | undefined;
 
       const nextDeps = new Map<string, DepEntry>();
 
@@ -85,7 +91,7 @@ export const selector = <T>(
           const state = scopedState(store);
           const value = state.get();
 
-          if (!signal.aborted && store.trackDep(key, state.key)) {
+          if (myGen === active && store.trackDep(key, state.key)) {
             const existing = deps.get(state.key);
 
             if (existing) {
@@ -104,7 +110,13 @@ export const selector = <T>(
 
           return value;
         },
-        signal,
+        get signal() {
+          if (!mySignal) {
+            controller = new AbortController();
+            mySignal = controller.signal;
+          }
+          return mySignal;
+        },
       });
       evaluating = false;
 
