@@ -11,7 +11,7 @@ const FAMILY_SIZE = 1000;
 
 export const s7Family: Scenario = {
   id: 's7',
-  name: `atomFamily (${FAMILY_SIZE} keys) — single-key update per tick`,
+  name: `atomFamily (${FAMILY_SIZE} keys) - single-key update per tick`,
   adapters: {
     stan: () => {
       const store = makeStore();

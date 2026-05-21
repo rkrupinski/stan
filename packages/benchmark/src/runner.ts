@@ -81,7 +81,7 @@ export async function runScenario(scenario: Scenario): Promise<Row[]> {
       'mean (μs)': fmt(r.latency.mean * 1000, 2),
       'p99 (μs)': fmt((r.latency.p99 ?? r.latency.max) * 1000, 2),
       samples: r.latency.samples.length,
-      'vs Stan': lib === 'stan' ? '—' : `${fmt(ratio, 2)}×`,
+      'vs Stan': lib === 'stan' ? '-' : `${fmt(ratio, 2)}×`,
     });
   }
   return rows;

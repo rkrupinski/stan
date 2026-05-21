@@ -37,7 +37,7 @@ const FeatureList: FeatureItem[] = [
 
 const Feature: FC<FeatureItem> = ({ num, title, icon, description }) => (
   <div className={styles.feature}>
-    <div className={styles.featureNum}>— {num}</div>
+    <div className={styles.featureNum}>- {num}</div>
     <div className={styles.featureIcon}>{icon}</div>
     <Heading as="h3" className={styles.featureTitle}>
       {title}

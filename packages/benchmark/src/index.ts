@@ -19,7 +19,7 @@ const scenarios = [
 
 async function main() {
   console.log(
-    `\nStan vanilla benchmark — Stan vs. Jotai vs. Zustand` +
+    `\nStan vanilla benchmark - Stan vs. Jotai vs. Zustand` +
       `\nNode ${process.version} · ${process.platform}/${process.arch}` +
       `\nNODE_ENV=${process.env.NODE_ENV}\n`,
   );
