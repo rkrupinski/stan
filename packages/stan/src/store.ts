@@ -18,6 +18,24 @@ let storeId = 0;
 
 type Deps = Map<string, number>;
 
+type Entry = {
+  value: unknown;
+  version: number;
+  deps: Deps | null;
+  mounted: boolean;
+  initialized: boolean;
+  hasValue: boolean;
+};
+
+const newEntry = (): Entry => ({
+  value: undefined,
+  version: 0,
+  deps: null,
+  mounted: false,
+  initialized: false,
+  hasValue: false,
+});
+
 export type StoreOptions = {
   tag?: string;
 };
@@ -29,12 +47,7 @@ export class Store {
   key: string;
   libVersion: string = process.env.STAN_VERSION;
 
-  #deps = new Map<string, Deps>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  #values = new Map<string, any>();
-  #versions = new Map<string, number>();
-  #mounted = new Map<string, boolean>();
-  #initialized = new Map<string, boolean>();
+  #entries = new Map<string, Entry>();
 
   constructor({ tag }: StoreOptions = {}) {
     this.key = `@@store${tag ? `[${tag}]` : ''}-${storeId++}`;
@@ -50,12 +63,17 @@ export class Store {
     }
   }
 
+  #touch(key: string): Entry {
+    let e = this.#entries.get(key);
+    if (!e) {
+      e = newEntry();
+      this.#entries.set(key, e);
+    }
+    return e;
+  }
+
   destroy() {
-    this.#deps.clear();
-    this.#values.clear();
-    this.#versions.clear();
-    this.#mounted.clear();
-    this.#initialized.clear();
+    this.#entries.clear();
 
     if (process.env.NODE_ENV !== 'production') {
       window.__STAN_DEVTOOLS__?.unregister(this);
@@ -63,100 +81,97 @@ export class Store {
   }
 
   erase(key: string) {
-    this.#deps.delete(key);
-    this.#values.delete(key);
-    this.#versions.delete(key);
-    this.#mounted.delete(key);
-    this.#initialized.delete(key);
+    this.#entries.delete(key);
     this.#emit({ type: 'DELETE', key });
   }
 
   /** @internal */
   has(key: string) {
-    return this.#values.has(key);
+    return this.#entries.get(key)?.hasValue ?? false;
   }
 
   /** @internal */
   peek<T>(key: string): T {
-    return this.#values.get(key) as T;
+    return this.#entries.get(key)?.value as T;
   }
 
   /** @internal */
   seed(key: string, v: unknown) {
-    this.#values.set(key, v);
+    const e = this.#touch(key);
+    e.value = v;
+    e.hasValue = true;
     this.#emit({ type: 'SET', key, value: v });
   }
 
   /** @internal */
   commit(key: string, v: unknown) {
-    this.#versions.set(key, (this.#versions.get(key) ?? 0) + 1);
-    this.#values.set(key, v);
+    const e = this.#touch(key);
+    e.version += 1;
+    e.value = v;
+    e.hasValue = true;
     this.#emit({ type: 'SET', key, value: v });
   }
 
   /** @internal */
   versionOf(key: string) {
-    return this.#versions.get(key) ?? 0;
+    return this.#entries.get(key)?.version ?? 0;
   }
 
   /** @internal */
   isReady(key: string) {
-    return !!this.#initialized.get(key);
+    return this.#entries.get(key)?.initialized ?? false;
   }
 
   /** @internal */
   markReady(key: string) {
-    this.#initialized.set(key, true);
+    this.#touch(key).initialized = true;
   }
 
   /** @internal */
   markStale(key: string) {
-    this.#initialized.set(key, false);
+    this.#touch(key).initialized = false;
   }
 
   /** @internal */
   isMounted(key: string) {
-    return !!this.#mounted.get(key);
+    return this.#entries.get(key)?.mounted ?? false;
   }
 
   /** @internal */
   mount(key: string) {
-    this.#mounted.set(key, true);
+    this.#touch(key).mounted = true;
   }
 
   /** @internal */
   unmount(key: string) {
-    this.#mounted.set(key, false);
+    this.#touch(key).mounted = false;
   }
 
   /** @internal */
   resetDeps(key: string) {
-    const d = this.#deps.get(key);
-    if (d) {
-      d.clear();
+    const e = this.#touch(key);
+    if (e.deps) {
+      e.deps.clear();
     } else {
-      this.#deps.set(key, new Map());
+      e.deps = new Map();
     }
   }
 
   /** @internal */
   trackDep(key: string, depKey: string) {
-    let d = this.#deps.get(key);
-    if (!d) {
-      d = new Map();
-      this.#deps.set(key, d);
-    }
-    if (d.has(depKey)) return false;
-    d.set(depKey, this.#versions.get(depKey) ?? 0);
+    const e = this.#touch(key);
+    if (!e.deps) e.deps = new Map();
+    if (e.deps.has(depKey)) return false;
+    e.deps.set(depKey, this.#entries.get(depKey)?.version ?? 0);
     return true;
   }
 
   /** @internal */
-  depsChanged(key: string) {
-    const d = this.#deps.get(key);
+  depsChanged(key: string): boolean {
+    const d = this.#entries.get(key)?.deps;
     if (!d || !d.size) return false;
-    for (const [k, v] of d.entries()) {
-      if ((this.#versions.get(k) ?? 0) !== v) return true;
+    for (const [k, v] of d) {
+      if ((this.#entries.get(k)?.version ?? 0) !== v) return true;
     }
     for (const k of d.keys()) {
       if (this.depsChanged(k)) return true;
@@ -165,8 +180,10 @@ export class Store {
   }
 
   /** @internal */
-  entries(): IterableIterator<[string, unknown]> {
-    return this.#values.entries();
+  *entries(): IterableIterator<[string, unknown]> {
+    for (const [k, e] of this.#entries) {
+      if (e.hasValue) yield [k, e.value];
+    }
   }
 }
 
