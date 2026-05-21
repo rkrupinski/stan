@@ -27,7 +27,7 @@ type Entry = {
   hasValue: boolean;
 };
 
-const newEntry = (): Entry => ({
+const makeEntry = (): Entry => ({
   value: undefined,
   version: 0,
   deps: null,
@@ -66,7 +66,7 @@ export class Store {
   #touch(key: string): Entry {
     let e = this.#entries.get(key);
     if (!e) {
-      e = newEntry();
+      e = makeEntry();
       this.#entries.set(key, e);
     }
     return e;
